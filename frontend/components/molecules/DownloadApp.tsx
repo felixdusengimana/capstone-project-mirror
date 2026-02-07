@@ -14,7 +14,7 @@ export default function DownloadApp({
   return (
     <div
       {...props}
-      className={`flex items-center gap-4 px-10 py-4 border ${
+      className={`flex items-center gap-4 lg:px-10 px-5 lg:py-4 py-2 border ${
         transparent
           ? "bg-[#20202466] backdrop-blur-md"
           : "border-[#202024] bg-[#202024]"

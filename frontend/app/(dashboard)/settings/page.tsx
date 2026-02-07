@@ -8,7 +8,7 @@ import React from "react";
 
 export default function page() {
   return (
-    <div className="min-h-full w-full px-[218px] text-black pb-10">
+    <div className="min-h-full w-full dashboard-padding text-black pb-10">
       <Headline className="text-gray-700 text-4xl">Settings</Headline>
       <div className="max-w-[900px] bg-white px-[67px] py-[55px] w-full rounded-lg mt-8 flex gap-28 justify-between items-start">
         <div className="max-w-[307px]">

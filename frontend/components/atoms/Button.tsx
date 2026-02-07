@@ -24,9 +24,9 @@ export default function Button({ ...props }: ButtonProps) {
   };
 
   const sizeClasses = {
-    sm: "px-2 py-1",
-    md: "px-8 py-4",
-    lg: "px-6 py-3",
+    sm: "lg:px-2 md:px-1 py-1",
+    md: "lg:px-8 md:px-6 px-4 lg:py-4 md:py-2 py-1",
+    lg: "lg:px-6 md:px-4 px-2 lg:py-3 md:py-2 py-1",
   };
 
   const borderClasses = bordered ? "border border-black" : "";
@@ -34,7 +34,7 @@ export default function Button({ ...props }: ButtonProps) {
   return (
     <button
       {...props}
-      className={`text-xl font-normal rounded-full ${
+      className={`lg:text-xl md:text-lg text-base font-normal rounded-full ${
         outline ? "border border-gray-200" : variantClasses[variant]
       } ${sizeClasses[size]} ${borderClasses} ${props.className}`}
     >

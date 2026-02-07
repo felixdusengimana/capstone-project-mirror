@@ -7,7 +7,7 @@ import Trusties from "../molecules/Trusties";
 
 export default function Intro() {
   return (
-    <div className="grid grid-cols-2 pl-[252px]">
+    <div className="grid grid-cols-1 lg:grid-cols-2 pl-24 pr-24 lg:pr-0 lg:pl-[252px] ">
       <div className="mt-40">
         <Headline className="text-[64px] leading-[79.47px]">
           Search and gift your favorite creators
@@ -17,14 +17,17 @@ export default function Intro() {
           love!
         </p>
 
-        <CreatorSearchModal className="min-w-[502px]" />
+        <CreatorSearchModal className="min-w-[300px] md:min-w-[502px]" />
         <Trusties />
-        <div className="flex gap-6 mt-6">
-          <DownloadApp os="android" />
-          <DownloadApp os="ios" className="px-[42px]" />
+        <div className="flex gap-2 lg:gap-6 mt-6 flex-wrap">
+          <DownloadApp os="android" className="flex-grow  max-w-[202px]" />
+          <DownloadApp
+            os="ios"
+            className="lg:px-[42px] flex-grow max-w-[202px]"
+          />
         </div>
       </div>
-      <div className="h-full w-full">
+      <div className="h-full w-full hidden lg:block">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="./home-bg.png" alt="" className="w-full h-full" />
       </div>

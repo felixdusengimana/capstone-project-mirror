@@ -17,11 +17,11 @@ export default function Layout({ children }: { children: ReactNode }) {
       <div
         className={`flex-grow bg-white ${
           isCreator ? "pt-[78px]" : "py-[78px]"
-        } px-[120px] overflow-auto`}
+        } px-10 md:px-16 lg:px-[120px] overflow-auto`}
       >
         {children}
       </div>
-      <div className="w-[667px] overflow-hidden relative">
+      <div className="w-[667px] overflow-hidden relative hidden md:block">
         {/* texts */}
         <div className="h-full w-full absolute z-20 bg-transparent px-12 py-[78px] flex flex-col justify-between">
           <div>
@@ -34,7 +34,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           </div>
           <div className="mt-auto">
             <Trusties className="text-[#fff]" />
-            <div className="flex gap-6 mt-6">
+            <div className="flex flex-wrap gap-6 mt-6">
               <DownloadApp os="android" transparent />
               <DownloadApp os="ios" transparent />
             </div>

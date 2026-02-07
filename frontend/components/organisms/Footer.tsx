@@ -3,8 +3,8 @@ import Icon from "../atoms/Icon";
 
 export default function Footer() {
   return (
-    <div className="flex justify-between gap-10 page-padding">
-      <div className="flex gap-[55px]">
+    <div className="flex justify-between gap-10 flex-wrap page-padding">
+      <div className="flex flex-wrap gap-[55px]">
         <p className="font-normal text-lg text-[#8A8A8B]">
           @ {new Date().getFullYear()} Pesatone
         </p>

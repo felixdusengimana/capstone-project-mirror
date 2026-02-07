@@ -6,7 +6,7 @@ import React from "react";
 
 export default function page() {
   return (
-    <div className="min-h-full w-full px-[218px] text-black pb-10">
+    <div className="min-h-full w-full dashboard-padding text-black pb-10">
       <div className="w-full flex justify-between gap-10 items-center">
         <div>
           <p className="text-gray-500 text-sm font-medium">10 Supporters</p>

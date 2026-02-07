@@ -33,7 +33,7 @@ export default function page() {
     },
   ];
   return (
-    <div className="min-h-full w-full px-[218px] text-black pb-10">
+    <div className="min-h-full w-full dashboard-padding text-black pb-10">
       <Headline className="text-gray-700 text-4xl">Payouts</Headline>
 
       <div className="w-full flex justify-between gap-10 items-center bg-white mt-8 px-6 py-7 rounded-lg">

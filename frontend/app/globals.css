@@ -22,6 +22,7 @@
 body {
   background: var(--bg);
   color: rgb(var(--foreground-rgb));
+  font-size: 16px;
 }
 
 @layer utilities {
@@ -32,4 +33,37 @@ body {
 
 .page-padding {
   padding: 0 252px;
+}
+
+.dashboard-padding {
+  padding: 0 218px;
+}
+
+@media screen and (max-width: 1024px) {
+  body {
+    font-size: 14px;
+  }
+
+  .page-padding {
+    padding: 0 100px;
+  }
+
+  .dashboard-padding {
+    padding: 0 100px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  body {
+    font-size: 12px;
+  }
+
+  .page-padding {
+    padding: 0 50px;
+  }
+
+  .dashboard-padding {
+    padding: 0 50px;
+  }
+
 }

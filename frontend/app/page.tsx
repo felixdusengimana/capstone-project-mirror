@@ -13,7 +13,7 @@ import React from "react";
 
 export default function page() {
   return (
-    <div className="py-[73px]">
+    <div className="py-12 md:py-14 lg:py-[73px]">
       <Navbar />
       <Intro />
       <section className="mt-24 page-padding">
@@ -23,7 +23,7 @@ export default function page() {
             Unleash Your Influence with Our Exclusive Features
           </Headline>
         </div>
-        <div className="grid grid-cols-3 gap-[18px] mt-12">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-[18px] mt-12">
           <Card title="Secure Transactions" icon="secure">
             Pesatone employs advanced encryption for secure transactions,
             safeguarding you and your fans
@@ -47,7 +47,7 @@ export default function page() {
             Experience the Benefits: Pesatone for Fans and Creators
           </Headline>
         </div>
-        <div className="grid grid-cols-2 gap-[18px] mt-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-[18px] mt-12">
           <div className="grid grid-cols-2 w-fit">
             <Avatar
               alt="Profile 1"
@@ -97,7 +97,7 @@ export default function page() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-[18px]  mt-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-[18px]  mt-12">
           <div className="flex flex-col justify-center">
             <h5 className="uppercase text-[#8A8A8B] mb-6">For creators</h5>
             <div className="flex flex-col gap-4">
@@ -149,7 +149,7 @@ export default function page() {
       </section>
 
       <section className="mt-24 page-padding">
-        <div className="grid grid-cols-4 grid-rows-3 min-h-[862px] gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 grid-rows-9 md:grid-rows-6 lg:grid-rows-3 min-h-[862px] gap-6">
           <div className="bg-[url('/creator-bg.png')] bg-cover bg-no-repeat row-span-2 bg-transparent rounded-[32px] px-6 flex items-center justify-center">
             <CreatorSearchModal className="border-2 border-r-[#ffffff79] w-[252px]" />
           </div>
@@ -275,7 +275,7 @@ export default function page() {
           <Headline className="max-w-[767px] text-[47px] text-center">
             Empowering African Influencers, One Tip at a Time.
           </Headline>
-          <div className="flex gap-6">
+          <div className="flex flex-wrap gap-6">
             <DownloadApp os="android" className="bg-black border-black" />
             <DownloadApp os="ios" className="bg-black border-black" />
           </div>

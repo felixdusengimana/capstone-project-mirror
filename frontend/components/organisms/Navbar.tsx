@@ -4,11 +4,11 @@ import Logo from "../molecules/Logo";
 
 export default function Navbar() {
   return (
-    <div className="page-padding flex justify-between items-center">
+    <div className="page-padding w-full flex justify-between items-center">
       <Logo />
       <div className="flex items-center gap-6">
         <Link href={"/login"}>
-          <Button variant="secondary" className="px-12">
+          <Button variant="secondary" className="lg:px-12">
             Login
           </Button>
         </Link>

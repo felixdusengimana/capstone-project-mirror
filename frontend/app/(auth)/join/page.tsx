@@ -118,7 +118,7 @@ export default function Join() {
         </div>
       ) : null}
 
-      <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+      <div className="flex items-center flex-wrap justify-between pt-6 border-t border-gray-200">
         <Button
           type="button"
           outline={true}
