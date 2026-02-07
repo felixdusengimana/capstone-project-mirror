@@ -18,7 +18,7 @@ export default function Card({ ...props }: CardProps) {
       {icon && <CardIcon icon={icon} />}
       <Headline className="text-2xl font-normal mt-6 w-full">{title}</Headline>
       <div
-        className={`text-gray-600 font-normal text-xl mt-4 max-w-[333px] ${props.className}`}
+        className={`text-[#8A8A8B] font-normal text-xl mt-4 max-w-[333px] ${props.className}`}
       >
         {props.children}
       </div>

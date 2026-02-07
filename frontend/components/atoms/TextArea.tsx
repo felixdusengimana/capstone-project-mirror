@@ -21,7 +21,7 @@ export default function TextArea({ ...props }: TextAreaProps) {
       )}
       <textarea
         {...props}
-        className={`bg-slate-50 py-[13px] min-h-[102px] px-4 border border-[#E5E9F0] outline-none w-full rounded-xl ${props.className}`}
+        className={`bg-slate-50 py-[13px] min-h-[102px] px-4 border border-[#E5E9F0] text-black outline-none w-full rounded-xl ${props.className}`}
         id={props.id ?? id}
       />
     </div>

@@ -18,6 +18,7 @@ export default function Avatar({ ...props }: AvatarProps) {
     circle = true,
     fallBackText,
     bordered,
+    className,
     ...rest
   } = props;
 
@@ -34,15 +35,15 @@ export default function Avatar({ ...props }: AvatarProps) {
       {...rest}
       className={`${src ? "bg-transparent" : "bg-gray-100"} ${
         circle ? "rounded-full" : "rounded"
-      } ${bordered ? "border-2 border-white" : ""} ${sizeClasses[size]} ${
-        rest.className
-      } flex items-center justify-center overflow-hidden`}
+      } ${bordered ? "border-2 border-white" : ""} ${
+        sizeClasses[size]
+      } ${className} flex items-center justify-center overflow-hidden`}
     >
       {src ? (
         <img
           src={src}
           alt={alt}
-          className={`w-full ${sizeClasses[size]} object-cover`}
+          className={`w-full h-full ${sizeClasses[size]} object-cover`}
         />
       ) : fallBackText ? (
         fallBackText

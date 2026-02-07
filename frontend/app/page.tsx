@@ -18,7 +18,7 @@ export default function page() {
       <Intro />
       <section className="mt-24 page-padding">
         <div className="max-w-[503px] mx-auto text-center">
-          <h5 className="uppercase text-gray-600 mb-4">features</h5>
+          <h5 className="uppercase text-[#8A8A8B] mb-4">features</h5>
           <Headline className="text-4xl text-center">
             Unleash Your Influence with Our Exclusive Features
           </Headline>
@@ -42,7 +42,7 @@ export default function page() {
 
       <section className="mt-24 page-padding">
         <div className="max-w-[543px] mx-auto text-center">
-          <h5 className="uppercase text-gray-600 mb-4">BENEFITS</h5>
+          <h5 className="uppercase text-[#8A8A8B] mb-4">BENEFITS</h5>
           <Headline className="text-4xl text-center">
             Experience the Benefits: Pesatone for Fans and Creators
           </Headline>
@@ -79,7 +79,7 @@ export default function page() {
             />
           </div>
           <div className="flex flex-col justify-center">
-            <h5 className="uppercase text-gray-600 mb-6">For Fans</h5>
+            <h5 className="uppercase text-[#8A8A8B] mb-6">For Fans</h5>
             <div className="flex flex-col gap-4">
               <SmallCard icon="check" title="Direct Interaction">
                 Engage directly with your favorite influencers, fostering a
@@ -99,7 +99,7 @@ export default function page() {
 
         <div className="grid grid-cols-2 gap-[18px]  mt-12">
           <div className="flex flex-col justify-center">
-            <h5 className="uppercase text-gray-600 mb-6">For creators</h5>
+            <h5 className="uppercase text-[#8A8A8B] mb-6">For creators</h5>
             <div className="flex flex-col gap-4">
               <SmallCard icon="check" title="Monetize Your Passion">
                 Turn your passion into profit by receiving tips and donations

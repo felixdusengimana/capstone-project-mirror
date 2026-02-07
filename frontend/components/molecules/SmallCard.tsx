@@ -11,7 +11,7 @@ export default function SmallCard({ ...props }: SmallCardProps) {
   return (
     <div className="flex gap-6">
       <CardIcon icon={props.icon} />
-      <p className="text-gray-600 font-normal text-xl">
+      <p className="text-[#8A8A8B] font-normal text-xl">
         <span className="text-white font-mono">{props.title} </span>
         {props.children}
       </p>

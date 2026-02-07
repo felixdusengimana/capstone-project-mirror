@@ -4,6 +4,7 @@ import Icon from "../atoms/Icon";
 import Dialog, { DialogRoot, DialogTrigger } from "./Dialog";
 import Profile from "./Profile";
 import SearchInput from "./SearchInput";
+import Link from "next/link";
 
 interface SearchTriggerProps extends ComponentProps<"div"> {
   placeholder?: string;
@@ -39,15 +40,17 @@ export default function CreatorSearchModal({ ...props }: SearchTriggerProps) {
         <SearchInput />
         <div className="px-4 flex flex-col gap-4">
           {[...Array(5)].map((_, i) => (
-            <Profile
-              user={{
-                name: "John Doe",
-                username: "johndoe",
-                photo: `/profiles/profile${(i % 4) + 1}.png`,
-              }}
-              verified={i % 2 === 0}
-              key={i}
-            />
+            <Link key={i} href={`/creator/${i}`}>
+              {" "}
+              <Profile
+                user={{
+                  name: "John Doe",
+                  username: "johndoe",
+                  photo: `/profiles/profile${(i % 4) + 1}.png`,
+                }}
+                verified={i % 2 === 0}
+              />
+            </Link>
           ))}
         </div>
       </Dialog>

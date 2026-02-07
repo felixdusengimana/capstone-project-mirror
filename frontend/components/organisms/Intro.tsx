@@ -3,6 +3,7 @@
 import Headline from "@/components/atoms/Headline";
 import DownloadApp from "../molecules/DownloadApp";
 import CreatorSearchModal from "../molecules/CreatorSearchModal";
+import Trusties from "../molecules/Trusties";
 
 export default function Intro() {
   return (
@@ -11,16 +12,13 @@ export default function Intro() {
         <Headline className="text-[64px] leading-[79.47px]">
           Search and gift your favorite creators
         </Headline>
-        <p className="text-xl text-gray-600 max-w-[535px] mt-5">
+        <p className="text-xl text-[#8A8A8B] max-w-[535px] mt-5 mb-10">
           A place where fans show gratitude to the African content creators they
           love!
         </p>
 
-        <CreatorSearchModal />
-        <p className="text-gray-600 mt-24 text-base">
-          Trusted Users <br />
-          Rated 4.5 by 700K+ Customers
-        </p>
+        <CreatorSearchModal className="min-w-[502px]" />
+        <Trusties />
         <div className="flex gap-6 mt-6">
           <DownloadApp os="android" />
           <DownloadApp os="ios" className="px-[42px]" />

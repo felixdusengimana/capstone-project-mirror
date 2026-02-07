@@ -5,13 +5,13 @@ export default function Footer() {
   return (
     <div className="flex justify-between gap-10 page-padding">
       <div className="flex gap-[55px]">
-        <p className="font-normal text-lg text-gray-600">
+        <p className="font-normal text-lg text-[#8A8A8B]">
           @ {new Date().getFullYear()} Pesatone
         </p>
-        <Link href={"/"} className="font-normal text-lg text-gray-600">
+        <Link href={"/"} className="font-normal text-lg text-[#8A8A8B]">
           Terms of Use
         </Link>
-        <Link href={"/"} className="font-normal text-lg text-gray-600">
+        <Link href={"/"} className="font-normal text-lg text-[#8A8A8B]">
           Privacy Policy
         </Link>
       </div>

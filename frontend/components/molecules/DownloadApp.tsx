@@ -3,13 +3,22 @@ import Icon from "../atoms/Icon";
 
 interface DownloadAppProps extends ComponentProps<"div"> {
   os: "android" | "ios";
+  transparent?: boolean;
 }
 
-export default function DownloadApp({ os, ...props }: DownloadAppProps) {
+export default function DownloadApp({
+  os,
+  transparent,
+  ...props
+}: DownloadAppProps) {
   return (
     <div
       {...props}
-      className={`flex items-center gap-4 px-10 py-4 border border-[#202024] bg-[#202024] rounded-full cursor-pointer min-w-[202.09px] ${props.className}`}
+      className={`flex items-center gap-4 px-10 py-4 border ${
+        transparent
+          ? "bg-[#20202466] backdrop-blur-md"
+          : "border-[#202024] bg-[#202024]"
+      } rounded-full cursor-pointer min-w-[202.09px] ${props.className}`}
     >
       <Icon name={os == "android" ? "google-play" : "apple-store"} />
       <div>
