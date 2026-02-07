@@ -1,0 +1,35 @@
+import Avatar from "@/components/atoms/Avatar";
+import Button from "@/components/atoms/Button";
+import Headline from "@/components/atoms/Headline";
+import Input from "@/components/atoms/Input";
+import TextArea from "@/components/atoms/TextArea";
+import React from "react";
+
+export default function page() {
+  return (
+    <div className="p-10 flex flex-col gap-3">
+      <div>
+        <h1>Button</h1>
+        <Button variant="secondary" size="sm">
+          Click me
+        </Button>
+      </div>
+      <div className="bg-black">
+        <h1 className="text-white">Header</h1>
+        <Headline>Search and gift your favorite creators</Headline>
+      </div>
+      <div>
+        <h1>Avatar</h1>
+        <Avatar src="https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg" />
+      </div>
+      <div>
+        <h1>input</h1>
+        <Input label="Email" />
+      </div>
+      <div>
+        <h1>text area</h1>
+        <TextArea placeholder="COde.py" label="Message" />
+      </div>
+    </div>
+  );
+}
