@@ -2,17 +2,17 @@
 import { ComponentProps, useEffect, useState } from "react";
 import Icon from "../atoms/Icon";
 
-interface SearchProps extends ComponentProps<"div"> {
+interface SearchInputProps extends ComponentProps<"div"> {
   placeholder?: string;
   onSearch?: (query: string) => void;
   onClear?: () => void;
 }
-export default function Search({
+export default function SearchInput({
   placeholder = "Search for creators",
   onSearch,
   onClear,
   ...props
-}: SearchProps) {
+}: SearchInputProps) {
   const [query, setQuery] = useState("");
 
   // return value after 300ms
@@ -30,15 +30,20 @@ export default function Search({
   return (
     <div
       {...props}
-      className={`flex bg-[#2C2C3033] px-5 py-4 gap-4 rounded-full ${props.className}`}
+      className={`flex border-b border-gray-900 w-full px-5 py-4 gap-4 ${props.className}`}
     >
-      <Icon name="search" onClick={() => onSearch?.(query)} />
+      <Icon
+        name="search"
+        onClick={() => onSearch?.(query)}
+        width={24}
+        height={25}
+        stroke="#000"
+      />
       <input
-        disabled
-        type="text"
-        placeholder={placeholder}
-        className="w-full text-white placeholder:text-white bg-transparent outline-none"
+        value={query}
         onChange={(e) => setQuery(e.target.value)}
+        placeholder={placeholder}
+        className="w-full text-black text-left placeholder:text-gray-400 bg-transparent outline-none"
       />
     </div>
   );

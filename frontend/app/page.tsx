@@ -2,8 +2,8 @@ import Avatar from "@/components/atoms/Avatar";
 import Headline from "@/components/atoms/Headline";
 import Icon from "@/components/atoms/Icon";
 import Card from "@/components/molecules/Card";
+import CreatorSearchModal from "@/components/molecules/CreatorSearchModal";
 import DownloadApp from "@/components/molecules/DownloadApp";
-import Search from "@/components/molecules/Search";
 import SmallCard from "@/components/molecules/SmallCard";
 import Transaction from "@/components/molecules/Transaction";
 import Footer from "@/components/organisms/Footer";
@@ -151,7 +151,7 @@ export default function page() {
       <section className="mt-24 page-padding">
         <div className="grid grid-cols-4 grid-rows-3 min-h-[862px] gap-6">
           <div className="bg-[url('/creator-bg.png')] bg-cover bg-no-repeat row-span-2 bg-transparent rounded-[32px] px-6 flex items-center justify-center">
-            <Search className="border-2 border-r-[#ffffff79] " />
+            <CreatorSearchModal className="border-2 border-r-[#ffffff79] w-[252px]" />
           </div>
           <div className="col-span-2">
             <Card

@@ -1,8 +1,8 @@
 "use client";
 
 import Headline from "@/components/atoms/Headline";
-import Search from "@/components/molecules/Search";
 import DownloadApp from "../molecules/DownloadApp";
+import CreatorSearchModal from "../molecules/CreatorSearchModal";
 
 export default function Intro() {
   return (
@@ -15,8 +15,8 @@ export default function Intro() {
           A place where fans show gratitude to the African content creators they
           love!
         </p>
-        <Search className="max-w-[502px] mt-10" />
 
+        <CreatorSearchModal />
         <p className="text-gray-600 mt-24 text-base">
           Trusted Users <br />
           Rated 4.5 by 700K+ Customers

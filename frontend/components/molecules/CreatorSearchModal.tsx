@@ -1,0 +1,56 @@
+"use client";
+import { ComponentProps, useEffect, useState } from "react";
+import Icon from "../atoms/Icon";
+import Dialog, { DialogRoot, DialogTrigger } from "./Dialog";
+import Profile from "./Profile";
+import SearchInput from "./SearchInput";
+
+interface SearchTriggerProps extends ComponentProps<"div"> {
+  placeholder?: string;
+}
+export function SearchTrigger({
+  placeholder = "Search for creators",
+  ...props
+}: SearchTriggerProps) {
+  return (
+    <div
+      {...props}
+      className={`flex bg-[#2C2C3033] w-full px-5 py-4 gap-4 rounded-full ${props.className}`}
+    >
+      <Icon name="search" />
+      <p className="w-full text-white text-left placeholder:text-white bg-transparent outline-none">
+        {placeholder}
+      </p>
+    </div>
+  );
+}
+
+export default function CreatorSearchModal({ ...props }: SearchTriggerProps) {
+  return (
+    <DialogRoot>
+      <DialogTrigger>
+        <SearchTrigger
+          placeholder="Search for creators"
+          className="mt-8 w-[502px]"
+          {...props}
+        />
+      </DialogTrigger>
+      <Dialog className="py-4">
+        <SearchInput />
+        <div className="px-4 flex flex-col gap-4">
+          {[...Array(5)].map((_, i) => (
+            <Profile
+              user={{
+                name: "John Doe",
+                username: "johndoe",
+                photo: `/profiles/profile${(i % 4) + 1}.png`,
+              }}
+              verified={i % 2 === 0}
+              key={i}
+            />
+          ))}
+        </div>
+      </Dialog>
+    </DialogRoot>
+  );
+}
