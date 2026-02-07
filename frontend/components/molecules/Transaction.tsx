@@ -18,11 +18,11 @@ export default function Transaction({
   currency,
   amount,
   status,
-  className,
+  className = "bg-white",
 }: TransactionProps) {
   return (
     <div
-      className={`flex justify-between gap-10 rounded-xl bg-white px-[11px] py-5 ${className}`}
+      className={`flex justify-between gap-10 rounded-xl  px-[11px] py-5 ${className}`}
     >
       <div className="flex gap-4">
         <Avatar src={user.photo} alt={user.name} />

@@ -177,6 +177,7 @@ export default function page() {
           </Card>
           <div className="col-span-2">
             <Card
+              containerClassName="h-full"
               className="max-w-full"
               title={
                 <p className="w-full text-center max-w-[277px] text-[30px] mx-auto">
@@ -186,7 +187,7 @@ export default function page() {
             >
               <div className="max-w-[316px] flex justify-center mx-auto relative">
                 <Transaction
-                  className="absolute z-40"
+                  className="absolute z-40 bg-white"
                   currency="RWF"
                   status="completed"
                   date={"Dec 9, 2022"}
