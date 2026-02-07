@@ -13,7 +13,7 @@ interface SearchTriggerProps extends ComponentProps<"div"> {
 }
 export function SearchTrigger({
   placeholder = "Search for creators",
-  className = "bg-[#2C2C3033]",
+  className,
   stroke,
   placeholderClassName = "text-white",
   ...props
@@ -21,7 +21,7 @@ export function SearchTrigger({
   return (
     <div
       {...props}
-      className={`flex w-full px-5 py-4 gap-4 rounded-full ${className}`}
+      className={`flex w-full px-5 py-4 gap-4 rounded-full bg-[#2C2C3033] ${className}`}
     >
       <Icon name="search" stroke={stroke} />
       <p
@@ -43,7 +43,7 @@ export default function CreatorSearchModal({
         <SearchTrigger
           placeholder="Search for creators"
           {...props}
-          className={`mt-8 min-w-[502px] ${className}`}
+          className={`mt-8 ${className}`}
         />
       </DialogTrigger>
       <Dialog className="py-4">

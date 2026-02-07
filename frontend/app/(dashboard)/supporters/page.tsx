@@ -8,7 +8,7 @@ export default function page() {
     <div className="min-h-full w-full px-[218px] text-black pb-10">
       <Headline className="text-gray-700 text-4xl mb-8">Creators</Headline>
       <CreatorSearchModal
-        className="w-[900px] rounded-lg bg-white text-black"
+        className="w-[900px] rounded-lg bg-[#fff] text-black"
         placeholderClassName="text-gray-600"
         stroke="#4B5563"
       />
