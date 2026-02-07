@@ -35,7 +35,7 @@ export default function SupportCreator() {
             label="Tip amount"
             placeholder="Tip amount"
             value={5000}
-            rightIcon={
+            right={
               <select className="bg-[#F7F9FB] text-[#475569]">
                 <option value="RWF">RWF</option>
               </select>

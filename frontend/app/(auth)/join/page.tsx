@@ -28,7 +28,9 @@ export default function Join() {
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        if (step === "4") router.replace("/dashboard");
+        if (step === "4") {
+          return router.replace("/dashboard");
+        }
         router.replace(`/join?step=${parseInt(step) + 1}`);
       }}
       className="flex flex-col text-gray-700 justify-between h-full"
@@ -49,10 +51,10 @@ export default function Join() {
             Choose your account type depending on your interest
           </p>
           <div className="flex justify-between gap-10 items-center mt-10">
-            <div>
+            <div className="max-w-[307px]">
               <label htmlFor="upload-profile-photo">
                 <Avatar src="" size="2xl" />
-                <div className="mt-6 text-xl font-normal rounded-full border border-gray-200 flex gap-1 px-4 py-3">
+                <div className="mt-6 text-xlfont-normal rounded-full border border-gray-200 flex gap-1 px-4 py-3">
                   <Icon name="camera" />
                   <p>Upload Profile</p>
                 </div>
@@ -65,7 +67,7 @@ export default function Join() {
                 id="upload-profile-photo"
               />
             </div>
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 flex-grow max-w-[438px]">
               <Input label="Your name" />
               <TextArea label="Bio" />
               <Input label="Industry" />
@@ -83,7 +85,7 @@ export default function Join() {
             label="PesaTag"
             className="mt-10"
             placeholder="username"
-            leftIcon={
+            left={
               <div className="flex items-center gap-0.5">
                 <Icon name="alt" />
                 <p className="text-[#475569]">Pesatone.com/</p>
@@ -102,7 +104,7 @@ export default function Join() {
             label="Instagram"
             className="mt-10"
             value={"https://www.instagram.com/theBen007/"}
-            leftIcon={
+            left={
               <Icon width={20} height={20} name="instagram" className="mr-2" />
             }
           />

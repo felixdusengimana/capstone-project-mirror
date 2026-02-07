@@ -1,6 +1,7 @@
-/* eslint-disable @next/next/no-img-element */
+"use client";
 import { ComponentProps } from "react";
 import Icon from "./Icon";
+import Image from "next/image";
 
 interface AvatarProps extends ComponentProps<"div"> {
   src: string;
@@ -37,12 +38,15 @@ export default function Avatar({ ...props }: AvatarProps) {
         circle ? "rounded-full" : "rounded"
       } ${bordered ? "border-2 border-white" : ""} ${
         sizeClasses[size]
-      } ${className} flex items-center justify-center overflow-hidden`}
+      } ${className} flex items-center justify-center overflow-hidden relative`}
     >
       {src ? (
-        <img
+        <Image
           src={src}
-          alt={alt}
+          alt={alt ?? ""}
+          loading="eager"
+          loader={({ src }) => src}
+          fill={true}
           className={`w-full h-full ${sizeClasses[size]} object-cover`}
         />
       ) : fallBackText ? (

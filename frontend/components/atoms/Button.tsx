@@ -1,7 +1,7 @@
 import { ComponentProps } from "react";
 
 interface ButtonProps extends ComponentProps<"button"> {
-  variant?: "dark" | "white" | "blurred" | "secondary";
+  variant?: "dark" | "white" | "blurred" | "secondary" | "danger";
   size?: "sm" | "md" | "lg";
   bordered?: boolean;
   outline?: boolean;
@@ -20,6 +20,7 @@ export default function Button({ ...props }: ButtonProps) {
     white: "bg-white text-black",
     secondary: "bg-secondary text-white",
     blurred: "bg-blurred text-white",
+    danger: "bg-red-600 text-white",
   };
 
   const sizeClasses = {

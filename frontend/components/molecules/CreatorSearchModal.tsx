@@ -8,32 +8,42 @@ import Link from "next/link";
 
 interface SearchTriggerProps extends ComponentProps<"div"> {
   placeholder?: string;
+  stroke?: string;
+  placeholderClassName?: string;
 }
 export function SearchTrigger({
   placeholder = "Search for creators",
+  className = "bg-[#2C2C3033]",
+  stroke,
+  placeholderClassName = "text-white",
   ...props
 }: SearchTriggerProps) {
   return (
     <div
       {...props}
-      className={`flex bg-[#2C2C3033] w-full px-5 py-4 gap-4 rounded-full ${props.className}`}
+      className={`flex w-full px-5 py-4 gap-4 rounded-full ${className}`}
     >
-      <Icon name="search" />
-      <p className="w-full text-white text-left placeholder:text-white bg-transparent outline-none">
+      <Icon name="search" stroke={stroke} />
+      <p
+        className={`w-full text-left bg-transparent outline-none ${placeholderClassName}`}
+      >
         {placeholder}
       </p>
     </div>
   );
 }
 
-export default function CreatorSearchModal({ ...props }: SearchTriggerProps) {
+export default function CreatorSearchModal({
+  className,
+  ...props
+}: SearchTriggerProps) {
   return (
     <DialogRoot>
       <DialogTrigger>
         <SearchTrigger
           placeholder="Search for creators"
-          className="mt-8 w-[502px]"
           {...props}
+          className={`mt-8 min-w-[502px] ${className}`}
         />
       </DialogTrigger>
       <Dialog className="py-4">

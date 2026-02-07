@@ -4,14 +4,21 @@ import { ComponentProps, ReactNode, useId, useState } from "react";
 interface InputProps extends ComponentProps<"input"> {
   label?: string;
   labelStyle?: string;
-  leftIcon?: ReactNode;
-  rightIcon?: ReactNode;
+  left?: ReactNode;
+  right?: ReactNode;
 }
 
-export default function Input({ ...props }: InputProps) {
-  const { label, labelStyle, leftIcon } = props;
-  const [value, setValue] = useState(props.value ?? "");
+export default function Input({ value, onChange, ...props }: InputProps) {
+  const { label, labelStyle, left, right } = props;
+  const [localValue, setLocalValue] = useState(value || "");
   const id = useId();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLocalValue(e.target.value);
+    if (onChange) {
+      onChange(e);
+    }
+  };
 
   return (
     <div className={`${props.className}`}>
@@ -26,16 +33,15 @@ export default function Input({ ...props }: InputProps) {
       <div
         className={`w-full flex items-center px-4 bg-slate-50 border rounded-xl  border-[#E5E9F0]`}
       >
-        {leftIcon && <>{leftIcon}</>}
+        {left && <>{left}</>}
         <input
           {...props}
-          value={value}
-          defaultValue={props.defaultValue ?? props.value}
-          onChange={(e) => setValue(e.target.value)}
+          value={localValue}
+          onChange={handleChange}
           className={`outline-none w-full py-[13px] bg-slate-50 text-black`}
           id={props.id ?? id}
         />
-        {props.rightIcon && <>{props.rightIcon}</>}
+        {right && <>{right}</>}
       </div>
     </div>
   );
