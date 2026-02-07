@@ -20,7 +20,7 @@ export default function page() {
 
       <div className="w-full flex justify-between gap-10 items-center mt-10">
         {/* Money Earned */}
-        <div className="flex-grow max-w-[438px] bg-white p-8 rounded-lg">
+        <div className="flex-grow bg-white p-8 rounded-lg">
           <CardIcon icon="coins" className="bg-gray-50" />
           <h3 className="font-medium text-sm text-gray-400 mt-6">
             Money Earned
@@ -32,7 +32,7 @@ export default function page() {
         </div>
 
         {/* Payouts */}
-        <div className="flex-grow max-w-[438px] bg-white p-8 rounded-lg">
+        <div className="flex-grow bg-white p-8 rounded-lg">
           <CardIcon icon="inbox-out" className="bg-gray-50" />
           <h3 className="font-medium text-sm text-gray-400 mt-6">Payouts</h3>
           <h1 className="text-gray-800 font-medium text-4xl mt-4">

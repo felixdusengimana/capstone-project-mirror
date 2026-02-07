@@ -52,7 +52,7 @@ export default function page() {
         </Button>
       </div>
 
-      <div className="max-w-[900px] bg-white px-[67px] py-[55px] w-full rounded-lg mt-8">
+      <div className="bg-white px-[67px] py-[55px] w-full rounded-lg mt-8">
         <p className="font-medium text-base text-gray-700 mb-4">
           Payouts History
         </p>
