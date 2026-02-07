@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #141416;
+  --bg-hover: #232326;
+  --secondary-color: #17171A;
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  background: var(--bg);
+  color: rgb(var(--foreground-rgb));
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+.page-padding {
+  padding: 0 252px;
+}
+
+.button-border-gradient {
+  color: #fff;
+  border: 2px double transparent;
+  font-size: 18px;
+  border: 2px solid;
+  background: #2C2C3033;
+  border-radius: 50px;
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
