@@ -16,7 +16,7 @@ export default function page() {
     <div className="py-12 md:py-14 lg:py-[73px]">
       <Navbar />
       <Intro />
-      <section className="mt-24 page-padding">
+      <section className="pt-24 page-padding">
         <div className="max-w-[503px] mx-auto text-center">
           <h5 className="uppercase text-[#8A8A8B] mb-4">features</h5>
           <Headline className="text-4xl text-center">
@@ -40,7 +40,7 @@ export default function page() {
         </div>
       </section>
 
-      <section className="mt-24 page-padding">
+      <section className="pt-20 page-padding">
         <div className="max-w-[543px] mx-auto text-center">
           <h5 className="uppercase text-[#8A8A8B] mb-4">BENEFITS</h5>
           <Headline className="text-4xl text-center">

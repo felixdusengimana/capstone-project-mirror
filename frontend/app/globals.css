@@ -32,7 +32,9 @@ body {
 }
 
 .page-padding {
-  padding: 0 252px;
+  width: 72%;
+  max-width: 1728px;
+  margin: 0 auto;
 }
 
 .dashboard-padding {
@@ -45,7 +47,7 @@ body {
   }
 
   .page-padding {
-    padding: 0 100px;
+    width: 90%;
   }
 
   .dashboard-padding {
@@ -59,7 +61,7 @@ body {
   }
 
   .page-padding {
-    padding: 0 50px;
+    width: 95%;
   }
 
   .dashboard-padding {

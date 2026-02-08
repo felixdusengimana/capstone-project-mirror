@@ -7,8 +7,8 @@ import Trusties from "../molecules/Trusties";
 
 export default function Intro() {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 pl-24 pr-24 lg:pr-0 lg:pl-[252px] ">
-      <div className="mt-40">
+    <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 page-padding">
+      <div className="mt-40 max-w-[722px]">
         <Headline className="text-[64px] leading-[79.47px]">
           Search and gift your favorite creators
         </Headline>
@@ -28,7 +28,6 @@ export default function Intro() {
         </div>
       </div>
       <div className="h-full w-full hidden lg:block">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="./home-bg.png" alt="" className="w-full h-full" />
       </div>
     </div>
