@@ -48,7 +48,7 @@ export default function page() {
           </Headline>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-[18px] mt-12">
-          <div className="grid grid-cols-2 w-fit">
+          <div className="hidden lg:grid grid-cols-2 w-fit">
             <Avatar
               alt="Profile 1"
               src="/profiles/profile4.png"
@@ -115,7 +115,7 @@ export default function page() {
               </SmallCard>
             </div>
           </div>
-          <div className="grid grid-cols-2 ml-auto w-fit">
+          <div className="hidden lg:grid grid-cols-2 ml-auto w-fit">
             <Avatar
               alt="Profile 1"
               src="/profiles/profile4.png"
@@ -148,9 +148,9 @@ export default function page() {
         </div>
       </section>
 
-      <section className="mt-24 page-padding">
+      <section className="pt-24 page-padding">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 grid-rows-9 md:grid-rows-6 lg:grid-rows-3 min-h-[862px] gap-6">
-          <div className="bg-[url('/creator-bg.png')] bg-cover bg-no-repeat row-span-2 bg-transparent rounded-[32px] px-6 flex items-center justify-center">
+          <div className="hidden lg:flex bg-[url('/creator-bg.png')] bg-cover bg-no-repeat row-span-2 bg-transparent rounded-[32px] px-6 items-center justify-center">
             <CreatorSearchModal className="border-2 border-r-[#ffffff79] w-[252px]" />
           </div>
           <div className="col-span-2">
@@ -234,7 +234,7 @@ export default function page() {
             </Card>
           </div>
 
-          <div className="bg-[url('/sent-bg.png')] bg-cover bg-no-repeat row-span-2 bg-transparent rounded-[32px] px-6 flex items-center justify-center">
+          <div className="bg-[url('/sent-bg.png')] bg-cover bg-no-repeat row-span-2 bg-transparent rounded-[32px] px-6 lg:flex hidden  items-center justify-center">
             <button className="border-2 relative border-white w-[100px] h-[100px] rounded-full flex items-center justify-center  backdrop-blur-xl">
               <Icon name="send" />
               <Icon
