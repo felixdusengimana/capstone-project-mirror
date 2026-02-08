@@ -14,11 +14,11 @@ export default function VerifyAccount({
   return (
     <DialogRoot>
       <DialogTrigger>
-        <div>
+        <div className="w-full">
           {trigger ?? (
-            <Button className="text-sm font-normal py-[11px] px-0 max-w-[204px]">
+            <button className="text-sm bg-gray-900 rounded-full font-normal py-[11px] w-[204px]">
               Get verified
-            </Button>
+            </button>
           )}
         </div>
       </DialogTrigger>
