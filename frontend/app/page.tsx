@@ -149,7 +149,7 @@ export default function page() {
       </section>
 
       <section className="pt-24 page-padding">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 grid-rows-9 md:grid-rows-6 lg:grid-rows-3 min-h-[862px] gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 grid-rows-5 md:grid-rows-5 lg:grid-rows-3 min-h-[862px] gap-6">
           <div className="hidden lg:flex bg-[url('/creator-bg.png')] bg-cover bg-no-repeat row-span-2 bg-transparent rounded-[32px] px-6 items-center justify-center">
             <CreatorSearchModal className="border-2 border-r-[#ffffff79] w-[252px]" />
           </div>
@@ -270,7 +270,7 @@ export default function page() {
         </div>
       </section>
 
-      <section className="mt-8 lg:mt-24 page-padding">
+      <section className="pt-8 lg:pt-24 page-padding">
         <div className="bg-[url('/lines-bg.png')] bg-cover bg-no-repeat row-span-2 bg-transparent min-h-[450px] rounded-[32px] px-6 flex flex-col gap-[53px] items-center justify-center">
           <Headline className="max-w-[767px] text-[47px] text-center">
             Empowering African Influencers, One Tip at a Time.

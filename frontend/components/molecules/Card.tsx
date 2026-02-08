@@ -14,7 +14,9 @@ interface CardProps {
 export default function Card({ ...props }: CardProps) {
   const { icon, title, containerClassName, ...rest } = props;
   return (
-    <div className={`bg-[#171719] p-8 rounded-[23px] ${containerClassName}`}>
+    <div
+      className={`bg-[#171719] p-8 rounded-[23px] w-full  ${containerClassName}`}
+    >
       {icon && <CardIcon icon={icon} />}
       <Headline className="text-2xl font-normal mt-6 w-full">{title}</Headline>
       <div
