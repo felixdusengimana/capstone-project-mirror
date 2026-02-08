@@ -4,8 +4,11 @@ import Icon from "@/components/atoms/Icon";
 import Input from "@/components/atoms/Input";
 import CardIcon from "@/components/molecules/CardIcon";
 import Profile from "@/components/molecules/Profile";
-import React from "react";
-
+import dynamic from "next/dynamic";
+const ShareProfile = dynamic(
+  () => import("@/components/molecules/ShareProfile"),
+  { ssr: false }
+);
 export default function page() {
   return (
     <div className="min-h-full w-full dashboard-padding text-black pb-32">
@@ -23,9 +26,7 @@ export default function page() {
             }}
             verified={true}
           />
-          <Button className="flex gap-0.5 items-center">
-            <p className="font-medium text-sm text-white">Share profile</p>
-          </Button>
+          <ShareProfile />
         </div>
         <div className="flex justify-between items-center">
           <div className="max-w-[476px]">

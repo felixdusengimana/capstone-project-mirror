@@ -21,8 +21,13 @@ export default function WithdrawForm({
           )}
         </div>
       </DialogTrigger>
-      <Dialog className="p-10 bg-[#F0F2F7]">
-        <div className="w-full py-6 pb-16 bg-white rounded-lg">
+      <Dialog
+        className="p-10"
+        style={{
+          background: "#F0F2F7",
+        }}
+      >
+        <div className="w-full py-6 pb-16 bg-white rounded-lg border-gray-200">
           <div className="px-8 border-b border-gray-100 pb-6 mb-6">
             <p className="text-gray-500 text-base font-light">
               Available to withdraw
@@ -58,7 +63,14 @@ export default function WithdrawForm({
         </div>
         <div className="flex flex-col gap-4">
           <Button className="w-full mt-8">Withdraw 50,000 RWF</Button>
-          <Button className="w-full bg-gray-200 text-[#4B5563]">Cancel</Button>
+          <Button
+            className="w-full bg-gray-200 text-[#4B5563]"
+            style={{
+              color: "#4B5563",
+            }}
+          >
+            Cancel
+          </Button>
         </div>
       </Dialog>
     </DialogRoot>

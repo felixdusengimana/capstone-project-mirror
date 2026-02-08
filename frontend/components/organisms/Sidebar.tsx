@@ -6,6 +6,11 @@ import Icon, { IconNames } from "../atoms/Icon";
 import Link from "next/link";
 import Image from "next/image";
 import Button from "../atoms/Button";
+import dynamic from "next/dynamic";
+const VerifyAccount = dynamic(
+  () => import("@/components/molecules/VerifyAccount"),
+  { ssr: false }
+);
 
 interface SidebarProps extends ComponentProps<"div"> {}
 
@@ -73,9 +78,7 @@ export default function Sidebar({ className, ...props }: SidebarProps) {
         <p className="text-center text-[#475569] text-sm font-normal">
           Verify your account now to unlock exclusive benefits!
         </p>
-        <Button className="text-sm font-normal py-[11px] px-0 max-w-[204px]">
-          Get verified
-        </Button>
+        <VerifyAccount />
       </div>
 
       <div>
