@@ -270,7 +270,7 @@ export default function page() {
         </div>
       </section>
 
-      <section className="mt-24 page-padding">
+      <section className="mt-8 lg:mt-24 page-padding">
         <div className="bg-[url('/lines-bg.png')] bg-cover bg-no-repeat row-span-2 bg-transparent min-h-[450px] rounded-[32px] px-6 flex flex-col gap-[53px] items-center justify-center">
           <Headline className="max-w-[767px] text-[47px] text-center">
             Empowering African Influencers, One Tip at a Time.
