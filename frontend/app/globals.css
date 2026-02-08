@@ -31,6 +31,10 @@ body {
   }
 }
 
+.heading {
+  font-size: clamp(2.25rem, 5.4vw, 4.5rem);
+}
+
 .page-padding {
   width: 72%;
   max-width: 1728px;
