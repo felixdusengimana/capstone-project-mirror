@@ -6,7 +6,9 @@ import React from "react";
 export default function page() {
   return (
     <div className="min-h-full w-full dashboard-padding text-black pb-10">
-      <Headline className="text-gray-700 text-4xl mb-8">Creators</Headline>
+      <Headline className="text-4xl font-sans font-bold text-[#1A1A1A]">
+        Creators
+      </Headline>
       <CreatorSearchModal
         className="min-w-[900px] rounded-lg bg-[#fff] text-black"
         placeholderClassName="text-gray-600"

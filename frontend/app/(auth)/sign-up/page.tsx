@@ -5,7 +5,6 @@ import Input from "@/components/atoms/Input";
 import ThirdPartyLogin from "@/components/molecules/ThirdPartyLogin";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React from "react";
 
 export default function Register() {
   const router = useRouter();
@@ -33,8 +32,12 @@ export default function Register() {
           <p className="text-gray-400 leading-6">OR</p>
           <div className="bg-gray-400 h-[1px] w-[105.5px]" />
         </div>
-        <Input label="Email" className="mb-4" />
-        <Input label="Password" type="password" />
+        <Input
+          label="Email"
+          className="mb-4"
+          placeholder="Eg: fullname@email.com"
+        />
+        <Input label="Password" type="password" placeholder="● ● ● ● ● ● ●" />
       </div>
 
       <div className="flex items-center flex-wrap justify-between pt-6 border-t border-gray-200">

@@ -1,7 +1,7 @@
 import React, { ComponentProps } from "react";
 import Icon, { IconNames } from "../atoms/Icon";
 
-interface CardIconProps extends ComponentProps<"div"> {
+interface CardIconProps extends ComponentProps<"svg"> {
   icon: IconNames;
 }
 export default function CardIcon({
@@ -12,10 +12,9 @@ export default function CardIcon({
 }: CardIconProps) {
   return (
     <div
-      {...rest}
       className={`w-16 min-w-[64px] h-16 rounded-[11px] bg-[#1A1A1C] flex items-center justify-center ${className}`}
     >
-      <Icon name={icon} />
+      <Icon {...rest} name={icon} />
     </div>
   );
 }

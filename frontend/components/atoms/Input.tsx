@@ -1,5 +1,6 @@
 "use client";
-import { ComponentProps, ReactNode, useId, useState } from "react";
+import { ComponentProps, ReactNode, useEffect, useId, useState } from "react";
+import Icon from "./Icon";
 
 interface InputProps extends ComponentProps<"input"> {
   label?: string;
@@ -11,6 +12,8 @@ interface InputProps extends ComponentProps<"input"> {
 export default function Input({ value, onChange, ...props }: InputProps) {
   const { label, labelStyle, left, right } = props;
   const [localValue, setLocalValue] = useState(value || "");
+  const isPassword = props.type === "password";
+  const [showPassword, setShowPassword] = useState(false);
   const id = useId();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,6 +22,10 @@ export default function Input({ value, onChange, ...props }: InputProps) {
       onChange(e);
     }
   };
+
+  useEffect(() => {
+    setLocalValue(value || "");
+  }, [value]);
 
   return (
     <div className={`${props.className}`}>
@@ -36,12 +43,24 @@ export default function Input({ value, onChange, ...props }: InputProps) {
         {left && <>{left}</>}
         <input
           {...props}
+          type={isPassword && showPassword ? "text" : props.type}
           value={localValue}
           onChange={handleChange}
           className={`outline-none w-full py-[13px] bg-slate-50 text-black`}
           id={props.id ?? id}
         />
-        {right && <>{right}</>}
+        {right ||
+          (isPassword && (
+            <div className="flex items-center gap-2">
+              {right}
+              {isPassword && (
+                <Icon
+                  name="eye"
+                  onClick={() => setShowPassword(!showPassword)}
+                />
+              )}
+            </div>
+          ))}
       </div>
     </div>
   );

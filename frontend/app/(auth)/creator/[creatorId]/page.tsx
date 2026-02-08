@@ -7,7 +7,7 @@ import TextArea from "@/components/atoms/TextArea";
 
 export default function SupportCreator() {
   return (
-    <div className="flex flex-col items-center gap-24 overflow-hidden  h-full">
+    <div className="flex flex-col items-center gap-24 h-full">
       <Headline className="text-[#374151] text-4xl text-center">
         Pesatone makes Supporting fun and easy.
       </Headline>

@@ -4,6 +4,8 @@ import { ComponentProps } from "react";
 import Profile from "../molecules/Profile";
 import Icon, { IconNames } from "../atoms/Icon";
 import Link from "next/link";
+import Image from "next/image";
+import Button from "../atoms/Button";
 
 interface SidebarProps extends ComponentProps<"div"> {}
 
@@ -20,11 +22,11 @@ export default function Sidebar({ className, ...props }: SidebarProps) {
       icon: "payouts",
       href: "/payouts",
     },
-    {
-      label: "Supporters",
-      icon: "flash",
-      href: "/supporters",
-    },
+    // {
+    //   label: "Supporters",
+    //   icon: "flash",
+    //   href: "/supporters",
+    // },
     {
       label: "Settings",
       icon: "settings",
@@ -35,7 +37,7 @@ export default function Sidebar({ className, ...props }: SidebarProps) {
   return (
     <div
       {...props}
-      className={`w-[393px] pt-[112px] pl-[91px] pr-[78px] border-r border-gray-300 overflow-hidden ${className}`}
+      className={`w-[393px] pt-[64px] pl-[72px] pr-[71px] border-r border-gray-300 overflow-x-hidden h-full pb-6 ${className}`}
     >
       <Profile
         user={{
@@ -64,6 +66,23 @@ export default function Sidebar({ className, ...props }: SidebarProps) {
             <p>{link.label}</p>
           </Link>
         ))}
+      </div>
+
+      <div className="flex flex-col mt-[152px] mb-[96px] gap-[15px] items-center justify-center bg-gray-50 border border-gray-200 px-[39px] py-[31px] rounded-lg">
+        <Image alt="" src="/dance.svg" width={204} height={130} />
+        <p className="text-center text-[#475569] text-sm font-normal">
+          Verify your account now to unlock exclusive benefits!
+        </p>
+        <Button className="text-sm font-normal py-[11px] px-0 max-w-[204px]">
+          Get verified
+        </Button>
+      </div>
+
+      <div>
+        <Button outline className="text-gray-900 flex gap-1 items-center">
+          <Icon name="logout" />
+          <p>Logout</p>
+        </Button>
       </div>
     </div>
   );

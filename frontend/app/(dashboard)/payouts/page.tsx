@@ -2,7 +2,11 @@ import Button from "@/components/atoms/Button";
 import Headline from "@/components/atoms/Headline";
 import Icon from "@/components/atoms/Icon";
 import Pill from "@/components/atoms/Pill";
-import React from "react";
+import dynamic from "next/dynamic";
+const WithdrawForm = dynamic(
+  () => import("@/components/molecules/WithdrawForm"),
+  { ssr: false }
+);
 
 export default function page() {
   const data = [
@@ -34,22 +38,21 @@ export default function page() {
   ];
   return (
     <div className="min-h-full w-full dashboard-padding text-black pb-10">
-      <Headline className="text-gray-700 text-4xl">Payouts</Headline>
+      <Headline className="text-4xl font-sans font-bold text-[#1A1A1A]">
+        Payouts
+      </Headline>
 
       <div className="w-full flex justify-between gap-10 items-center bg-white mt-8 px-6 py-7 rounded-lg">
         <div>
-          <p className="text-gray-500 text-sm font-medium">
+          <p className="text-gray-400 text-sm font-medium">
             Outstanding balance
           </p>
-          <h3 className=" text-gray-800 font-medium text-4xl mt-4">
+          <h3 className=" text-gray-800 font-medium text-4xl flex items-center gap-2 mt-4">
             <span className="font-normal text-base text-gray-400">RWF</span>{" "}
             150,000
           </h3>
         </div>
-        <Button className="flex gap-0.5 items-center">
-          <Icon name="cash-out" />
-          <p className="font-medium text-sm text-white">Withdraw</p>
-        </Button>
+        <WithdrawForm />
       </div>
 
       <div className="bg-white px-[67px] py-[55px] w-full rounded-lg mt-8">

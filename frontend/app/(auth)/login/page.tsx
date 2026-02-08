@@ -25,7 +25,7 @@ export default function Login() {
       </p>
       <div className="max-w-[562px]">
         <Headline className="text-gray-700 text-4xl mb-10">
-          Fund your creative work
+          Login into your account{" "}
         </Headline>
         <ThirdPartyLogin thirdParty="google" />
         <div className="my-6 flex gap-5 justify-center items-center">
@@ -35,20 +35,12 @@ export default function Login() {
         </div>
         <Input label="Email" className="mb-4" />
         <Input label="Password" type="password" />
+        <Link href={"/forgot-password"} className="text-right block">
+          Forgot password?
+        </Link>
+        <Button className="w-full mt-10">Login</Button>
       </div>
-
-      <div className="flex items-center flex-wrap justify-between pt-6 border-t border-gray-200">
-        <Button
-          type="button"
-          outline={true}
-          onClick={() => {
-            router.back();
-          }}
-        >
-          Back
-        </Button>
-        <Button className="px-[72px]">Login</Button>
-      </div>
+      <div></div>
     </form>
   );
 }
