@@ -1,5 +1,5 @@
 import Button from "@/components/atoms/Button";
-import Headline from "@/components/atoms/Headline";
+
 import Icon from "@/components/atoms/Icon";
 import Pill from "@/components/atoms/Pill";
 import dynamic from "next/dynamic";
@@ -38,9 +38,7 @@ export default function page() {
   ];
   return (
     <div className="min-h-full w-full dashboard-padding text-black pb-10">
-      <Headline className="text-4xl font-sans font-bold text-[#1A1A1A]">
-        Payouts
-      </Headline>
+      <h1 className="text-4xl font-sans font-bold text-[#1A1A1A]">Payouts</h1>
 
       <div className="w-full flex justify-between gap-10 items-center bg-white mt-8 px-6 py-7 rounded-lg">
         <div>

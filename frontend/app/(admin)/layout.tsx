@@ -1,5 +1,4 @@
 "use client";
-import Button from "@/components/atoms/Button";
 import { IconNames } from "@/components/atoms/Icon";
 import Sidebar from "@/components/organisms/Sidebar";
 import { ReactNode, useState } from "react";
@@ -11,12 +10,12 @@ export default function DashBoardLayout({ children }: { children: ReactNode }) {
     {
       label: "Home",
       icon: "dashboard",
-      href: "/dashboard",
+      href: "/ad",
     },
     {
-      label: "Payouts",
-      icon: "payouts",
-      href: "/payouts",
+      label: "Transactions",
+      icon: "transactions",
+      href: "/ad/transactions",
     },
     // {
     //   label: "Supporters",
@@ -24,9 +23,9 @@ export default function DashBoardLayout({ children }: { children: ReactNode }) {
     //   href: "/supporters",
     // },
     {
-      label: "Settings",
-      icon: "settings",
-      href: "/settings",
+      label: "Payouts",
+      icon: "payouts",
+      href: "/ad/payouts",
     },
   ] as { label: string; icon: IconNames; href: string }[];
 
@@ -37,15 +36,7 @@ export default function DashBoardLayout({ children }: { children: ReactNode }) {
           showSidebar ? "block" : "hidden"
         } absolute lg:relative lg:block`}
       >
-        <Sidebar links={links} />
-      </div>
-      <div className="flex-grow bg-[#F0F2F7] overflow-auto pt-0 lg:pt-[112px]">
-        {/* <div className="lg:hidden py-4">
-          <Button onClick={() => setShowSidebar(!showSidebar)}>
-            Open Sidebar
-          </Button>
-        </div> */}
-        {children}
+        <Sidebar links={links} isAdmin />
       </div>
     </div>
   );

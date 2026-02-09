@@ -1,5 +1,4 @@
 import Avatar from "@/components/atoms/Avatar";
-import Headline from "@/components/atoms/Headline";
 import Icon from "@/components/atoms/Icon";
 import Card from "@/components/molecules/Card";
 import CreatorSearchModal from "@/components/molecules/CreatorSearchModal";
@@ -19,21 +18,21 @@ export default function page() {
       <section className="pt-24 page-padding">
         <div className="max-w-[503px] mx-auto text-center">
           <h5 className="uppercase text-[#8A8A8B] mb-4">features</h5>
-          <Headline className="text-4xl text-center">
+          <h1 className="text-4xl font-mono text-center text-white">
             Unleash Your Influence with Our Exclusive Features
-          </Headline>
+          </h1>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-[18px] mt-12">
-          <Card title="Secure Transactions" icon="secure">
+          <Card glow title="Secure Transactions" icon="secure">
             Pesatone employs advanced encryption for secure transactions,
             safeguarding you and your fans
           </Card>
-          <Card title="Direct Engagement" icon="fast">
+          <Card glow title="Direct Engagement" icon="fast">
             Connect instantly with followers through Pesatone&apos;s
             user-friendly interface, fostering community and stronger
             relationships
           </Card>
-          <Card title="Transparent Earnings" icon="dollar">
+          <Card glow title="Transparent Earnings" icon="dollar">
             Gain clear insight into earnings with Pesatone, easily tracking tips
             and donations for effective financial management
           </Card>
@@ -43,9 +42,9 @@ export default function page() {
       <section className="pt-20 page-padding">
         <div className="max-w-[543px] mx-auto text-center">
           <h5 className="uppercase text-[#8A8A8B] mb-4">BENEFITS</h5>
-          <Headline className="text-4xl text-center">
+          <h1 className="text-4xl font-mono text-center text-white">
             Experience the Benefits: Pesatone for Fans and Creators
-          </Headline>
+          </h1>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-[18px] mt-12">
           <div className="hidden lg:grid grid-cols-2 w-fit">
@@ -270,11 +269,11 @@ export default function page() {
         </div>
       </section>
 
-      <section className="pt-8 lg:pt-24 page-padding">
+      <section className="p-8 lg:pt-24 page-padding">
         <div className="bg-[url('/lines-bg.png')] bg-cover bg-no-repeat row-span-2 bg-transparent min-h-[450px] rounded-[32px] px-6 flex flex-col gap-[53px] items-center justify-center">
-          <Headline className="max-w-[767px] text-[47px] text-center">
+          <h1 className="max-w-[767px] font-mono text-white text-[47px] text-center">
             Empowering African Influencers, One Tip at a Time.
-          </Headline>
+          </h1>
           <div className="flex flex-wrap gap-6">
             <DownloadApp os="android" className="bg-black border-black" />
             <DownloadApp os="ios" className="bg-black border-black" />

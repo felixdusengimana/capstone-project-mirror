@@ -37,6 +37,59 @@ export default function CreatorSearchModal({
   className,
   ...props
 }: SearchTriggerProps) {
+  const [query, setQuery] = useState("");
+  const dummyData = [
+    {
+      name: "Bruce Melodie",
+      username: "brucemelodie",
+      photo: "/profiles/profile1.png",
+      verified: true,
+    },
+    {
+      name: "Queen Cha",
+      username: "queencha",
+      photo: "/profiles/profile2.png",
+      verified: false,
+    },
+    {
+      name: "Riderman",
+      username: "riderman",
+      photo: "/profiles/profile3.png",
+      verified: true,
+    },
+    {
+      name: "Tom Close",
+      username: "tomclose",
+      photo: "/profiles/profile4.png",
+      verified: false,
+    },
+    {
+      name: "Christopher",
+      username: "christopher",
+      photo: "/profiles/profile1.png",
+      verified: true,
+    },
+    {
+      name: "Diamond Platnumz",
+      username: "diamondplatnumz",
+      photo: "/profiles/profile2.png",
+      verified: false,
+    },
+    {
+      name: "Davido",
+      username: "davido",
+      photo: "/profiles/profile3.png",
+      verified: true,
+    },
+  ];
+
+  const remaining = dummyData.filter(
+    (d) =>
+      d.name.toLocaleLowerCase().includes(query) ||
+      d.username.toLocaleLowerCase().includes(query) ||
+      !Boolean(query)
+  );
+
   return (
     <DialogRoot>
       <DialogTrigger>
@@ -46,22 +99,29 @@ export default function CreatorSearchModal({
           className={`mt-8 ${className}`}
         />
       </DialogTrigger>
-      <Dialog className="py-4">
-        <SearchInput />
-        <div className="px-4 flex flex-col gap-4">
-          {[...Array(5)].map((_, i) => (
-            <Link key={i} href={`/creator/${i}`}>
-              {" "}
-              <Profile
-                user={{
-                  name: "John Doe",
-                  username: "johndoe",
-                  photo: `/profiles/profile${(i % 4) + 1}.png`,
-                }}
-                verified={i % 2 === 0}
-              />
-            </Link>
-          ))}
+      <Dialog className="pt-4">
+        <SearchInput onSearch={(query) => setQuery(query)} />
+        <div className="">
+          {remaining.length > 0 ? (
+            remaining.map((art, i) => (
+              <Link
+                className="block py-3 px-4 hover:bg-gray-200"
+                key={i}
+                href={`/creator/${i}`}
+              >
+                <Profile
+                  user={{
+                    name: art.name,
+                    username: art.username,
+                    photo: art.photo,
+                  }}
+                  verified={i % 2 === 0}
+                />
+              </Link>
+            ))
+          ) : (
+            <p className="text-center text-gray-500 py-4">No results found</p>
+          )}
         </div>
       </Dialog>
     </DialogRoot>

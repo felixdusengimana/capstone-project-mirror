@@ -1,5 +1,5 @@
 import Button from "@/components/atoms/Button";
-import Headline from "@/components/atoms/Headline";
+
 import Icon from "@/components/atoms/Icon";
 import Input from "@/components/atoms/Input";
 import CardIcon from "@/components/molecules/CardIcon";
@@ -12,9 +12,7 @@ const ShareProfile = dynamic(
 export default function page() {
   return (
     <div className="min-h-full w-full dashboard-padding text-black pb-32">
-      <Headline className="text-4xl font-sans font-bold text-[#1A1A1A]">
-        Dashboard
-      </Headline>
+      <h1 className="text-4xl font-sans font-bold text-[#1A1A1A]">Dashboard</h1>
 
       <div className="w-full flex flex-col gap-10 bg-white mt-8 px-6 py-7 rounded-lg">
         <div className="flex justify-between ">

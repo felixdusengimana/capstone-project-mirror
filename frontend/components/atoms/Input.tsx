@@ -10,21 +10,38 @@ interface InputProps extends ComponentProps<"input"> {
 }
 
 export default function Input({ value, onChange, ...props }: InputProps) {
-  const { label, labelStyle, left, right } = props;
-  const [localValue, setLocalValue] = useState(value || "");
+  const { label, labelStyle, left, right, type = "text" } = props;
+  const [localValue, setLocalValue] = useState("");
   const isPassword = props.type === "password";
   const [showPassword, setShowPassword] = useState(false);
   const id = useId();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLocalValue(e.target.value);
+    const unFormatted =
+      type === "number"
+        ? e.target.value.replace(/[^0-9]/g, "")
+        : e.target.value;
+    const formatted =
+      type === "number" && Boolean(e.target.value)
+        ? Number(unFormatted).toLocaleString()
+        : unFormatted;
+    setLocalValue(formatted);
     if (onChange) {
-      onChange(e);
+      onChange({
+        ...e,
+        target: {
+          ...e.target,
+          value: unFormatted,
+        },
+      });
     }
   };
 
   useEffect(() => {
-    setLocalValue(value || "");
+    setLocalValue(
+      (type === "number" ? value?.toLocaleString() : String(value ?? "")) || ""
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   return (
@@ -43,7 +60,13 @@ export default function Input({ value, onChange, ...props }: InputProps) {
         {left && <>{left}</>}
         <input
           {...props}
-          type={isPassword && showPassword ? "text" : props.type}
+          type={
+            isPassword && showPassword
+              ? "text"
+              : type === "number"
+              ? "text"
+              : type
+          }
           value={localValue}
           onChange={handleChange}
           className={`outline-none w-full py-[13px] bg-slate-50 text-black`}

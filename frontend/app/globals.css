@@ -9,6 +9,7 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+  --animated-card-direction: to right;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -17,6 +18,10 @@
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 0, 0, 0;
   }
+}
+
+* {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -32,17 +37,51 @@ body {
 }
 
 .heading {
-  font-size: clamp(2.25rem, 5.4vw, 4.5rem);
+  font-size: clamp(2.25rem, 5.4vw, 64px);
+}
+
+.intro {
+  background: url('/home-bg.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position-x: right;
+  background-position-y: -120px;
 }
 
 .page-padding {
-  width: 72%;
+  width: 80%;
   max-width: 1728px;
   margin: 0 auto;
 }
 
 .dashboard-padding {
-  padding: 0 218px;
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.animated-icon::before,
+.animated-card:hover:before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  right: 0;
+  bottom: 0;
+  left: -2px;
+  z-index: -1;
+  border: 1px solid;
+  border-radius: 23px;
+  width: 101%;
+  height: 101%;
+  border: 0;
+  background: linear-gradient(var(--animated-card-direction), #FFFFFF, rgba(252, 252, 252, 0));
+}
+
+.animated-icon::before {
+  border-radius: 11px;
+  height: 103%;
+  width: 105%;
+  background: linear-gradient(60%, #FFFFFF, rgba(252, 252, 252, 0));
 }
 
 @media screen and (max-width: 1024px) {
@@ -54,8 +93,12 @@ body {
     width: 90%;
   }
 
+  .intro {
+    background-size: 0px;
+  }
+
   .dashboard-padding {
-    padding: 0 100px;
+    width: 95%;
   }
 }
 
@@ -68,8 +111,12 @@ body {
     width: 95%;
   }
 
+  .intro {
+    background-size: 0px;
+  }
+
   .dashboard-padding {
-    padding: 0 50px;
+    width: 98%;
   }
 
 }

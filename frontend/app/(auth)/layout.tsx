@@ -1,7 +1,6 @@
 "use client";
 
 import Avatar from "@/components/atoms/Avatar";
-import Headline from "@/components/atoms/Headline";
 import DownloadApp from "@/components/molecules/DownloadApp";
 import Logo from "@/components/molecules/Logo";
 import Trusties from "@/components/molecules/Trusties";
@@ -26,11 +25,11 @@ export default function Layout({ children }: { children: ReactNode }) {
         <div className="h-full w-full absolute z-20 bg-transparent px-12 py-[78px] flex flex-col justify-between">
           <div>
             <Logo />
-            <Headline className="mt-20 text-[64px] leading-[79px]">
+            <h1 className="mt-20 font-mono text-[64px] text-white leading-[79px]">
               {isCreator
                 ? "Search and gift your favorite creators"
                 : "Give your audience an easy way to say thanks."}
-            </Headline>
+            </h1>
           </div>
           <div className="mt-auto">
             <Trusties className="text-[#fff]" />
@@ -49,15 +48,15 @@ export default function Layout({ children }: { children: ReactNode }) {
           }}
         />
         {/* images */}
-        <div className="-rotate-45 flex gap-4">
-          {Array.from({ length: 5 }).map((_, i) => (
+        <div className="flex gap-4 bg-[url('/auth-bg.png')] h-full w-full bg-no-repeat bg-cover">
+          {/* {Array.from({ length: 5 }).map((_, i) => (
             <Fragment key={i}>
               {Array.from({ length: 5 }).map((_, j) => (
                 <div key={`${i}${j}`} className="flex flex-col gap-4">
                   {Array.from({ length: 5 }).map((_, k) => (
                     <Avatar
                       key={`avatar-${i}-${k}`}
-                      src={`https://picsum.photos/200/300?random=${i}${j}${k}`}
+                      src={`/profiles/profile${k}.png`}
                       circle={false}
                       size="2xl"
                       className="w-[295px] h-[250px] rounded-[21px]"
@@ -66,7 +65,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                 </div>
               ))}
             </Fragment>
-          ))}
+          ))} */}
         </div>
       </div>
     </div>

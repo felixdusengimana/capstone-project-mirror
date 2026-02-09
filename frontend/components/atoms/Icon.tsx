@@ -41,7 +41,9 @@ export type IconNames =
   | "copy"
   | "camera-center-focus"
   | "sun"
-  | "glasses";
+  | "glasses"
+  | "dropdown"
+  | "transactions";
 interface IconProps extends ComponentProps<"svg"> {
   name: IconNames;
 }
@@ -1004,6 +1006,56 @@ function Glasses({ ...props }) {
   );
 }
 
+function Dropdown({ fill, stroke, ...props }: IconComponentProps) {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        d="M5.83301 8.33337L9.99967 12.5L14.1663 8.33337H5.83301Z"
+        fill={fill ?? "#4B5563"}
+      />
+    </svg>
+  );
+}
+
+function Transactions({ fill, stroke, ...props }: IconComponentProps) {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M15.8334 16.6666V11.6666M15.8334 11.6666L17.5 13.3333M15.8334 11.6666L14.1667 13.3333"
+        stroke="#6B7280"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M18.3334 9.99998C18.3334 6.85748 18.3334 5.28581 17.3567 4.30998C16.3809 3.33331 14.8092 3.33331 11.6667 3.33331H8.33335C5.19085 3.33331 3.61919 3.33331 2.64335 4.30998C1.66669 5.28581 1.66669 6.85748 1.66669 9.99998C1.66669 13.1425 1.66669 14.7141 2.64335 15.69C3.61919 16.6666 5.19085 16.6666 8.33335 16.6666H11.6667"
+        stroke="#6B7280"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M8.33335 13.3333H5.00002M10.8334 13.3333H10.4167M1.66669 8.33331H18.3334"
+        stroke="#6B7280"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 export default function Icon({ name, ...props }: IconProps) {
   switch (name) {
     case "user":
@@ -1086,6 +1138,10 @@ export default function Icon({ name, ...props }: IconProps) {
       return <Sun {...props} />;
     case "glasses":
       return <Glasses {...props} />;
+    case "dropdown":
+      return <Dropdown {...props} />;
+    case "transactions":
+      return <Transactions {...props} />;
     default:
       return null;
   }

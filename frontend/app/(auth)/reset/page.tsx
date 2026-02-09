@@ -1,6 +1,6 @@
 "use client";
 import Button from "@/components/atoms/Button";
-import Headline from "@/components/atoms/Headline";
+
 import Input from "@/components/atoms/Input";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -18,9 +18,9 @@ export default function Login() {
     >
       <div></div>
       <div className="max-w-[562px]">
-        <Headline className="text-gray-700 text-4xl mb-4">
+        <h1 className="text-gray-700 text-4xl font-mono mb-4">
           Reset password
-        </Headline>
+        </h1>
         <p className="text-gray-600 font-normal text-lg">
           This password should be different from the previous password
         </p>

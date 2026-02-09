@@ -21,12 +21,7 @@ export default function WithdrawForm({
           )}
         </div>
       </DialogTrigger>
-      <Dialog
-        className="p-10"
-        style={{
-          background: "#F0F2F7",
-        }}
-      >
+      <Dialog className="p-10 bg-[#d6d8dd]">
         <div className="w-full py-6 pb-16 bg-white rounded-lg border-gray-200">
           <div className="px-8 border-b border-gray-100 pb-6 mb-6">
             <p className="text-gray-500 text-base font-light">

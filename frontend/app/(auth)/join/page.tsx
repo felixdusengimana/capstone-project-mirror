@@ -1,14 +1,17 @@
 "use client";
 import Avatar from "@/components/atoms/Avatar";
 import Button from "@/components/atoms/Button";
-import Headline from "@/components/atoms/Headline";
+
 import Icon from "@/components/atoms/Icon";
 import Input from "@/components/atoms/Input";
 import Progress from "@/components/atoms/Progress";
+import Select from "@/components/atoms/Select";
 import TextArea from "@/components/atoms/TextArea";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import React from "react";
+
+import countries from "@/data/countries.json";
+import { ICountry } from "@/types/common";
 
 export default function Join() {
   const router = useRouter();
@@ -44,9 +47,9 @@ export default function Join() {
       {step === "2" ? (
         <div className="w-full">
           <Progress percentage={50} />
-          <Headline className="text-[#374151] text-4xl mt-[30px]">
+          <h1 className="text-[#374151] text-4xl font-mono mt-[30px]">
             Fill in your profile
-          </Headline>
+          </h1>
           <p className="text-[#8A8A8B] mt-2">
             Choose your account type depending on your interest
           </p>
@@ -70,16 +73,30 @@ export default function Join() {
             <div className="flex flex-col gap-4 flex-grow max-w-[438px]">
               <Input label="Your name" />
               <TextArea label="Bio" />
-              <Input label="Industry" />
+              <Select label="Industry" placeholder="Select your industry">
+                <option value="musician">Musician/Band</option>
+                <option value="youtuber">YouTuber</option>
+                <option value="podcaster">Podcaster</option>
+                <option value="actor">Actor/Actress</option>
+                <option value="comedian">Comedian</option>
+                <option value="artist">Artist</option>
+              </Select>
+              <Select label="Country" placeholder="Select your country">
+                {countries.map((country: ICountry) => (
+                  <option key={country.id} value={country.shortCode}>
+                    {country.flag} {country.name}
+                  </option>
+                ))}
+              </Select>
             </div>
           </div>
         </div>
       ) : step === "3" ? (
         <div className="w-full">
           <Progress percentage={75} />
-          <Headline className="text-[#374151] text-4xl mt-[30px]">
+          <h1 className="text-[#374151] text-4xl font-mono mt-[30px]">
             Create your account
-          </Headline>
+          </h1>
           <p className="text-[#8A8A8B] mt-2">Setup Pesatag for your page</p>
           <Input
             label="PesaTag"
@@ -96,9 +113,9 @@ export default function Join() {
       ) : step === "4" ? (
         <div className="w-full">
           <Progress percentage={100} />
-          <Headline className="text-[#374151] text-4xl mt-[30px]">
+          <h1 className="text-[#374151] text-4xl font-mono mt-[30px]">
             Creator links{" "}
-          </Headline>
+          </h1>
           <p className="text-[#8A8A8B] mt-2">Add your social links</p>
           <Input
             label="Instagram"

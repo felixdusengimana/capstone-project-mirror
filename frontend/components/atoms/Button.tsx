@@ -7,7 +7,10 @@ interface ButtonProps extends ComponentProps<"button"> {
     | "blurred"
     | "secondary"
     | "danger"
-    | "danger-reverse";
+    | "danger-reverse"
+    | "gray"
+    | "success"
+    | "none";
   size?: "sm" | "md" | "lg";
   bordered?: boolean;
   outline?: boolean;
@@ -19,6 +22,7 @@ export default function Button({ ...props }: ButtonProps) {
     size = "md",
     bordered = false,
     outline = false,
+    disabled,
   } = props;
 
   const variantClasses = {
@@ -28,6 +32,9 @@ export default function Button({ ...props }: ButtonProps) {
     blurred: "bg-blurred text-white",
     danger: "bg-red-600 text-white",
     "danger-reverse": "bg-red-50 text-red-600",
+    gray: "bg-gray-200 text-[#4B5563]",
+    success: "bg-[#ECFDF5] text-green-600",
+    none: "",
   };
 
   const sizeClasses = {
@@ -43,7 +50,9 @@ export default function Button({ ...props }: ButtonProps) {
       {...props}
       className={`lg:text-xl md:text-lg text-base font-normal rounded-full ${
         outline ? "border border-gray-200" : variantClasses[variant]
-      } ${sizeClasses[size]} ${borderClasses} ${props.className}`}
+      } ${sizeClasses[size]} ${borderClasses} ${props.className} ${
+        disabled ? "opacity-65 cursor-not-allowed" : ""
+      }`}
     >
       {props.children}
     </button>

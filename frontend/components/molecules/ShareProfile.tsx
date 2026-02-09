@@ -4,12 +4,15 @@ import Button from "../atoms/Button";
 import Icon from "../atoms/Icon";
 import Image from "next/image";
 import CardIcon from "./CardIcon";
+import { useState } from "react";
 
 export default function ShareProfile({
   trigger,
 }: {
   trigger?: React.ReactNode;
 }) {
+  const [linkCopied, setLinkCopied] = useState(false);
+
   return (
     <DialogRoot>
       <DialogTrigger>
@@ -21,12 +24,7 @@ export default function ShareProfile({
           )}
         </div>
       </DialogTrigger>
-      <Dialog
-        className="p-10"
-        style={{
-          background: "#F0F2F7",
-        }}
-      >
+      <Dialog className="p-10 bg-[#d6d8dd]">
         <div className="w-full py-6 pb-16 bg-white rounded-lg border border-gray-200">
           <Image
             alt=""
@@ -69,13 +67,19 @@ export default function ShareProfile({
         <div className="flex flex-col gap-4">
           <Button className="w-full mt-8">Download QR code</Button>
           <Button
-            className="w-full flex items-center gap-2 justify-center bg-gray-200"
-            style={{
-              color: "#4B5563",
+            className="w-full flex items-center gap-2 justify-center transition-all duration-200"
+            variant={linkCopied ? "success" : "gray"}
+            onClick={() => {
+              navigator.clipboard?.writeText("https://www.google.com");
+              setLinkCopied(!linkCopied);
             }}
           >
-            <span>Copy link</span>
-            <Icon name="copy" />
+            <p className="text-base font-medium">
+              {linkCopied ? "Copied!" : "Copy link"}
+            </p>
+
+            {/* this only displayed if !linkCopied */}
+            {!linkCopied && <Icon name={"copy"} className="w-4 h-4" />}
           </Button>
         </div>
       </Dialog>

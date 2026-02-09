@@ -1,6 +1,6 @@
 import Avatar from "@/components/atoms/Avatar";
 import Button from "@/components/atoms/Button";
-import Headline from "@/components/atoms/Headline";
+
 import Input from "@/components/atoms/Input";
 import TextArea from "@/components/atoms/TextArea";
 import React from "react";
@@ -16,7 +16,7 @@ export default function page() {
       </div>
       <div className="bg-black">
         <h1 className="text-white">Header</h1>
-        <Headline>Search and gift your favorite creators</Headline>
+        <h1>Search and gift your favorite creators</h1>
       </div>
       <div>
         <h1>Avatar</h1>

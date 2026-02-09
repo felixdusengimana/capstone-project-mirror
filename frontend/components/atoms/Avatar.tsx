@@ -38,14 +38,14 @@ export default function Avatar({ ...props }: AvatarProps) {
         circle ? "rounded-full" : "rounded"
       } ${bordered ? "border-2 border-white" : ""} ${
         sizeClasses[size]
-      } ${className} flex items-center justify-center overflow-hidden relative`}
+      } flex items-center justify-center overflow-hidden relative ${className}`}
     >
       {src ? (
         <Image
           src={src}
           alt={alt ?? ""}
-          loading="eager"
-          loader={({ src }) => src}
+          // loading="eager"
+          // loader={({ src }) => src}
           fill={true}
           className={`w-full h-full ${sizeClasses[size]} object-cover`}
         />

@@ -1,6 +1,6 @@
 "use client";
 import Button from "@/components/atoms/Button";
-import Headline from "@/components/atoms/Headline";
+
 import Input from "@/components/atoms/Input";
 import ThirdPartyLogin from "@/components/molecules/ThirdPartyLogin";
 import Link from "next/link";
@@ -24,9 +24,9 @@ export default function Login() {
         </Link>
       </p>
       <div className="max-w-[562px]">
-        <Headline className="text-gray-700 text-4xl mb-10">
+        <h1 className="text-gray-700 text-4xl font-mono mb-10">
           Login into your account{" "}
-        </Headline>
+        </h1>
         <ThirdPartyLogin thirdParty="google" />
         <div className="my-6 flex gap-5 justify-center items-center">
           <div className="bg-gray-400 h-[1px] w-[105.5px]" />

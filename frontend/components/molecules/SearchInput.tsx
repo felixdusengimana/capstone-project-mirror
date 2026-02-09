@@ -30,7 +30,7 @@ export default function SearchInput({
   return (
     <div
       {...props}
-      className={`flex border-b border-gray-900 w-full px-5 py-4 gap-4 ${props.className}`}
+      className={`flex border-b border-gray-100 w-full px-5 py-4 gap-4 ${props.className}`}
     >
       <Icon
         name="search"

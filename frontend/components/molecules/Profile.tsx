@@ -23,7 +23,7 @@ export default function Profile({
       <div className="font-medium">
         <h3 className="text-base text-gray-800">{user.name}</h3>
         {user.username && (
-          <p className="text-sm text-gray-500">{user.username}</p>
+          <p className="text-sm text-gray-500">@{user.username}</p>
         )}
         {user.date && <p className="text-sm text-gray-500">{user.date}</p>}
       </div>

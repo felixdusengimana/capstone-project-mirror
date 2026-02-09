@@ -1,6 +1,6 @@
 import Avatar from "@/components/atoms/Avatar";
 import Button from "@/components/atoms/Button";
-import Headline from "@/components/atoms/Headline";
+
 import Icon from "@/components/atoms/Icon";
 import Input from "@/components/atoms/Input";
 import TextArea from "@/components/atoms/TextArea";
@@ -9,9 +9,7 @@ import React from "react";
 export default function page() {
   return (
     <div className="min-h-full w-full dashboard-padding text-black pb-10">
-      <Headline className="text-4xl font-sans font-bold text-[#1A1A1A]">
-        Settings
-      </Headline>
+      <h1 className="text-4xl font-sans font-bold text-[#1A1A1A]">Settings</h1>
       <div className="max-w-[900px] bg-white px-[67px] py-[55px] w-full rounded-lg mt-8 flex gap-28 justify-between items-start">
         <div className="max-w-[307px]">
           <label htmlFor="upload-profile-photo">

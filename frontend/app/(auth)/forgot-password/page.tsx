@@ -1,6 +1,6 @@
 "use client";
 import Button from "@/components/atoms/Button";
-import Headline from "@/components/atoms/Headline";
+
 import Input from "@/components/atoms/Input";
 import { useRouter } from "next/navigation";
 
@@ -15,9 +15,9 @@ export default function ForgotPassword() {
       className="flex flex-col text-gray-700 justify-between h-full "
     >
       <div className="max-w-[562px] h-fit my-auto">
-        <Headline className="text-gray-700 text-4xl mb-2">
+        <h1 className="text-gray-700 text-4xl font-mono mb-2">
           Reset password
-        </Headline>
+        </h1>
         <p className="text-gray-600 font-normal text-lg">
           Enter the email address with your account and we’ll send an email with
           instruction to reset your password
