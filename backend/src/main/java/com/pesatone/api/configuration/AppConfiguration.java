@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
-import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.hibernate.proxy.pojo.BasicLazyInitializer;
@@ -17,8 +16,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.IOException;
@@ -30,7 +27,8 @@ import java.util.List;
 
 @Configuration
 @ComponentScan({
-        "com.pesatone.api.service"
+        "com.pesatone.api.service",
+        "com.pesatone.api.model.validator"
 })
 @EnableJpaRepositories({"com.pesatone.api.repository"})
 public class AppConfiguration implements WebMvcConfigurer {
@@ -38,11 +36,6 @@ public class AppConfiguration implements WebMvcConfigurer {
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         converters.add(customJackson2HttpMessageConverter());
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
     }
 
     @Bean
@@ -67,7 +60,6 @@ public class AppConfiguration implements WebMvcConfigurer {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.setDateFormat(isoDate);
         objectMapper.registerModule(simpleModule);
-        objectMapper.registerModule(new Hibernate5Module());
 
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.registerModule(new Jdk8Module());
