@@ -1,5 +1,6 @@
 FROM openjdk:17-jdk-slim
 EXPOSE 9093
-ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} pesatone.jar
+VOLUME /tmp
+COPY target/*.jar pesatone.jar
 ENTRYPOINT ["java","-jar","/pesatone.jar"]
+
