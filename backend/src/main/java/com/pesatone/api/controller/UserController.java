@@ -8,14 +8,18 @@ import com.pesatone.api.service.UserService;
 import com.querydsl.core.QueryResults;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartException;
+import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -60,6 +64,19 @@ public class UserController {
         AppUser user = principal.getLoggedInUser();
         return ResponseEntity.ok(new ApiResponseObject<>("Profile updated successfully", true,
                 userService.updateUserDetails(user, dto)));
+    }
+
+    @Operation(summary = "Update profile", description = "Update logged in user profile")
+    @PostMapping("profile/image")
+    @PreAuthorize("hasAnyAuthority(T(com.pesatone.api.model.enumeration.PermissionEnum).UPDATE_PROFILE)")
+    public ResponseEntity<ApiResponseObject<String>> updateProfileImage(@Valid @RequestParam("image") MultipartFile file) {
+        AppUser user = principal.getLoggedInUser();
+        List<String> validImageFileTypes = List.of("image/png","image/jpg","image/jpeg");
+        if(StringUtils.isBlank(file.getContentType()) || !validImageFileTypes.contains(file.getContentType())){
+            throw new MultipartException("Please upload a valid image file (jpeg, png or jpg)");
+        }
+        return ResponseEntity.ok(new ApiResponseObject<>("Profile image uploaded successfully", true,
+                userService.uploadProfileImage(user, file)));
     }
     
 }

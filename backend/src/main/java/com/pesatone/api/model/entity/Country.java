@@ -1,5 +1,6 @@
 package com.pesatone.api.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pesatone.api.model.enumeration.CurrencyEnum;
 import com.pesatone.api.model.enumeration.StatusEnum;
 import jakarta.persistence.*;
@@ -21,18 +22,22 @@ public class Country {
     @NotNull
     private String name;
 
-    @NotNull
-    private String code;
+    private String isoCode;
+
+    private String countryCode;
 
     @Enumerated(EnumType.STRING)
     private CurrencyEnum currency;
 
+    @JsonIgnore
     @CreationTimestamp
     private Date createdAt;
 
+    @JsonIgnore
     @UpdateTimestamp
     private Date updatedAt;
 
+    @JsonIgnore
     @Enumerated(EnumType.STRING)
     @NotNull
     private StatusEnum status;

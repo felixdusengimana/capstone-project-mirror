@@ -2,6 +2,7 @@ package com.pesatone.api.exception;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.pesatone.api.model.dto.ApiResponseObject;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -15,8 +16,10 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.server.MethodNotAllowedException;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.stream.Collectors;
 
@@ -26,6 +29,11 @@ import java.util.stream.Collectors;
 public class ErrorControllerAdvice {
 
     private static final String GENERIC_ERROR_MESSAGE = "Something went wrong! Please try again.";
+
+    @ExceptionHandler(MultipartException.class)
+    public ResponseEntity<Object> handleMultipartException(MultipartException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponseObject<>("Please select a file",false));
+    }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Object> handle(IllegalArgumentException e) {

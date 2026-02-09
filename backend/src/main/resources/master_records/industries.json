@@ -1,0 +1,58 @@
+[
+  {
+    "name": "Music",
+    "code": "MUSIC"
+  },
+  {
+    "name": "Advertising",
+    "code": "ADVERTISING"
+  },
+  {
+    "name": "Publishing",
+    "code": "PUBLISHING"
+  },
+  {
+    "name": "Architecture",
+    "code": "ARCHITECTURE"
+  },
+  {
+    "name": "Film",
+    "code": "FILM"
+  },
+  {
+    "name": "Video Game",
+    "code": "VIDEO_GAME"
+  },
+  {
+    "name": "Design",
+    "code": "DESIGN"
+  },
+  {
+    "name": "Fashion",
+    "code": "FASHION"
+  },
+  {
+    "name": "Art",
+    "code": "ART"
+  },
+  {
+    "name": "Creative Industry",
+    "code": "CREATIVE_INDUSTRY"
+  },
+  {
+    "name": "TV and Radio",
+    "code": "TV_RADIO"
+  },
+  {
+    "name": "Museum",
+    "code": "MUSEUM"
+  },
+  {
+    "name": "Screen Production",
+    "code": "SCREEN_PRODUCTION"
+  },
+  {
+    "name": "Crafts",
+    "code": "CRAFTS"
+  }
+  ]

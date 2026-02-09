@@ -1,10 +1,8 @@
 package com.pesatone.api.model.dto;
 
 import com.pesatone.api.model.validator.UniqueUserName;
-import com.pesatone.api.model.validator.ValidPassword;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -33,10 +31,10 @@ public class UserDetailDto {
             example = "A short bio")
     private String bio;
 
-    @Schema(name = "countryCode",
-            description = "Country Code",
-            example = "RW")
-    private String countryCode;
+    @Schema(name = "countryIsoCode",
+            description = "Country ISO Code",
+            example = "RWA")
+    private String countryIsoCode;
 
     @Schema(name = "industryCode",
             description = "Industry code",

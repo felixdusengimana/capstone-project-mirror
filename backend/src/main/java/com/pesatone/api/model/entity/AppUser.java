@@ -1,7 +1,6 @@
 package com.pesatone.api.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.pesatone.api.model.enumeration.RoleEnum;
 import com.pesatone.api.model.enumeration.StatusEnum;
 import jakarta.persistence.*;
@@ -59,13 +58,11 @@ public class AppUser {
 
     private String bio;
 
-//    @Column(columnDefinition = "json")
-//    @JsonRawValue
-//    private String socialLinks;
-
+    @JsonIgnore
     @ManyToOne(fetch =  FetchType.LAZY)
     private Country country;
 
+    @JsonIgnore
     @ManyToOne(fetch =  FetchType.LAZY)
     private Industry industry;
 }

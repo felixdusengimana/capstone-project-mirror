@@ -1,5 +1,6 @@
 package com.pesatone.api.configuration.auth;
 
+import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class ApplicationSecurityConfig {
+    private final Gson gson;
 
     private static final String[] WHITELIST = {
             "/v3/api-docs/**",
@@ -26,7 +28,8 @@ public class ApplicationSecurityConfig {
             "/webjars/swagger-ui/**",
             "/actuator/**",
             "/swagger-ui/**",
-            "/api-doc.html"
+            "/api-doc.html",
+            "/resources/**"
     };
 
     @Bean

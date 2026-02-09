@@ -1,5 +1,6 @@
 package com.pesatone.api.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pesatone.api.model.enumeration.StatusEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -23,12 +24,15 @@ public class Industry {
     @NotNull
     private String code;
 
+    @JsonIgnore
     @CreationTimestamp
     private Date createdAt;
 
+    @JsonIgnore
     @UpdateTimestamp
     private Date updatedAt;
 
+    @JsonIgnore
     @Enumerated(EnumType.STRING)
     @NotNull
     private StatusEnum status;
