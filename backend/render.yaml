@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: pesatone-api
+    env: docker
+    envVars:
+      - key: DATABASE_HOST
+        fromDatabase:
+          name: pesatone_db
+          property: host
+      - key: DATABASE_SCHEMA
+        fromDatabase:
+          name: pesatone_db
+          property: database
+      - key: DATABASE_USER
+        fromDatabase:
+          name: pesatone_db
+          property: user
+      - key: DATABASE_PASSWORD
+        fromDatabase:
+          name: pesatone_db
+          property: password
+
+databases:
+  - name: pesatone_db
