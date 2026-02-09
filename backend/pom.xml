@@ -236,8 +236,7 @@
 						</goals>
 						<configuration>
 							<excludes>
-<!--								<exclude>com/pesatone/api/service/impl/DataPublisherServiceImpl.class</exclude>-->
-<!--								<exclude>com/pesatone/api/service/PaymentAccountService.class</exclude>-->
+								<exclude>com.pesatone.api.PesatoneApiApplication.class</exclude>
 							</excludes>
 							<rules>
 								<rule>

@@ -35,14 +35,12 @@ public class UserController {
 
     @Operation(summary = "Get User", description = "Get an Existing User")
     @GetMapping("{id}")
-    @PreAuthorize("hasAnyAuthority(T(com.pesatone.api.model.enumeration.PermissionTypeConstant).USER_READ)")
     public ResponseEntity<ApiResponseObject<Object>> getUser(@PathVariable(name ="id") UUID id) {
         return ResponseEntity.ok(new ApiResponseObject<>("",true, null));
     }
 
     @Operation(summary = "List Users", description = "Search for Users")
     @GetMapping
-    @PreAuthorize("hasAnyAuthority(T(com.pesatone.api.model.enumeration.PermissionTypeConstant).USER_READ)")
     public ResponseEntity<ApiResponseObject<QueryResults<Object>>> searchUsers( @Valid Object filter) {
         return ResponseEntity.ok(new ApiResponseObject<>("Users retrieved successfully",
                 true,null));
