@@ -20,7 +20,7 @@ export default function Profile({
   return (
     <div className={`flex gap-2 items-start ${className}`} {...rest}>
       <Avatar src={user.photo} alt={user.name} />
-      <div className="font-medium">
+      <div className="font-medium flex items-start flex-col">
         <h3 className="text-base text-gray-800">{user.name}</h3>
         {user.username && (
           <p className="text-sm text-gray-500">@{user.username}</p>

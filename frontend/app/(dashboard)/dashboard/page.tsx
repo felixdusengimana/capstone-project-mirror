@@ -4,6 +4,7 @@ import Icon from "@/components/atoms/Icon";
 import Input from "@/components/atoms/Input";
 import CardIcon from "@/components/molecules/CardIcon";
 import Profile from "@/components/molecules/Profile";
+import SupporterDialog from "@/components/molecules/SupporterDialog";
 import dynamic from "next/dynamic";
 const ShareProfile = dynamic(
   () => import("@/components/molecules/ShareProfile"),
@@ -124,28 +125,36 @@ export default function page() {
             <Icon name="arrow-down" />
           </Button>
         </div>
-        <div className="px-6">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div
-              key={i}
-              className={`flex justify-between items-center p-4 ${
-                i !== 4 ? "border-b border-gray-100" : ""
-              }`}
-            >
-              <Profile
-                user={{
-                  name: "Nziranziza Rafael",
-                  photo: "/profiles/profile1.png",
-                  date: "Dec 9, 2022",
-                }}
-              />
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div
+            className={`w-full px-6 p-4 ${
+              i !== 4 ? "border-b border-gray-100" : ""
+            }`}
+            key={i}
+          >
+            <SupporterDialog
+              trigger={
+                <div
+                  key={i}
+                  className={`w-full flex justify-between items-center`}
+                >
+                  <Profile
+                    user={{
+                      name: "Nziranziza Rafael",
+                      photo: "/profiles/profile1.png",
+                      date: "Dec 9, 2022",
+                    }}
+                  />
 
-              <h3 className="text-gray-800 font-medium text-sm">
-                <span className="text-[#838AA2] font-normal">RWF</span> 35,000
-              </h3>
-            </div>
-          ))}
-        </div>
+                  <h3 className="text-gray-800 font-medium text-sm">
+                    <span className="text-[#838AA2] font-normal">RWF</span>{" "}
+                    35,000
+                  </h3>
+                </div>
+              }
+            />
+          </div>
+        ))}
       </div>
     </div>
   );
