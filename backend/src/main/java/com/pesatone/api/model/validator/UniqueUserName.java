@@ -6,8 +6,8 @@
 package com.pesatone.api.model.validator;
 
 import com.pesatone.api.model.validator.impl.UniqueUserEmailImpl;
+import com.pesatone.api.model.validator.impl.UniqueUserNameImpl;
 import jakarta.validation.Constraint;
-import jakarta.validation.ConstraintValidator;
 import jakarta.validation.Payload;
 
 import java.lang.annotation.*;
@@ -22,10 +22,10 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD, ElementType.TYPE_USE})
-@Constraint(validatedBy = {UniqueUserEmailImpl.class})
-public @interface UniqueUserEmail {
+@Constraint(validatedBy = {UniqueUserNameImpl.class})
+public @interface UniqueUserName {
 
-    String message() default "Email already exists";
+    String message() default "Username already exists";
 
     Class<?>[] groups() default {};
 

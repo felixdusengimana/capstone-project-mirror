@@ -13,7 +13,7 @@ import org.springframework.security.core.Authentication;
 public interface RequestPrincipal {
     Authentication getAuthentication();
 
-    AppPrincipal getPrincipal();
+    AuthUser getAuthUser();
 
     AppUser getLoggedInUser();
 

@@ -2,8 +2,12 @@ package com.pesatone.api.controller;
 
 import com.pesatone.api.configuration.auth.RequestPrincipal;
 import com.pesatone.api.model.dto.ApiResponseObject;
+import com.pesatone.api.model.dto.UserDetailDto;
+import com.pesatone.api.model.entity.AppUser;
+import com.pesatone.api.service.UserService;
 import com.querydsl.core.QueryResults;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +28,10 @@ import java.util.UUID;
 @Controller
 @RequestMapping("users")
 @Slf4j
+@Tag(name="2. User Management")
 public class UserController {
     private final RequestPrincipal principal;
+    private final UserService userService;
 
     @Operation(summary = "Get User", description = "Get an Existing User")
     @GetMapping("{id}")
@@ -42,24 +48,20 @@ public class UserController {
                 true,null));
     }
 
-
-    @Operation(summary = "Change Password", description = "Change a Password")
-    @PutMapping("/changePassword")
-    public ResponseEntity<ApiResponseObject<Object>> changePassword(@RequestBody @Valid Object changePasswordDto) {
-        return ResponseEntity.ok(new ApiResponseObject<>("Password changed successfully", true, null));
+    @Operation(summary = "Get User Profile", description = "Get LoggedIn User Profile")
+    @GetMapping("/profile")
+    public ResponseEntity<ApiResponseObject<AppUser>> getLoggedInUser() {
+        AppUser user = principal.getLoggedInUser();
+        return ResponseEntity.ok(new ApiResponseObject<>("User profile retrieved successfully", true, user));
     }
 
-
-    @Operation(summary = "Reset Password", description = "Request for Reset a Password Through Email")
-    @PostMapping("resetPassword")
-    public ResponseEntity<ApiResponseObject<Object>> requestPasswordReset(@RequestBody @Valid Object resetPasswordEmailDto) {
-        return ResponseEntity.ok(new ApiResponseObject<>("You will receive an email with a link to retrieve your password if the email address is registered with us", true));
+    @Operation(summary = "Update profile", description = "Update logged in user profile")
+    @PutMapping("profile")
+    @PreAuthorize("hasAnyAuthority(T(com.pesatone.api.model.enumeration.PermissionEnum).UPDATE_PROFILE)")
+    public ResponseEntity<ApiResponseObject<AppUser>> updateUserProfile(@RequestBody @Valid UserDetailDto dto) {
+        AppUser user = principal.getLoggedInUser();
+        return ResponseEntity.ok(new ApiResponseObject<>("Profile updated successfully", true,
+                userService.updateUserDetails(user, dto)));
     }
-
-
-    @Operation(summary = "Send New password", description = "Send New Password after Reset")
-    @PostMapping("password")
-    public ResponseEntity<ApiResponseObject<Object>> resetPassword(@RequestBody @Valid Object newPasswordDto) {
-        return ResponseEntity.ok(new ApiResponseObject<>("Password reset successfully", true));
-    }
+    
 }

@@ -1,6 +1,7 @@
 package com.pesatone.api.configuration.auth;
 
 import com.pesatone.api.model.entity.AppUser;
+import com.pesatone.api.model.enumeration.RoleEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,13 +13,16 @@ public class RequestPrincipalImpl implements RequestPrincipal {
 
     @Override
     public AppUser getLoggedInUser() {
-//        if(this.getPrincipal() != null && this.getPrincipal().getUserId() != null)
+        if(this.getAuthUser() != null)
+            return this.getAuthUser().getUser();
         return null;
     }
 
     @Override
     public boolean isAdmin() {
-        return true;
+        if(this.getLoggedInUser() != null)
+            return this.getLoggedInUser().getRole().equals(RoleEnum.ADMIN);
+        return false;
     }
 
     @Override
@@ -27,9 +31,9 @@ public class RequestPrincipalImpl implements RequestPrincipal {
     }
 
     @Override
-    public AppPrincipal getPrincipal() {
+    public AuthUser getAuthUser() {
         if(this.getAuthentication() != null)
-            return (AppPrincipal) this.getAuthentication().getDetails();
+            return (AuthUser) this.getAuthentication().getDetails();
         return null;
     }
 

@@ -15,7 +15,7 @@ public class AuthUserDetailService implements UserDetailsService {
     private final AppUserRepository appUserRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) {
+    public AuthUser loadUserByUsername(String username) {
         // If no username (email) is provided
         if (StringUtils.isBlank(username))
             throw new UsernameNotFoundException(username);

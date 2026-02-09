@@ -6,9 +6,15 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-public class LoginResponse extends AppPrincipal {
+public class LoginResponse {
+    private String email;
     private String token;
-    public LoginResponse(AppUser appUser) {
-        super(appUser);
+    private String tokenType;
+    private Integer expiresIn;
+    public LoginResponse(AppUser appUser,String token, Integer expiresIn) {
+        setEmail(appUser.getEmail());
+        setToken("Bearer");
+        setToken(token);
+        setExpiresIn(expiresIn);
     }
 }

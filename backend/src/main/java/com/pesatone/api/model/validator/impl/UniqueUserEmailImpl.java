@@ -2,10 +2,11 @@ package com.pesatone.api.model.validator.impl;
 
 import com.pesatone.api.model.validator.UniqueUserEmail;
 import com.pesatone.api.repository.AppUserRepository;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.inject.Named;
-import jakarta.validation.ConstraintValidatorContext;
 
 /**
  * Copyright (c) 2026. Pesatone. All rights reserved
@@ -15,15 +16,18 @@ import jakarta.validation.ConstraintValidatorContext;
  **/
 
 @Named
-public class UniqueUserEmailImpl implements UniqueUserEmail.Validator {
+public class UniqueUserEmailImpl implements ConstraintValidator<UniqueUserEmail, String> {
     @Autowired
     private AppUserRepository userRepository;
+
+    @Override
+    public void initialize(UniqueUserEmail email) {}
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
         if (value == null) {
             return true;
         }
-        return userRepository.findActiveByEmail(value.trim()).isEmpty();
+        return userRepository.findByEmail(value.trim()).isEmpty();
     }
 }

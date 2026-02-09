@@ -1,6 +1,8 @@
 package com.pesatone.api.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonRawValue;
+import com.pesatone.api.model.enumeration.RoleEnum;
 import com.pesatone.api.model.enumeration.StatusEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -13,9 +15,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.util.Date;
 
 @Entity
-@Table(
-        uniqueConstraints= @UniqueConstraint(columnNames={"email"})
-)
+@Table(uniqueConstraints= @UniqueConstraint(columnNames={"email","username"}))
 @Getter @Setter
 public class AppUser {
     @Id
@@ -26,7 +26,8 @@ public class AppUser {
     @Email
     private String email;
 
-    @NotNull
+    private String username;
+
     private String name;
 
     private String phoneNumber;
@@ -46,4 +47,25 @@ public class AppUser {
     @Enumerated(EnumType.STRING)
     @NotNull
     private StatusEnum status;
+
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    @JsonIgnore
+    private RoleEnum role;
+
+    private Boolean emailVerified;
+
+    private Boolean phoneNumberVerified;
+
+    private String bio;
+
+//    @Column(columnDefinition = "json")
+//    @JsonRawValue
+//    private String socialLinks;
+
+    @ManyToOne(fetch =  FetchType.LAZY)
+    private Country country;
+
+    @ManyToOne(fetch =  FetchType.LAZY)
+    private Industry industry;
 }

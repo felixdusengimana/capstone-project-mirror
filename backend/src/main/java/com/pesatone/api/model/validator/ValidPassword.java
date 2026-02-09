@@ -5,9 +5,10 @@
  */
 package com.pesatone.api.model.validator;
 
-import jakarta.validation.Constraint;
-import jakarta.validation.ConstraintValidator;
+import com.pesatone.api.model.validator.impl.ValidPasswordImpl;
 import jakarta.validation.Payload;
+
+import jakarta.validation.Constraint;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -22,17 +23,14 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD, ElementType.TYPE_USE})
-@Constraint(validatedBy = {ValidPassword.Validator.class})
+@Constraint(validatedBy = {ValidPasswordImpl.class})
 public @interface ValidPassword {
 
-    String message() default "Password must be up to 8 characters and must contain lowercase, uppercase, special character and number";
+    String message() default "Password must be up to 8 characters and must contain lowercase, uppercase and number";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
 
     String value() default "";
-
-    interface Validator extends ConstraintValidator<ValidPassword, String> {
-    }
 }

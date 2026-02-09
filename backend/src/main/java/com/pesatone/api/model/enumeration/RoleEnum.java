@@ -19,11 +19,16 @@ public enum RoleEnum {
             PermissionEnum.USER_DELETE,
             PermissionEnum.UPDATE_USER_STATUS,
             PermissionEnum.VIEW_PAYOUT,
-            PermissionEnum.VIEW_TRANSACTION),
+            PermissionEnum.VIEW_TRANSACTION,
+            PermissionEnum.UPDATE_PROFILE),
     CREATOR("Creator",
             PermissionEnum.CREATE_PAYOUT,
             PermissionEnum.VIEW_PAYOUT,
-            PermissionEnum.VIEW_TRANSACTION),
+            PermissionEnum.VIEW_TRANSACTION,
+            PermissionEnum.UPDATE_PROFILE),
+    FAN("Fan",
+            PermissionEnum.VIEW_TRANSACTION,
+            PermissionEnum.UPDATE_PROFILE)
 
 ;
 

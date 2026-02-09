@@ -16,20 +16,13 @@ public class SignUpDto {
     @Schema(name = "email",
             description = "A non-existing user email",
             example = "user@mail.com", requiredMode = Schema.RequiredMode.REQUIRED)
-//    @UniqueUserEmail
+    @UniqueUserEmail
     private String email;
 
     @NotBlank(message = "Password is required")
     @Schema(name = "password",
-            description = "A non-existing user email",
-            example = "user@mail.com", requiredMode = Schema.RequiredMode.REQUIRED)
-//    @ValidPassword
+            description = "A valid password. Password must be up to 8 characters and must contain lowercase, uppercase and number",
+            example = "P123@ssword", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ValidPassword
     private String password;
-
-    @NotBlank(message = "Name is required")
-    @Schema(name = "name",
-            description = "Your full name",
-            example = "Okoro Herbert", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String name;
-
 }

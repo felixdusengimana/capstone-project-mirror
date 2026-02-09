@@ -1,6 +1,5 @@
 package com.pesatone.api.exception;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.pesatone.api.model.dto.ApiResponseObject;
 import jakarta.validation.ConstraintViolation;
@@ -11,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.server.MethodNotAllowedException;
 
 import java.util.Date;
+import java.util.stream.Collectors;
 
 
 @ControllerAdvice
@@ -28,7 +29,6 @@ public class ErrorControllerAdvice {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Object> handle(IllegalArgumentException e) {
-        log.info(e.getMessage(), e);
         String errorMessage;
         if (e.getCause() != null) {
             errorMessage = e.getCause().getMessage();
@@ -43,69 +43,79 @@ public class ErrorControllerAdvice {
     @ExceptionHandler({ConstraintViolationException.class})
     public ResponseEntity<Object> handleConstraintViolation(
             ConstraintViolationException ex) {
-        log.info(ex.getMessage());
-        String customizedErrorMessage = "";
-        for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
-           customizedErrorMessage = String.format("Invalid %s", violation.getPropertyPath().toString());
-        }
 
-        return new ResponseEntity<>(new ApiResponseObject<>(customizedErrorMessage,false), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        String errorMessage = ex.getConstraintViolations()
+                .stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.joining(", "));
+
+        return new ResponseEntity<>(new ApiResponseObject<>(errorMessage,false), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({MethodArgumentNotValidException.class})
     public ResponseEntity<Object> handleMethodArgumentException(MethodArgumentNotValidException ex) {
-        log.info(ex.getMessage());
-        return new ResponseEntity<>(new ApiResponseObject<>("handleMethodArgumentException",false), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+
+        String errorMessage = ex.getBindingResult().getFieldErrors()
+                .stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.joining(", "));
+
+        return new ResponseEntity<>(new ApiResponseObject<>(errorMessage,false), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
 
-    @ExceptionHandler({BindException.class})
+    @ExceptionHandler({BindException.class,})
     public ResponseEntity<Object> handleBindingException(BindException ex) {
-        log.info(ex.getMessage());
-//        for (FieldError violation : ex.getBindingResult().getFieldErrors()) {
-//            String customizedErrorMessage = String.format("Invalid %s", violation.getField());
-//            if(StringUtils.isNotBlank(violation.getDefaultMessage())){
-//                customizedErrorMessage = violation.getDefaultMessage();
-//            }
-//            errors.add(new ApiErrorObject(PesatoneExceptionConstant.BAD_DATA.name(), customizedErrorMessage, violation.getField()));
-//        }
-
-        return new ResponseEntity<>(new ApiResponseObject<>("handleBindingException",false), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        String errorMessage = ex.getBindingResult().getFieldErrors()
+                .stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.joining(", "));
+        return new ResponseEntity<>(new ApiResponseObject<>(errorMessage,false), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Object> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         log.info(e.getMessage());
-
         String field = "invalid_field";
-//
-//        if (e.getCause() instanceof InvalidFormatException) {
-//            InvalidFormatException ifx = (InvalidFormatException) e.getCause();
-//            if (ifx.getTargetType()!=null && (ifx.getTargetType().isEnum() || ifx.getTargetType().equals(Date.class))) {
-//                field = ifx.getPath().get(ifx.getPath().size()-1).getFieldName();
-//            }
-//        }
+
+        if (e.getCause() instanceof InvalidFormatException) {
+            InvalidFormatException ifx = (InvalidFormatException) e.getCause();
+            if (ifx.getTargetType()!=null && (ifx.getTargetType().isEnum() || ifx.getTargetType().equals(Date.class))) {
+                field = ifx.getPath().get(ifx.getPath().size()-1).getFieldName();
+            }
+        }
 
         String errorMessage = "Invalid value for "+field;
 
          return new ResponseEntity<>(new ApiResponseObject<>(errorMessage,false), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(PesatoneAuthenticationException.class)
+    public ResponseEntity<Object> handle(PesatoneAuthenticationException e) {
+        log.info("AUTHORIZATION_EXCEPTION", e);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponseObject<>("Sorry, your credentials are invalid or the account is not active",false));
+    }
+
+    @ExceptionHandler(PesatoneNotFoundException.class)
+    public ResponseEntity<Object> handle(PesatoneNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponseObject<>(e.getMessage(),false));
+    }
+
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Object> handle(RuntimeException e) throws JsonProcessingException {
-        log.error(e.getMessage(),e);
+    public ResponseEntity<Object> handle(RuntimeException e) {
+        log.error("RUNTIME_EXCEPTION",e);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponseObject<>(GENERIC_ERROR_MESSAGE,false));
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<Object> handle(MethodNotAllowedException e) {
         log.error(e.getMessage(),e);
-        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(new ApiResponseObject<>(GENERIC_ERROR_MESSAGE,false));
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(new ApiResponseObject<>("Http method not supported",false));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handle(Exception e) {
-        log.error(e.getMessage(),e);
+        log.error("SYSTEM_EXCEPTION",e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponseObject<>(GENERIC_ERROR_MESSAGE,false));
     }
 }
