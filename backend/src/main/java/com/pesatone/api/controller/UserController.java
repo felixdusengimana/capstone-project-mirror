@@ -28,6 +28,7 @@ import java.util.UUID;
  * @author phelixdusengimana@gmail.com
  **/
 
+@CrossOrigin
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("users")

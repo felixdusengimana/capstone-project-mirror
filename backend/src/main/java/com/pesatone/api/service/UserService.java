@@ -13,5 +13,7 @@ public interface UserService {
 
     String uploadProfileImage(AppUser user, MultipartFile file);
 
+    void initiatePasswordReset(AppUser user);
+
     void resetPassword(Long userId, String password);
 }

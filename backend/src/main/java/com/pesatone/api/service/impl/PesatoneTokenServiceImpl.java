@@ -38,6 +38,20 @@ public class PesatoneTokenServiceImpl implements PesatoneTokenService {
     }
 
     @Override
+    public String getPasswordResetToken(AppUser user) {
+
+        Date tokenExpiryDate = Timestamp.valueOf(LocalDateTime.now().plusSeconds(jwtExpiry));
+
+        return Jwts.builder()
+                .subject("Password Reset")
+                .claim("userId", user.getId())
+                .issuedAt(new Date())
+                .expiration(tokenExpiryDate)
+                .signWith(secretKey)
+                .compact();
+    }
+
+    @Override
     public Long getUserIdFromPasswordResetToken(String token) {
         Long userId;
         try {

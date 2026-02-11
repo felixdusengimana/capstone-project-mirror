@@ -1,10 +1,10 @@
 package com.pesatone.api.controller;
 
 import com.pesatone.api.configuration.auth.AuthUser;
-import com.pesatone.api.configuration.auth.RequestPrincipal;
 import com.pesatone.api.model.dto.*;
 import com.pesatone.api.model.entity.AppUser;
 import com.pesatone.api.model.enumeration.RoleEnum;
+import com.pesatone.api.repository.AppUserRepository;
 import com.pesatone.api.service.PesatoneTokenService;
 import com.pesatone.api.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
  * @author phelixdusengimana@gmail.com
  **/
 
+@CrossOrigin
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("auth")
@@ -35,6 +36,7 @@ public class AuthenticationController {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final PesatoneTokenService tokenService;
+    private final AppUserRepository userRepository;
     @Value("${application.jwtExpiry}")
     Integer jwtExpiry;
 
@@ -69,8 +71,9 @@ public class AuthenticationController {
 
     @Operation(summary = "Initiate Password Reset", description = "Initiate Password Reset")
     @PostMapping("/password-reset/initiate")
-    public ResponseEntity<ApiResponseObject<Object>> initiatePasswordReset(@RequestBody @Valid ResetPasswordDto dto) {
-        // TODO send email
+    public ResponseEntity<ApiResponseObject<Object>> initiatePasswordReset(@RequestBody @Valid InitiateResetPasswordDto dto) {
+        userRepository.findByEmail(dto.getEmail())
+                .ifPresent(userService::initiatePasswordReset);
         return ResponseEntity.ok(new ApiResponseObject<>("Password reset initiated successfully", true, null));
     }
 

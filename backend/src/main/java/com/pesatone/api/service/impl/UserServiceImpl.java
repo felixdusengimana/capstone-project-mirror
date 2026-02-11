@@ -14,6 +14,7 @@ import com.pesatone.api.repository.AppUserRepository;
 import com.pesatone.api.repository.CountryRepository;
 import com.pesatone.api.repository.IndustryRepository;
 import com.pesatone.api.repository.SocialLinkRepository;
+import com.pesatone.api.service.PesatoneTokenService;
 import com.pesatone.api.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -24,7 +25,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +37,7 @@ public class UserServiceImpl implements UserService {
     private final IndustryRepository industryRepository;
     private final SocialLinkRepository socialLinkRepository;
     private final Cloudinary cloudinary;
+    private final PesatoneTokenService tokenService;
 
     @Transactional
     @Override
@@ -89,6 +90,12 @@ public class UserServiceImpl implements UserService {
             e.printStackTrace();
         }
         return secureUrl;
+    }
+
+    @Override
+    public void initiatePasswordReset(AppUser user){
+        String token = tokenService.getPasswordResetToken(user);
+        //TODO send email
     }
 
     @Transactional
