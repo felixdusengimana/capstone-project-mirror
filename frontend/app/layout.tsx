@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Righteous, Outfit } from "next/font/google";
 import "./globals.css";
+import Provider from "./provider";
 
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 const righteous = Righteous({
@@ -23,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${outfit.variable} ${righteous.variable} font-sans`}>
-        {children}
+        <Provider>{children}</Provider>
       </body>
     </html>
   );

@@ -1007,11 +1007,17 @@ function Glasses({ ...props }) {
   );
 }
 
-function Dropdown({ fill, stroke, ...props }: IconComponentProps) {
+function Dropdown({
+  width = 20,
+  height = 20,
+  fill,
+  stroke,
+  ...props
+}: IconComponentProps) {
   return (
     <svg
-      width="20"
-      height="20"
+      width={width}
+      height={height}
       viewBox="0 0 20 20"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

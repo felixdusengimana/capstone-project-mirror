@@ -12,11 +12,17 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import countries from "@/data/countries.json";
 import { ICountry } from "@/types/common";
+import { useGetAllIndustries } from "@/services/resources";
 
 export default function Join() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const step = searchParams.get("step");
+
+  const { data: industries, isLoading: isLoadingIndustries } =
+    useGetAllIndustries({
+      enabled: step === "2",
+    });
 
   if (
     !step ||
@@ -73,7 +79,11 @@ export default function Join() {
             <div className="flex flex-col gap-4 flex-grow max-w-[438px]">
               <Input label="Your name" />
               <TextArea label="Bio" />
-              <Select label="Industry" placeholder="Select your industry">
+              <Select
+                isLoading
+                label="Industry"
+                placeholder="Select your industry"
+              >
                 <option value="musician">Musician/Band</option>
                 <option value="youtuber">YouTuber</option>
                 <option value="podcaster">Podcaster</option>

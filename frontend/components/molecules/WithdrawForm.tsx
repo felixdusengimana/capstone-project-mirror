@@ -36,7 +36,9 @@ export default function WithdrawForm({
           <form action="" className="px-8 flex flex-col gap-4">
             <Input
               label="Enter amount"
-              value={"50,000"}
+              value={50000}
+              autoFocus
+              type="number"
               right={
                 <select className="bg-[#F7F9FB] text-[#475569]">
                   <option value="RWF">RWF</option>
