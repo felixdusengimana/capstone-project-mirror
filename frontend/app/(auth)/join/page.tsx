@@ -42,7 +42,7 @@ export default function Join() {
         }
         router.replace(`/join?step=${parseInt(step) + 1}`);
       }}
-      className="flex flex-col text-gray-700 justify-between h-full"
+      className="flex flex-col p-7 lg:p-0 text-gray-700 justify-between h-full"
     >
       <p className="text-right font-light text-lg text-gray-500">
         Already have an account,{" "}
@@ -51,7 +51,7 @@ export default function Join() {
         </Link>
       </p>
       {step === "2" ? (
-        <div className="w-full">
+        <div className="w-full pb-5 lg:pb-0">
           <Progress percentage={50} />
           <h1 className="text-[#374151] text-4xl font-mono mt-[30px]">
             Fill in your profile
@@ -59,7 +59,7 @@ export default function Join() {
           <p className="text-[#8A8A8B] mt-2">
             Choose your account type depending on your interest
           </p>
-          <div className="flex justify-between gap-10 items-center mt-10">
+          <div className="flex flex-col lg:flex-row justify-between gap-10 items-center mt-10">
             <div className="max-w-[307px]">
               <label htmlFor="upload-profile-photo">
                 <Avatar src="" size="2xl" />
@@ -144,7 +144,7 @@ export default function Join() {
         </div>
       ) : null}
 
-      <div className="flex items-center flex-wrap justify-between pt-6 border-t border-gray-200">
+      <div className="sticky bottom-0 p-6 bg-white flex items-center flex-wrap justify-between border-t border-gray-200">
         <Button
           type="button"
           outline={true}

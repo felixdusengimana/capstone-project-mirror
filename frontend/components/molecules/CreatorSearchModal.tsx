@@ -99,7 +99,7 @@ export default function CreatorSearchModal({
           className={`mt-8 ${className}`}
         />
       </DialogTrigger>
-      <Dialog className="pt-4 min-w-full">
+      <Dialog className="pt-4 min-w-full lg:min-w-[600px]">
         <SearchInput onSearch={(query) => setQuery(query)} />
         <div className="">
           {remaining.length > 0 ? (

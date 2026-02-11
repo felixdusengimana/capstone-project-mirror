@@ -1,11 +1,10 @@
 "use client";
 
-import Avatar from "@/components/atoms/Avatar";
 import DownloadApp from "@/components/molecules/DownloadApp";
 import Logo from "@/components/molecules/Logo";
 import Trusties from "@/components/molecules/Trusties";
 import { useParams } from "next/navigation";
-import { Fragment, ReactNode } from "react";
+import { ReactNode } from "react";
 
 export default function Layout({ children }: { children: ReactNode }) {
   const params = useParams() as { creatorId: string };
@@ -15,8 +14,8 @@ export default function Layout({ children }: { children: ReactNode }) {
     <div className="flex h-screen">
       <div
         className={`flex-grow bg-white ${
-          isCreator ? "pt-[78px]" : "py-[78px]"
-        } px-10 md:px-16 lg:px-[120px] overflow-auto`}
+          isCreator ? "pt-[78px]" : "py-0 pt-20 lg:py-[78px]"
+        } px-0 md:px-16 lg:px-[120px] overflow-auto`}
       >
         {children}
       </div>

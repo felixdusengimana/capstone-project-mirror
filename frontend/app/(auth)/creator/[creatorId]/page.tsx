@@ -10,11 +10,11 @@ import { useState } from "react";
 export default function SupportCreator() {
   const [tipAmount, setTipAmount] = useState(5000);
   return (
-    <div className="flex flex-col items-center gap-24 h-full">
+    <div className="flex flex-col items-center gap-24 h-full p-8 lg:p-0">
       <h1 className="text-[#374151] text-4xl font-mono text-center">
         Pesatone makes Supporting fun and easy.
       </h1>
-      <div className="w-[598px] flex flex-col items-center justify-between gap-10  rounded-2xl border border-gray-200 pt-24 pb-[61px] px-20 relative">
+      <div className="w-full lg:w-[598px] flex flex-col items-center justify-between gap-10  rounded-2xl border border-gray-200 pt-24 pb-[61px] px-20 relative">
         <div className="absolute -top-16">
           <Avatar src="/profiles/profile1.png" size="xl" />
         </div>
