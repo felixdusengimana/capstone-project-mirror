@@ -13,10 +13,26 @@ interface SelectProps extends ComponentProps<"select"> {
   isLoading?: boolean;
 }
 
-export default function Select({ value, onChange, ...props }: SelectProps) {
-  const { label, labelStyle, left, placeholder, isLoading, disabled } = props;
+export default function Select(props: SelectProps) {
+  const {
+    label,
+    labelStyle,
+    left,
+    placeholder,
+    isLoading,
+    disabled,
+    onChange,
+    value = "",
+    ...rest
+  } = props;
   const id = useId();
   const isDisabled = disabled || isLoading;
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (onChange) {
+      onChange(e);
+    }
+  };
 
   return (
     <div className={`${props.className}`}>
@@ -36,14 +52,14 @@ export default function Select({ value, onChange, ...props }: SelectProps) {
         {left && <>{left}</>}
         <select
           disabled={isDisabled}
-          {...props}
+          {...rest}
           className={`appearance-none outline-none w-full py-[13px] bg-slate-50 text-black disabled:bg-slate-300`}
           id={props.id ?? id}
           value={value}
-          onChange={onChange}
+          onChange={handleChange}
         >
           {placeholder && (
-            <option value="" disabled selected>
+            <option value="" disabled>
               {placeholder}
             </option>
           )}

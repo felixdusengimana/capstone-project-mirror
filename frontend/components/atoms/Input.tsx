@@ -7,10 +7,19 @@ interface InputProps extends ComponentProps<"input"> {
   labelStyle?: string;
   left?: ReactNode;
   right?: ReactNode;
+  error?: string | ReactNode;
 }
 
-export default function Input({ value, onChange, ...props }: InputProps) {
-  const { label, labelStyle, left, right, type = "text" } = props;
+export default function Input({ value, ...props }: InputProps) {
+  const {
+    label,
+    labelStyle,
+    left,
+    right,
+    type = "text",
+    error,
+    onChange,
+  } = props;
   const [localValue, setLocalValue] = useState("");
   const isPassword = props.type === "password";
   const [showPassword, setShowPassword] = useState(false);
@@ -54,35 +63,43 @@ export default function Input({ value, onChange, ...props }: InputProps) {
           {label}
         </label>
       )}
-      <div
-        className={`w-full flex items-center px-4 bg-slate-50 border rounded-xl  border-[#E5E9F0]`}
-      >
-        {left && <>{left}</>}
-        <input
-          {...props}
-          type={
-            isPassword && showPassword
-              ? "text"
-              : type === "number"
-              ? "text"
-              : type
-          }
-          value={localValue}
-          onChange={handleChange}
-          className={`outline-none w-full py-[13px] bg-slate-50 text-black`}
-          id={props.id ?? id}
-        />
-        {right ||
-          (isPassword && (
-            <div className="flex items-center gap-2">
-              {right}
-              {isPassword && (
-                <Icon
-                  name="eye"
-                  onClick={() => setShowPassword(!showPassword)}
-                />
-              )}
-            </div>
+      <div>
+        <div
+          className={`w-full flex items-center px-4 border rounded-xl  ${
+            error ? "border-red-400 bg-red-50" : "border-[#E5E9F0] bg-slate-50 "
+          }`}
+        >
+          {left && <>{left}</>}
+          <input
+            {...props}
+            type={
+              isPassword && showPassword
+                ? "text"
+                : type === "number"
+                ? "text"
+                : type
+            }
+            value={localValue}
+            onChange={handleChange}
+            className={`outline-none w-full py-[13px] bg-inherit text-black`}
+            id={props.id ?? id}
+          />
+          {right ||
+            (isPassword && (
+              <div
+                className="flex items-center gap-2"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {right}
+                {isPassword && <Icon name={showPassword ? "eye-off" : "eye"} />}
+              </div>
+            ))}
+        </div>
+        {Boolean(error) &&
+          (typeof error === "string" ? (
+            <p className="text-red-500 text-sm mt-1">{error}</p>
+          ) : (
+            error
           ))}
       </div>
     </div>

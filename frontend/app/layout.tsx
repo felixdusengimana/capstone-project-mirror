@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Righteous, Outfit } from "next/font/google";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 import Provider from "./provider";
 
@@ -24,6 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${outfit.variable} ${righteous.variable} font-sans`}>
+        <Toaster />
         <Provider>{children}</Provider>
       </body>
     </html>

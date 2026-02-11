@@ -31,8 +31,10 @@ export type IconNames =
   | "coins"
   | "inbox-out"
   | "x"
+  | "twitter"
   | "more-horizontal"
   | "eye"
+  | "eye-off"
   | "logout"
   | "snapchat"
   | "tiktok"
@@ -44,7 +46,9 @@ export type IconNames =
   | "glasses"
   | "dropdown"
   | "transactions"
-  | "close";
+  | "close"
+  | "trash";
+
 interface IconProps extends ComponentProps<"svg"> {
   name: IconNames;
 }
@@ -827,11 +831,16 @@ function MoreHorizontal({ ...props }) {
   );
 }
 
-function Eye({ ...props }) {
+function Eye({
+  width = 20,
+  height = 20,
+  fill = "#3F3F46",
+  ...props
+}: IconComponentProps) {
   return (
     <svg
-      width="20"
-      height="20"
+      width={width}
+      height={height}
       viewBox="0 0 20 20"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -839,14 +848,14 @@ function Eye({ ...props }) {
     >
       <path
         d="M11.7678 11.7678C12.2366 11.2989 12.5 10.663 12.5 10C12.5 9.33696 12.2366 8.70107 11.7678 8.23223C11.2989 7.76339 10.663 7.5 10 7.5C9.33696 7.5 8.70107 7.76339 8.23223 8.23223C7.76339 8.70107 7.5 9.33696 7.5 10C7.5 10.663 7.76339 11.2989 8.23223 11.7678C8.70107 12.2366 9.33696 12.5 10 12.5C10.663 12.5 11.2989 12.2366 11.7678 11.7678Z"
-        stroke="#3F3F46"
+        stroke={fill}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M2.04785 10.0001C3.10952 6.61925 6.26868 4.16675 9.99952 4.16675C13.7312 4.16675 16.8895 6.61925 17.9512 10.0001C16.8895 13.3809 13.7312 15.8334 9.99952 15.8334C6.26868 15.8334 3.10952 13.3809 2.04785 10.0001Z"
-        stroke="#3F3F46"
+        stroke={fill}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -882,7 +891,7 @@ function UserStar({ ...props }) {
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
-      <g clip-path="url(#clip0_1858_495)">
+      <g clipPath="url(#clip0_1858_495)">
         <path
           fillRule="evenodd"
           clipRule="evenodd"
@@ -1089,6 +1098,44 @@ function Close({ fill, stroke, ...props }: IconComponentProps) {
   );
 }
 
+function Trash({ fill = "#4B5563", stroke, ...props }: IconComponentProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+    >
+      <path
+        fill={fill}
+        d="M20 6h-4V5a3 3 0 0 0-3-3h-2a3 3 0 0 0-3 3v1H4a1 1 0 0 0 0 2h1v11a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3V8h1a1 1 0 0 0 0-2M10 5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1h-4Zm7 14a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V8h10Z"
+      />
+    </svg>
+  );
+}
+
+function EyeOff({
+  width = 20,
+  height = 20,
+  fill = "#3F3F46",
+  stroke,
+  ...props
+}: IconComponentProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={width}
+      height={height}
+      viewBox="0 0 24 24"
+    >
+      <path
+        fill={fill}
+        d="M2 5.27L3.28 4L20 20.72L18.73 22l-3.08-3.08c-1.15.38-2.37.58-3.65.58c-5 0-9.27-3.11-11-7.5c.69-1.76 1.79-3.31 3.19-4.54zM12 9a3 3 0 0 1 3 3a3 3 0 0 1-.17 1L11 9.17A3 3 0 0 1 12 9m0-4.5c5 0 9.27 3.11 11 7.5a11.79 11.79 0 0 1-4 5.19l-1.42-1.43A9.862 9.862 0 0 0 20.82 12A9.821 9.821 0 0 0 12 6.5c-1.09 0-2.16.18-3.16.5L7.3 5.47c1.44-.62 3.03-.97 4.7-.97M3.18 12A9.821 9.821 0 0 0 12 17.5c.69 0 1.37-.07 2-.21L11.72 15A3.064 3.064 0 0 1 9 12.28L5.6 8.87c-.99.85-1.82 1.91-2.42 3.13"
+      />
+    </svg>
+  );
+}
+
 export default function Icon({ name, ...props }: IconProps) {
   switch (name) {
     case "user":
@@ -1153,6 +1200,8 @@ export default function Icon({ name, ...props }: IconProps) {
       return <InboxOut {...props} />;
     case "x":
       return <X {...props} />;
+    case "twitter":
+      return <X {...props} />;
     case "more-horizontal":
       return <MoreHorizontal {...props} />;
     case "eye":
@@ -1177,6 +1226,10 @@ export default function Icon({ name, ...props }: IconProps) {
       return <Transactions {...props} />;
     case "close":
       return <Close {...props} />;
+    case "trash":
+      return <Trash {...props} />;
+    case "eye-off":
+      return <EyeOff {...props} />;
     default:
       return null;
   }

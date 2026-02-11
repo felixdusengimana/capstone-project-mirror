@@ -14,15 +14,18 @@ interface ButtonProps extends ComponentProps<"button"> {
   size?: "sm" | "md" | "lg";
   bordered?: boolean;
   outline?: boolean;
+  isLoading?: boolean;
 }
 
-export default function Button({ ...props }: ButtonProps) {
+export default function Button(props: ButtonProps) {
   const {
     variant = "dark",
     size = "md",
     bordered = false,
     outline = false,
+    isLoading,
     disabled,
+    ...rest
   } = props;
 
   const variantClasses = {
@@ -44,16 +47,20 @@ export default function Button({ ...props }: ButtonProps) {
   };
 
   const borderClasses = bordered ? "border border-black" : "";
+  const isDisabled = isLoading || disabled;
 
   return (
     <button
-      {...props}
-      className={`lg:text-xl md:text-lg text-base font-normal rounded-full ${
+      {...rest}
+      className={`flex items-center justify-center gap-1 lg:text-xl md:text-lg text-base font-normal rounded-full ${
         outline ? "border border-gray-200" : variantClasses[variant]
       } ${sizeClasses[size]} ${borderClasses} ${props.className} ${
-        disabled ? "opacity-65 cursor-not-allowed" : ""
+        isDisabled ? "opacity-65 cursor-not-allowed" : ""
       }`}
     >
+      {isLoading && (
+        <div className="w-3 h-3 rounded-full border border-t-0 border-gray-200 animate-spin"></div>
+      )}
       {props.children}
     </button>
   );

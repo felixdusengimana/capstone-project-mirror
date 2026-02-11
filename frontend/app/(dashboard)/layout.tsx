@@ -1,5 +1,4 @@
 "use client";
-import Button from "@/components/atoms/Button";
 import { IconNames } from "@/components/atoms/Icon";
 import Sidebar from "@/components/organisms/Sidebar";
 import { ReactNode, useState } from "react";

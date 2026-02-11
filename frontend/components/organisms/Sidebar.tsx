@@ -7,6 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Button from "../atoms/Button";
 import dynamic from "next/dynamic";
+import { removeCookie } from "@/utils/cookie";
 const VerifyAccount = dynamic(
   () => import("@/components/molecules/VerifyAccount"),
   { ssr: false }
@@ -24,6 +25,11 @@ export default function Sidebar({
   ...props
 }: SidebarProps) {
   const pathname = usePathname();
+
+  const logout = () => {
+    removeCookie("token");
+    window.location.href = "/login";
+  };
 
   return (
     <div
@@ -73,9 +79,7 @@ export default function Sidebar({
 
       <div>
         <Button
-          onClick={() => {
-            window.location.href = "/login";
-          }}
+          onClick={logout}
           outline
           className="text-gray-900 flex gap-1 items-center"
         >

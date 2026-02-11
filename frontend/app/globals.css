@@ -12,6 +12,8 @@
   --animated-card-direction: to right;
 }
 
+
+
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
@@ -22,12 +24,21 @@
 
 * {
   scroll-behavior: smooth;
+
 }
 
 body {
   background: var(--bg);
   color: rgb(var(--foreground-rgb));
   font-size: 16px;
+}
+
+/* Change the white to any color */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 @layer utilities {

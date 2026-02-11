@@ -8,7 +8,6 @@ import Transaction from "@/components/molecules/Transaction";
 import Footer from "@/components/organisms/Footer";
 import Intro from "@/components/organisms/Intro";
 import Navbar from "@/components/organisms/Navbar";
-import React from "react";
 
 export default function page() {
   return (
