@@ -28,7 +28,7 @@ export default function Avatar({ ...props }: AvatarProps) {
     md: "w-12 h-12",
     lg: "w-16 h-16",
     xl: "w-[150px] h-[150px]",
-    "2xl": "w-[202px] h-[202px]",
+    "2xl": "lg:w-[202px] lg:h-[202px] w-[143.98px] h-[143.98px]",
   };
 
   return (
@@ -47,7 +47,7 @@ export default function Avatar({ ...props }: AvatarProps) {
           // loading="eager"
           // loader={({ src }) => src}
           fill={true}
-          className={`w-full h-full ${sizeClasses[size]} object-cover`}
+          className={`w-full h-full object-cover`}
         />
       ) : fallBackText ? (
         fallBackText

@@ -8,7 +8,7 @@ export default function Navbar() {
       <Logo />
       <div className="flex items-center gap-6">
         <Link href={"/login"}>
-          <Button variant="secondary" className="lg:px-12">
+          <Button variant="secondary" className="hidden md:block">
             Login
           </Button>
         </Link>

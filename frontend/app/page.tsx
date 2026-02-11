@@ -47,7 +47,7 @@ export default function page() {
           </h1>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-[18px] mt-12">
-          <div className="hidden lg:grid grid-cols-2 w-fit">
+          <div className="grid grid-cols-2 w-fit mx-auto lg:mx-0">
             <Avatar
               alt="Profile 1"
               src="/profiles/profile4.png"
@@ -96,7 +96,7 @@ export default function page() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-[18px]  mt-12">
+        <div className="grid  grid-cols-1 md:grid-cols-2 gap-[18px]  mt-12">
           <div className="flex flex-col justify-center">
             <h5 className="uppercase text-[#8A8A8B] mb-6">For creators</h5>
             <div className="flex flex-col gap-4">
@@ -114,7 +114,7 @@ export default function page() {
               </SmallCard>
             </div>
           </div>
-          <div className="hidden lg:grid grid-cols-2 ml-auto w-fit">
+          <div className="grid grid-cols-2 mr-auto lg:mr-0 ml-auto w-fit">
             <Avatar
               alt="Profile 1"
               src="/profiles/profile4.png"
@@ -148,8 +148,8 @@ export default function page() {
       </section>
 
       <section className="pt-24 page-padding">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 grid-rows-5 md:grid-rows-5 lg:grid-rows-3 min-h-[862px] gap-6">
-          <div className="hidden lg:flex bg-[url('/creator-bg.png')] bg-cover bg-no-repeat row-span-2 bg-transparent rounded-[32px] px-6 items-center justify-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 grid-rows-7 md:grid-rows-5 lg:grid-rows-3 min-h-[862px] gap-x-0 lg:gap-x-6 gap-y-6">
+          <div className="w-full flex bg-[url('/creator-bg.png')] bg-cover bg-no-repeat row-span-2 bg-transparent rounded-[32px] px-6 items-center justify-center">
             <CreatorSearchModal className="border-2 border-r-[#ffffff79] w-[252px]" />
           </div>
           <div className="col-span-2">
@@ -233,7 +233,7 @@ export default function page() {
             </Card>
           </div>
 
-          <div className="bg-[url('/sent-bg.png')] bg-cover bg-no-repeat row-span-2 bg-transparent rounded-[32px] px-6 lg:flex hidden  items-center justify-center">
+          <div className="bg-[url('/sent-bg.png')] bg-cover bg-no-repeat row-span-2 bg-transparent rounded-[32px] px-6 flex items-center justify-center">
             <button className="border-2 relative border-white w-[100px] h-[100px] rounded-full flex items-center justify-center  backdrop-blur-xl">
               <Icon name="send" />
               <Icon
@@ -269,8 +269,8 @@ export default function page() {
         </div>
       </section>
 
-      <section className="p-8 lg:pt-24 page-padding">
-        <div className="bg-[url('/lines-bg.png')] bg-cover bg-no-repeat row-span-2 bg-transparent min-h-[450px] rounded-[32px] px-6 flex flex-col gap-[53px] items-center justify-center">
+      <section className="lg:pt-24 page-padding">
+        <div className="bg-[url('/lines-bg.png')] w-full bg-cover bg-no-repeat row-span-2 bg-transparent min-h-[450px] py-5 rounded-[32px] px-6 flex flex-col gap-[53px] items-center justify-center">
           <h1 className="max-w-[767px] font-mono text-white text-[47px] text-center">
             Empowering African Influencers, One Tip at a Time.
           </h1>

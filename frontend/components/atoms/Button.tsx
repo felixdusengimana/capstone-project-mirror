@@ -38,9 +38,9 @@ export default function Button({ ...props }: ButtonProps) {
   };
 
   const sizeClasses = {
-    sm: "lg:px-2 md:px-1 py-1",
-    md: "lg:px-8 md:px-6 px-4 lg:py-4 md:py-2 py-1",
-    lg: "lg:px-6 md:px-4 px-2 lg:py-3 md:py-2 py-1",
+    sm: "lg:px-2 px-1",
+    md: "lg:px-8 px-6 px-4 lg:py-4 py-2",
+    lg: "lg:px-6 px-4 lg:py-3 py-2",
   };
 
   const borderClasses = bordered ? "border border-black" : "";

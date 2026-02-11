@@ -80,16 +80,15 @@ export default function Join() {
               <Input label="Your name" />
               <TextArea label="Bio" />
               <Select
-                isLoading
+                isLoading={isLoadingIndustries}
                 label="Industry"
                 placeholder="Select your industry"
               >
-                <option value="musician">Musician/Band</option>
-                <option value="youtuber">YouTuber</option>
-                <option value="podcaster">Podcaster</option>
-                <option value="actor">Actor/Actress</option>
-                <option value="comedian">Comedian</option>
-                <option value="artist">Artist</option>
+                {industries?.data.map((industry) => (
+                  <option key={industry.id} value={industry.id}>
+                    {industry.name}
+                  </option>
+                ))}
               </Select>
               <Select label="Country" placeholder="Select your country">
                 {countries.map((country: ICountry) => (

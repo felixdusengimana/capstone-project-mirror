@@ -9,3 +9,9 @@ export interface ICountry {
   callingCode: string;
   region: string;
 }
+
+export interface IResponse<T> {
+  data: T;
+  message: string;
+  success: boolean;
+}
