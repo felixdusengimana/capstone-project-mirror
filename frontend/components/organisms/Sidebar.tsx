@@ -8,6 +8,7 @@ import Image from "next/image";
 import Button from "../atoms/Button";
 import dynamic from "next/dynamic";
 import { removeCookie } from "@/utils/cookie";
+import { useGetMe } from "@/services/users";
 const VerifyAccount = dynamic(
   () => import("@/components/molecules/VerifyAccount"),
   { ssr: false }
@@ -25,11 +26,14 @@ export default function Sidebar({
   ...props
 }: SidebarProps) {
   const pathname = usePathname();
+  const { data: usr, isLoading: isUserLoading } = useGetMe();
 
   const logout = () => {
     removeCookie("token");
     window.location.href = "/login";
   };
+
+  const user = usr && !isUserLoading ? usr.data : null;
 
   return (
     <div
@@ -39,9 +43,9 @@ export default function Sidebar({
       <div>
         <Profile
           user={{
-            name: "Nziranziza Rafael",
-            photo: "/profiles/profile1.png",
-            username: "Rafael02",
+            name: user?.name || "",
+            photo: user?.profileImageUrl || "",
+            username: user?.username ? `@${user.username}` : "",
           }}
         />
 

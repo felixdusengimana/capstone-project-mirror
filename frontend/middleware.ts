@@ -9,6 +9,7 @@ export function middleware(request: NextRequest) {
   ];
 
   const authorizedRoutes = [
+    "/resolve",
     "/dashboard",
     "/join",
     "/ad",
@@ -21,7 +22,7 @@ export function middleware(request: NextRequest) {
   const tokenCookie = request.cookies.get("token");
 
   if (tokenCookie?.value && unAuthorizedRoutes.includes(pathname)) {
-    return NextResponse.redirect(new URL(`/dashboard`, request.url));
+    return NextResponse.redirect(new URL(`/resolve`, request.url));
   }
 
   if (!tokenCookie?.value && authorizedRoutes.includes(pathname)) {

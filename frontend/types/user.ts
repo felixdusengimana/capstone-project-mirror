@@ -10,9 +10,17 @@ export interface IUser {
   emailVerified: boolean;
   phoneNumberVerified: boolean;
   bio: string;
+  countryName: string;
+  industryName: string;
+  socialLinks: ISocialLink[];
 }
 
 export const step1 = z.object({
+  image: z
+    .string({
+      required_error: "Image is required",
+    })
+    .optional(),
   name: z
     .string({
       required_error: "Name is required",
@@ -52,7 +60,10 @@ export const step4 = z.object({
   ),
 });
 
-export const userSteps = [step1, step2, step3, step4];
+export interface ISocialLink {
+  platform: string;
+  link: string;
+}
 
 export type ICreateUser = z.infer<typeof step1> &
   z.infer<typeof step2> &

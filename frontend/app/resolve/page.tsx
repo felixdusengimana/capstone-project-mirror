@@ -12,8 +12,16 @@ export default function ResolveScreen() {
       if (!isLoading) {
         const info = user?.data;
         if (!info?.id) return router.replace("/login");
-        const step = !info?.bio ? 1 : !info.username ? 2 : -1;
-        if (step === -1) return router.push("/dashboard");
+        const step = !info?.bio
+          ? 1
+          : !info.username
+          ? 2
+          : !info.countryName
+          ? 3
+          : info.socialLinks?.length <= 0
+          ? 4
+          : -1;
+        if (step === -1) return router.replace("/dashboard");
 
         return router.replace(`/join?step=${step}`);
       }

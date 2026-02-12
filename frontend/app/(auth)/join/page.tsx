@@ -18,7 +18,7 @@ import { supportedSocials } from "@/utils/socials";
 import { ICountry } from "@/types/resources";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { UpdateUser, useGetMe } from "@/services/users";
+import { UpdateUser, UploadProfileImage, useGetMe } from "@/services/users";
 import { ICreateUser, step1, step2, step3, step4 } from "@/types/user";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -42,11 +42,16 @@ export default function Join() {
 
   const { data: user, isPending: isGettingUser } = useGetMe();
 
+  const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
+
+  const navigate = () => {
+    if (parseInt(step!) === STEPS) router.replace("/dashboard");
+    else router.replace(`/join?step=${parseInt(step!) + 1}`);
+  };
   const { mutate, isPending } = useMutation({
     onSuccess() {
       toast.success("Profile updated successfully!", { id: "update-profile" });
-      if (parseInt(step!) === STEPS) router.push("/dashboard");
-      else router.replace(`/join?step=${parseInt(step!) + 1}`);
+      navigate();
     },
     onError(error) {
       toast.error(error.message ?? "Profile update failed!", {
@@ -61,14 +66,29 @@ export default function Join() {
     setValue,
     watch,
     reset,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<ICreateUser>({
     resolver: zodResolver(
       step === "1" ? step1 : step === "2" ? step2 : step === "3" ? step3 : step4
     ),
   });
 
-  const onSubmit = (data: Partial<ICreateUser>) => {
+  const onSubmit = async (data: Partial<ICreateUser>) => {
+    if (!isDirty) {
+      return navigate();
+    }
+
+    if (profilePhoto) {
+      const data = new FormData();
+      data.append("image", profilePhoto);
+      const response = await UploadProfileImage(data);
+      if (response.data.success) {
+        return toast.error("Profile image upload failed!", {
+          id: "update-profile",
+        });
+      }
+    }
+
     toast.loading("Updating profile...", { id: "update-profile" });
     const socialLinks = data.socialLinks?.filter((link) => link.link);
     mutate({
@@ -92,10 +112,9 @@ export default function Join() {
       bio: user?.data?.bio,
       name: user?.data?.name,
       username: user?.data?.username,
-      socialLinks: [{ platform: "", link: "" }],
-      // countryIsoCode: user?.data?.countryIsoCode,
-      // industryCode: user?.data?.industryCode,
-      // socialLinks: user?.data?.socialLinks,
+      countryIsoCode: user?.data?.countryName,
+      industryCode: user?.data?.industryName,
+      socialLinks: user?.data?.socialLinks ?? [{ platform: "", link: "" }],
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.data, isGettingUser]);
@@ -125,7 +144,15 @@ export default function Join() {
             </p>
             <div className="flex flex-col lg:flex-row justify-between gap-10 items-center mt-10">
               <div className="max-w-[307px] flex flex-col items-center justify-center">
-                <Avatar src="" size="sxl" />
+                <Avatar
+                  size="sxl"
+                  src={
+                    profilePhoto
+                      ? URL.createObjectURL(profilePhoto)
+                      : user?.data.profileImageUrl ?? ""
+                  }
+                  alt="Profile Photo"
+                />
                 <label htmlFor="upload-profile-photo">
                   <div className="mt-6 text-xlfont-normal rounded-full border border-gray-200 flex gap-1 px-4 py-3">
                     <Icon name="camera" />
@@ -138,6 +165,16 @@ export default function Join() {
                   accept=".png;.jpg;.jpeg"
                   hidden
                   id="upload-profile-photo"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setProfilePhoto(file);
+                      setValue("image", file.name, {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                      });
+                    }
+                  }}
                 />
               </div>
               <div className="flex flex-col gap-4 flex-grow max-w-[438px]">
@@ -270,7 +307,7 @@ export default function Join() {
               connect with friends
             </p>
             <div className="flex flex-col gap-2 mt-10">
-              {watch("socialLinks").map((link, index) => {
+              {watch("socialLinks")?.map((link, index) => {
                 const domain = extractDomainFromURL(link.link);
                 const socialMedia =
                   Boolean(domain) && String(domain).split(".")[0];
