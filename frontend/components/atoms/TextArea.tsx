@@ -3,10 +3,11 @@ import { ComponentProps, useId } from "react";
 interface TextAreaProps extends ComponentProps<"textarea"> {
   label?: string;
   labelStyle?: string;
+  error?: string | JSX.Element;
 }
 
 export default function TextArea({ ...props }: TextAreaProps) {
-  const { label, labelStyle } = props;
+  const { label, labelStyle, error } = props;
   const id = useId();
 
   return (
@@ -21,9 +22,17 @@ export default function TextArea({ ...props }: TextAreaProps) {
       )}
       <textarea
         {...props}
-        className={`bg-slate-50 py-[13px] min-h-[102px] px-4 border border-[#E5E9F0] text-black outline-none w-full rounded-xl ${props.className}`}
+        className={`py-[13px] min-h-[102px] px-4 border text-black outline-none w-full rounded-xl ${
+          error ? "border-red-400 bg-red-50" : "border-[#E5E9F0] bg-slate-50 "
+        } ${props.className}`}
         id={props.id ?? id}
       />
+      {Boolean(error) &&
+        (typeof error === "string" ? (
+          <p className="text-red-500 text-sm mt-1">{error}</p>
+        ) : (
+          error
+        ))}
     </div>
   );
 }

@@ -11,6 +11,7 @@ interface SelectProps extends ComponentProps<"select"> {
   left?: ReactNode;
   placeholder?: string;
   isLoading?: boolean;
+  error?: string | JSX.Element;
 }
 
 export default function Select(props: SelectProps) {
@@ -23,6 +24,7 @@ export default function Select(props: SelectProps) {
     disabled,
     onChange,
     value = "",
+    error,
     ...rest
   } = props;
   const id = useId();
@@ -46,14 +48,16 @@ export default function Select(props: SelectProps) {
       )}
       <div
         className={`w-full flex items-center px-4 ${
-          isDisabled ? "bg-slate-300" : "bg-slate-50"
-        } border rounded-xl  border-[#E5E9F0] `}
+          error ? "border-red-400 bg-red-50" : "border-[#E5E9F0] bg-slate-50"
+        } ${isDisabled ? "bg-slate-300" : ""} border rounded-xl`}
       >
         {left && <>{left}</>}
         <select
           disabled={isDisabled}
           {...rest}
-          className={`appearance-none outline-none w-full py-[13px] bg-slate-50 text-black disabled:bg-slate-300`}
+          className={`appearance-none outline-none w-full py-[13px] text-black disabled:bg-slate-300  ${
+            error ? "border-red-400 bg-red-50" : "bg-slate-50 "
+          }`}
           id={props.id ?? id}
           value={value}
           onChange={handleChange}
@@ -71,6 +75,12 @@ export default function Select(props: SelectProps) {
           <Icon name="dropdown" />
         )}
       </div>
+      {Boolean(error) &&
+        (typeof error === "string" ? (
+          <p className="text-red-500 text-sm mt-1">{error}</p>
+        ) : (
+          error
+        ))}
     </div>
   );
 }

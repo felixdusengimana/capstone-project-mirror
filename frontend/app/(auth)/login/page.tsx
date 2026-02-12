@@ -26,7 +26,7 @@ export default function LoginPage() {
         return toast.error("Login failed!", { id: "login" });
       }
       setCookie("token", token, expiresIn);
-      router.push("/join?step=1");
+      router.push("/resolve");
     },
     onError(error) {
       toast.error(`${error.message ?? "Login failed!"}`, {

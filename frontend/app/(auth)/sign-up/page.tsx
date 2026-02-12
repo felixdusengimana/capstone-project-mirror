@@ -17,9 +17,8 @@ export default function RegisterPage() {
   const router = useRouter();
 
   const { mutate, isPending } = useMutation({
-    onSuccess(data) {
+    onSuccess() {
       toast.success("Registration successful!", { id: "register" });
-      console.log({ data });
       router.push("/login");
     },
     onError(error) {

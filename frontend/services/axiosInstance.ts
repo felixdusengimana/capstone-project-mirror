@@ -1,3 +1,4 @@
+import { getCookie } from "@/utils/cookie";
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 
 export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -14,7 +15,11 @@ const axiosInstance: AxiosInstance = axios.create({
 // request interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
-    // config.headers.Authorization = `Bearer ${accessToken}`;
+    // get accessToken from cookie
+    const accessToken = getCookie("token");
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
     return config;
   },
   (error) => {

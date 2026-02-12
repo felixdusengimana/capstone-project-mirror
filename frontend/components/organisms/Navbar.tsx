@@ -10,7 +10,7 @@ export default function Navbar() {
       <Logo />
       <div className="flex items-center gap-6">
         {isLoggedIn ? (
-          <Link href={"/dashboard"}>
+          <Link href={"/resolve"}>
             <Button variant="secondary" className="hidden md:block">
               Dashboard
             </Button>

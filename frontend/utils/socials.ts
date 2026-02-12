@@ -1,6 +1,5 @@
 export const supportedSocials = [
   "instagram",
-  "twitter",
   "x",
   "facebook",
   "youtube",
