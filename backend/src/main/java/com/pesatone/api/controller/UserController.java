@@ -1,18 +1,22 @@
 package com.pesatone.api.controller;
 
+import com.blazebit.persistence.PagedList;
 import com.pesatone.api.configuration.auth.RequestPrincipal;
 import com.pesatone.api.model.dto.ApiResponseObject;
 import com.pesatone.api.model.dto.UserDetailDto;
 import com.pesatone.api.model.entity.AppUser;
 import com.pesatone.api.model.pojo.UserPojo;
+import com.pesatone.api.model.search.CreatorSearchFilter;
+import com.pesatone.api.model.search.CreatorSearchResponse;
 import com.pesatone.api.service.UserService;
-import com.querydsl.core.QueryResults;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -45,11 +49,12 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponseObject<>("",true, null));
     }
 
-    @Operation(summary = "List Users", description = "Search for Users")
-    @GetMapping
-    public ResponseEntity<ApiResponseObject<QueryResults<Object>>> searchUsers( @Valid Object filter) {
-        return ResponseEntity.ok(new ApiResponseObject<>("Users retrieved successfully",
-                true,null));
+    @Operation(summary = "Search Creators", description = "Search Creators by Name or Username")
+    @GetMapping("/creators")
+    public ResponseEntity<ApiResponseObject<Page<CreatorSearchResponse>>> searchCreators(@ParameterObject @Valid CreatorSearchFilter filter) {
+        Page<CreatorSearchResponse> response = userService.searchCreators(filter);
+        return ResponseEntity.ok(new ApiResponseObject<>("Creators retrieved successfully",
+                true,response));
     }
 
     @Operation(summary = "Get User Profile", description = "Get LoggedIn User Profile")

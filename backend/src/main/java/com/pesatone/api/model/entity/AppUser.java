@@ -52,9 +52,11 @@ public class AppUser {
     @JsonIgnore
     private RoleEnum role;
 
-    private Boolean emailVerified;
+    private Boolean verified = false;
 
-    private Boolean phoneNumberVerified;
+    private Boolean emailVerified = false;
+
+    private Boolean phoneNumberVerified = false;
 
     private String bio;
 

@@ -27,7 +27,8 @@ public class ApplicationSecurityConfig {
             "/actuator/**",
             "/swagger-ui/**",
             "/api-doc.html",
-            "/resources/**"
+            "/resources/**",
+            "/users/creators"
     };
 
     @Bean

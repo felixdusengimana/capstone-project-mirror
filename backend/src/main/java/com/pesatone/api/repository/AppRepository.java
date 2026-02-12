@@ -1,6 +1,5 @@
 package com.pesatone.api.repository;
 
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.jpa.impl.JPAQuery;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +33,7 @@ public interface AppRepository {
 
     <T> T unproxy(Class<T> tClass, T entity);
 
-//    <E> JPAQuery<E> startJPAQuery(EntityPath<E> entityPath);
+    <E> JPAQuery<E> startJPAQuery(EntityPath<E> entityPath);
 
     @Transactional(readOnly = true)
     <E> Optional<E> findFirstByField(Class<E> type, String columnName, Object value);

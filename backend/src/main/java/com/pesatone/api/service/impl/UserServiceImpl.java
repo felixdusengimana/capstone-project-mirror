@@ -1,5 +1,6 @@
 package com.pesatone.api.service.impl;
 
+import com.blazebit.persistence.*;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.pesatone.api.exception.PesatoneNotFoundException;
@@ -11,14 +12,19 @@ import com.pesatone.api.model.entity.SocialLink;
 import com.pesatone.api.model.enumeration.RoleEnum;
 import com.pesatone.api.model.enumeration.StatusEnum;
 import com.pesatone.api.model.pojo.UserPojo;
-import com.pesatone.api.repository.AppUserRepository;
-import com.pesatone.api.repository.CountryRepository;
-import com.pesatone.api.repository.IndustryRepository;
-import com.pesatone.api.repository.SocialLinkRepository;
+import com.pesatone.api.model.search.CreatorSearchFilter;
+import com.pesatone.api.model.search.CreatorSearchResponse;
+import com.pesatone.api.repository.*;
 import com.pesatone.api.service.PesatoneTokenService;
 import com.pesatone.api.service.UserService;
+import com.querydsl.core.Tuple;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +45,9 @@ public class UserServiceImpl implements UserService {
     private final SocialLinkRepository socialLinkRepository;
     private final Cloudinary cloudinary;
     private final PesatoneTokenService tokenService;
+    private final AppRepository appRepository;
+    private final CriteriaBuilderFactory builderFactory;
+    private final EntityManager entityManager;
 
     @Transactional
     @Override
@@ -54,20 +63,20 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public AppUser updateUserDetails(AppUser user, UserDetailDto dto) {
-        if(StringUtils.isNotBlank(dto.getUsername())) user.setUsername(dto.getUsername().toLowerCase());
-        if(StringUtils.isNotBlank(dto.getName())) user.setName(dto.getName());
-        if(StringUtils.isNotBlank(dto.getPhoneNumber())) user.setPhoneNumber(dto.getPhoneNumber());
-        if(StringUtils.isNotBlank(dto.getBio())) user.setBio(dto.getBio());
+        if (StringUtils.isNotBlank(dto.getUsername())) user.setUsername(dto.getUsername().toLowerCase());
+        if (StringUtils.isNotBlank(dto.getName())) user.setName(dto.getName());
+        if (StringUtils.isNotBlank(dto.getPhoneNumber())) user.setPhoneNumber(dto.getPhoneNumber());
+        if (StringUtils.isNotBlank(dto.getBio())) user.setBio(dto.getBio());
 
-        if(StringUtils.isNotBlank(dto.getCountryIsoCode())) {
+        if (StringUtils.isNotBlank(dto.getCountryIsoCode())) {
             countryRepository.findActiveByIsoCode(dto.getCountryIsoCode())
-                            .ifPresent(user::setCountry);
+                    .ifPresent(user::setCountry);
         }
-        if(StringUtils.isNotBlank(dto.getIndustryCode())) {
+        if (StringUtils.isNotBlank(dto.getIndustryCode())) {
             industryRepository.findActiveByCode(dto.getIndustryCode())
                     .ifPresent(user::setIndustry);
         }
-        if(dto.getSocialLinks() != null && !dto.getSocialLinks().isEmpty()) {
+        if (dto.getSocialLinks() != null && !dto.getSocialLinks().isEmpty()) {
             setSocialLinks(user, dto.getSocialLinks());
         }
 
@@ -85,8 +94,8 @@ public class UserServiceImpl implements UserService {
                     ObjectUtils.asMap("public_id", file.getName(),
                             "folder", "profile_images"));
             secureUrl = (String) uploadedFile.get("secure_url");
-           user.setProfileImageUrl(secureUrl);
-           userRepository.save(user);
+            user.setProfileImageUrl(secureUrl);
+            userRepository.save(user);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -94,7 +103,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void initiatePasswordReset(AppUser user){
+    public void initiatePasswordReset(AppUser user) {
         String token = tokenService.getPasswordResetToken(user);
         //TODO send email
     }
@@ -102,38 +111,92 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void resetPassword(Long userId, String password) {
-       AppUser user = userRepository.findActiveById(userId)
-                .orElseThrow(()-> new PesatoneNotFoundException("User not found"));
+        AppUser user = userRepository.findActiveById(userId)
+                .orElseThrow(() -> new PesatoneNotFoundException("User not found"));
 
-       user.setPassword(passwordEncoder.encode(password));
-       userRepository.save(user);
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
     }
 
     @Override
     public UserPojo getUserDetails(AppUser user) {
         UserPojo pojo = new UserPojo(user);
-        if(user.getCountry() != null){
+        if (user.getCountry() != null) {
             countryRepository.findById(user.getCountry().getId())
                     .ifPresent(country -> pojo.setCountryName(country.getName()));
         }
-        if(user.getIndustry() != null){
+        if (user.getIndustry() != null) {
             industryRepository.findById(user.getIndustry().getId())
                     .ifPresent(ind -> pojo.setIndustryName(ind.getName()));
         }
 
         pojo.setSocialLinks(socialLinkRepository.findByAppUser(user)
                 .stream()
-                .map(link-> new SocialLinkDto(link.getLink(), link.getPlatform()))
+                .map(link -> new SocialLinkDto(link.getLink(), link.getPlatform()))
                 .toList());
 
         return pojo;
     }
 
-    private void setSocialLinks(AppUser user, List<SocialLinkDto> linkDtos){
+    @Override
+    public Page<CreatorSearchResponse> searchCreators(CreatorSearchFilter filter) {
+        CriteriaBuilder<CreatorSearchResponse> criteriaBuilder = builderFactory.create(entityManager, CreatorSearchResponse.class)
+                .from(AppUser.class, "u")
+                .selectNew(new ObjectBuilder<>() {
+
+                    @Override
+                    public <X extends SelectBuilder<X>> void applySelects(X queryBuilder) {
+                        queryBuilder
+                                .select("id")
+                                .select("username")
+                                .select("name")
+                                .select("profileImageUrl")
+                                .select("verified");
+                    }
+
+                    @Override
+                    public CreatorSearchResponse build(Object[] tuple) {
+                        return new CreatorSearchResponse(
+                                (Long) tuple[0],
+                                (String) tuple[1],
+                                (String) tuple[2],
+                                (String) tuple[3],
+                                tuple[4] != null && (Boolean) tuple[4]
+                        );
+                    }
+
+                    @Override
+                    public List<CreatorSearchResponse> buildList(List<CreatorSearchResponse> list) {
+                        return list;
+                    }
+                });
+
+        criteriaBuilder.where("u.role").eq(RoleEnum.CREATOR);
+
+        if (StringUtils.isNotBlank(filter.getName())) {
+            criteriaBuilder
+                    .whereOr()
+                        .where("u.username").like().value("%" + filter.getName() + "%").noEscape()
+                        .where("u.name").like().value("%" + filter.getName() + "%").noEscape()
+                    .endOr();
+        }
+
+        PagedList<CreatorSearchResponse> result = criteriaBuilder
+                .orderByAsc("u.id")
+                .orderByAsc("u.verified")
+                .page((int) filter.getPageNumber(), (int) filter.getPageSize())
+                .getResultList();
+
+        return new PageImpl<CreatorSearchResponse>(result,
+                PageRequest.of(filter.getPageNumber(), filter.getPageSize()),
+                result.getTotalSize());
+    }
+
+    private void setSocialLinks(AppUser user, List<SocialLinkDto> linkDtos) {
         List<SocialLink> links = new ArrayList<>();
-        for (SocialLinkDto linkDto: linkDtos){
+        for (SocialLinkDto linkDto : linkDtos) {
             SocialLink link = socialLinkRepository.findByAppUserAndPlatform(user, linkDto.getPlatform())
-                    .orElseGet(()->{
+                    .orElseGet(() -> {
                         SocialLink newLink = new SocialLink();
                         newLink.setLink(linkDto.getLink());
                         newLink.setPlatform(linkDto.getPlatform());

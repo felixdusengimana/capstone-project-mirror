@@ -1,5 +1,6 @@
 package com.pesatone.api.repository;
 
+import com.blazebit.persistence.CriteriaBuilderFactory;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.jpa.impl.JPAQuery;
 import jakarta.persistence.EntityManager;
@@ -10,6 +11,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +31,9 @@ class AppRepositoryImpl implements AppRepository {
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Autowired
+    private CriteriaBuilderFactory criteriaBuilderFactory;
 
     @Transactional(readOnly = true)
     @Override
@@ -86,10 +91,10 @@ class AppRepositoryImpl implements AppRepository {
         entityManager.remove(e);
     }
 
-//    @Override
-//    public <E> JPAQuery<E> startJPAQuery(EntityPath<E> entityPath) {
-//        return new JPAQuery<E>(entityManager).from(entityPath);
-//    }
+    @Override
+    public <E> JPAQuery<E> startJPAQuery(EntityPath<E> entityPath) {
+        return new JPAQuery<E>(entityManager).from(entityPath);
+    }
 
     @Transactional(readOnly = true)
     @Override
