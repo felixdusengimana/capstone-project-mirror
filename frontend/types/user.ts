@@ -13,6 +13,13 @@ export interface IUser {
   countryName: string;
   industryName: string;
   socialLinks: ISocialLink[];
+  verified: boolean;
+}
+
+export interface ICreatorFilter {
+  name: string;
+  pageNumber: number;
+  pageSize: number;
 }
 
 export const step1 = z.object({

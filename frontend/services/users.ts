@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "./axiosInstance";
-import { IResponse } from "@/types/common";
-import { ICreateUser, IUser } from "@/types/user";
+import { IResponse, ISorted } from "@/types/common";
+import { ICreateUser, ICreatorFilter, IUser } from "@/types/user";
+import { ObjectToParams } from "@/utils/params";
 
 export function useGetMe() {
   return useQuery<IResponse<IUser>>({
@@ -26,5 +27,24 @@ export function UploadProfileImage(data: FormData) {
     headers: {
       "Content-Type": "multipart/form-data",
     },
+  });
+}
+
+export function useGetCreators({
+  name,
+  pageNumber = 1,
+  pageSize = 10,
+}: Partial<ICreatorFilter>) {
+  const params = ObjectToParams({ name, pageNumber, pageSize });
+  return useQuery<IResponse<ISorted<IUser>>>({
+    queryKey: ["creators", name, pageNumber, pageSize],
+    queryFn: async () => axiosInstance.get(`/users/creators?${params}`),
+  });
+}
+
+export function useGetCreator(id: string) {
+  return useQuery<IResponse<IUser>>({
+    queryKey: ["creator", id],
+    queryFn: async () => axiosInstance.get(`/users/creators/${id}`),
   });
 }

@@ -5,6 +5,7 @@ import Dialog, { DialogRoot, DialogTrigger } from "./Dialog";
 import Profile from "./Profile";
 import SearchInput from "./SearchInput";
 import Link from "next/link";
+import { useGetCreators } from "@/services/users";
 
 interface SearchTriggerProps extends ComponentProps<"div"> {
   placeholder?: string;
@@ -38,57 +39,8 @@ export default function CreatorSearchModal({
   ...props
 }: SearchTriggerProps) {
   const [query, setQuery] = useState("");
-  const dummyData = [
-    {
-      name: "Bruce Melodie",
-      username: "brucemelodie",
-      photo: "/profiles/profile1.png",
-      verified: true,
-    },
-    {
-      name: "Queen Cha",
-      username: "queencha",
-      photo: "/profiles/profile2.png",
-      verified: false,
-    },
-    {
-      name: "Riderman",
-      username: "riderman",
-      photo: "/profiles/profile3.png",
-      verified: true,
-    },
-    {
-      name: "Tom Close",
-      username: "tomclose",
-      photo: "/profiles/profile4.png",
-      verified: false,
-    },
-    {
-      name: "Christopher",
-      username: "christopher",
-      photo: "/profiles/profile1.png",
-      verified: true,
-    },
-    {
-      name: "Diamond Platnumz",
-      username: "diamondplatnumz",
-      photo: "/profiles/profile2.png",
-      verified: false,
-    },
-    {
-      name: "Davido",
-      username: "davido",
-      photo: "/profiles/profile3.png",
-      verified: true,
-    },
-  ];
-
-  const remaining = dummyData.filter(
-    (d) =>
-      d.name.toLocaleLowerCase().includes(query) ||
-      d.username.toLocaleLowerCase().includes(query) ||
-      !Boolean(query)
-  );
+  const { data, isLoading } = useGetCreators({ name: query });
+  const creators = data?.data.results || [];
 
   return (
     <DialogRoot>
@@ -102,20 +54,22 @@ export default function CreatorSearchModal({
       <Dialog className="pt-4 min-w-full lg:min-w-[600px]">
         <SearchInput onSearch={(query) => setQuery(query)} />
         <div className="">
-          {remaining.length > 0 ? (
-            remaining.map((art, i) => (
+          {isLoading ? (
+            <p className="text-center text-gray-500 py-4">Loading...</p>
+          ) : creators.length > 0 ? (
+            creators.map((art, i) => (
               <Link
                 className="block py-3 px-4 hover:bg-gray-200"
                 key={i}
-                href={`/creator/${i}`}
+                href={`/creator/${art.id}`}
               >
                 <Profile
                   user={{
                     name: art.name,
                     username: art.username,
-                    photo: art.photo,
+                    photo: art.profileImageUrl,
                   }}
-                  verified={i % 2 === 0}
+                  verified={art.verified}
                 />
               </Link>
             ))
