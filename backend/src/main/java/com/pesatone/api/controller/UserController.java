@@ -4,6 +4,7 @@ import com.pesatone.api.configuration.auth.RequestPrincipal;
 import com.pesatone.api.model.dto.ApiResponseObject;
 import com.pesatone.api.model.dto.UserDetailDto;
 import com.pesatone.api.model.entity.AppUser;
+import com.pesatone.api.model.pojo.UserPojo;
 import com.pesatone.api.service.UserService;
 import com.querydsl.core.QueryResults;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,18 +54,18 @@ public class UserController {
 
     @Operation(summary = "Get User Profile", description = "Get LoggedIn User Profile")
     @GetMapping("/profile")
-    public ResponseEntity<ApiResponseObject<AppUser>> getLoggedInUser() {
-        AppUser user = principal.getLoggedInUser();
-        return ResponseEntity.ok(new ApiResponseObject<>("User profile retrieved successfully", true, user));
+    public ResponseEntity<ApiResponseObject<UserPojo>> getLoggedInUser() {
+        return ResponseEntity.ok(new ApiResponseObject<>("User profile retrieved successfully",
+                true, userService.getUserDetails(principal.getLoggedInUser())));
     }
 
     @Operation(summary = "Update profile", description = "Update logged in user profile")
     @PutMapping("profile")
     @PreAuthorize("hasAnyAuthority(T(com.pesatone.api.model.enumeration.PermissionEnum).UPDATE_PROFILE)")
-    public ResponseEntity<ApiResponseObject<AppUser>> updateUserProfile(@RequestBody @Valid UserDetailDto dto) {
+    public ResponseEntity<ApiResponseObject<UserPojo>> updateUserProfile(@RequestBody @Valid UserDetailDto dto) {
         AppUser user = principal.getLoggedInUser();
         return ResponseEntity.ok(new ApiResponseObject<>("Profile updated successfully", true,
-                userService.updateUserDetails(user, dto)));
+                userService.getUserDetails(userService.updateUserDetails(user, dto))));
     }
 
     @Operation(summary = "Update profile", description = "Update logged in user profile")

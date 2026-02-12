@@ -10,6 +10,7 @@ import com.pesatone.api.model.entity.AppUser;
 import com.pesatone.api.model.entity.SocialLink;
 import com.pesatone.api.model.enumeration.RoleEnum;
 import com.pesatone.api.model.enumeration.StatusEnum;
+import com.pesatone.api.model.pojo.UserPojo;
 import com.pesatone.api.repository.AppUserRepository;
 import com.pesatone.api.repository.CountryRepository;
 import com.pesatone.api.repository.IndustryRepository;
@@ -106,6 +107,26 @@ public class UserServiceImpl implements UserService {
 
        user.setPassword(passwordEncoder.encode(password));
        userRepository.save(user);
+    }
+
+    @Override
+    public UserPojo getUserDetails(AppUser user) {
+        UserPojo pojo = new UserPojo(user);
+        if(user.getCountry() != null){
+            countryRepository.findById(user.getCountry().getId())
+                    .ifPresent(country -> pojo.setCountryName(country.getName()));
+        }
+        if(user.getIndustry() != null){
+            industryRepository.findById(user.getIndustry().getId())
+                    .ifPresent(ind -> pojo.setIndustryName(ind.getName()));
+        }
+
+        pojo.setSocialLinks(socialLinkRepository.findByAppUser(user)
+                .stream()
+                .map(link-> new SocialLinkDto(link.getLink(), link.getPlatform()))
+                .toList());
+
+        return pojo;
     }
 
     private void setSocialLinks(AppUser user, List<SocialLinkDto> linkDtos){

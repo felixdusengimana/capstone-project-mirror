@@ -4,6 +4,7 @@ import com.pesatone.api.model.dto.SignUpDto;
 import com.pesatone.api.model.dto.UserDetailDto;
 import com.pesatone.api.model.entity.AppUser;
 import com.pesatone.api.model.enumeration.RoleEnum;
+import com.pesatone.api.model.pojo.UserPojo;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
@@ -16,4 +17,6 @@ public interface UserService {
     void initiatePasswordReset(AppUser user);
 
     void resetPassword(Long userId, String password);
+
+    UserPojo getUserDetails(AppUser user);
 }
