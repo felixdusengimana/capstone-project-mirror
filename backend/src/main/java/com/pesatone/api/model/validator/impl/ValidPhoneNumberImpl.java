@@ -1,11 +1,10 @@
 package com.pesatone.api.model.validator.impl;
 
-import com.pesatone.api.model.validator.UniqueUserEmail;
 import com.pesatone.api.model.validator.ValidPhoneNumber;
 import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.stereotype.Component;
 
-import jakarta.validation.ConstraintValidatorContext;
 import java.util.regex.Pattern;
 
 @Component
