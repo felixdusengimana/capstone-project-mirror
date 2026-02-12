@@ -38,6 +38,7 @@ export default function DashBoardLayout({ children }: { children: ReactNode }) {
       >
         <Sidebar links={links} isAdmin />
       </div>
+      {children}
     </div>
   );
 }
