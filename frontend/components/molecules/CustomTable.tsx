@@ -13,7 +13,7 @@ export interface CustomTableProps<Tdata> {
 
 const Table = ({ children, className, ...props }: ComponentProps<"table">) => {
   return (
-    <div className="rounded-xl overflow-auto md:overflow-hidden w-full border border-t-0">
+    <div className="bg-white text-gray-400 font-medium text-xs overflow-auto w-full border border-t-0">
       <table {...props} className={`w-full ${className}`}>
         {children}
       </table>
@@ -23,7 +23,7 @@ const Table = ({ children, className, ...props }: ComponentProps<"table">) => {
 
 const THead = ({ children, className, ...props }: ComponentProps<"thead">) => {
   return (
-    <thead {...props} className={`text-left capitalize ${className}`}>
+    <thead {...props} className={`text-left bg-white capitalize ${className}`}>
       {children}
     </thead>
   );
@@ -52,7 +52,7 @@ const Th = ({ children, className, ...props }: ComponentProps<"th">) => {
   return (
     <th
       {...props}
-      className={`font-medium first:pl-4 py-4 bg-[#F6F6F6] text-xs text-gray-400 capitalize last:pr-6 ${className}`}
+      className={`font-medium border-b first:pl-4 py-4 text-xs text-gray-400 capitalize last:pr-6 ${className}`}
     >
       {children}
     </th>
@@ -119,7 +119,7 @@ const CustomTable = <TData,>({
                     length: table.getVisibleFlatColumns().length,
                   }).map((_, colKey) => (
                     <Td key={colKey}>
-                      <div className="h-2 bg-gray-200 rounded-full w-1/2 animate-pulse"></div>
+                      <div className="h-2 bg-gray-200 w-1/2 animate-pulse"></div>
                     </Td>
                   ))}
                 </Tr>

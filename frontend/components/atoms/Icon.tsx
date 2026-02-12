@@ -47,6 +47,7 @@ export type IconNames =
   | "dropdown"
   | "transactions"
   | "close"
+  | "attachment"
   | "trash";
 
 interface IconProps extends ComponentProps<"svg"> {
@@ -1136,6 +1137,29 @@ function EyeOff({
   );
 }
 
+function Attachment({
+  fill = "#00B7FE",
+  stroke,
+  width = 17,
+  height = 16,
+  ...props
+}: IconComponentProps) {
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox="0 0 17 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M11.3334 4V11.6667C11.3334 13.14 10.14 14.3333 8.6667 14.3333C7.19336 14.3333 6.00003 13.14 6.00003 11.6667V3.33333C6.00003 2.41333 6.7467 1.66666 7.6667 1.66666C8.5867 1.66666 9.33336 2.41333 9.33336 3.33333V10.3333C9.33336 10.7 9.03336 11 8.6667 11C8.30003 11 8.00003 10.7 8.00003 10.3333V4H7.00003V10.3333C7.00003 11.2533 7.7467 12 8.6667 12C9.5867 12 10.3334 11.2533 10.3334 10.3333V3.33333C10.3334 1.86 9.14003 0.666664 7.6667 0.666664C6.19336 0.666664 5.00003 1.86 5.00003 3.33333V11.6667C5.00003 13.6933 6.64003 15.3333 8.6667 15.3333C10.6934 15.3333 12.3334 13.6933 12.3334 11.6667V4H11.3334Z"
+        fill={fill}
+      />
+    </svg>
+  );
+}
+
 export default function Icon({ name, ...props }: IconProps) {
   switch (name) {
     case "user":
@@ -1230,6 +1254,8 @@ export default function Icon({ name, ...props }: IconProps) {
       return <Trash {...props} />;
     case "eye-off":
       return <EyeOff {...props} />;
+    case "attachment":
+      return <Attachment {...props} />;
     default:
       return null;
   }
