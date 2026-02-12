@@ -7,6 +7,7 @@ import com.pesatone.api.repository.AppUserRepository;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +37,7 @@ public class UniqueUserNameImpl implements ConstraintValidator<UniqueUserName, S
         }
         return (principal != null
                 && principal.getLoggedInUser() != null
+                && StringUtils.isNotBlank(principal.getLoggedInUser().getUsername())
                 && principal.getLoggedInUser().getUsername().equalsIgnoreCase(value.trim()))
                 || userRepository.findByUserName(value.trim()).isEmpty();
     }

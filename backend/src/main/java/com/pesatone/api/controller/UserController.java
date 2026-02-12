@@ -11,6 +11,7 @@ import com.pesatone.api.model.search.CreatorSearchFilter;
 import com.pesatone.api.model.search.CreatorSearchResponse;
 import com.pesatone.api.repository.AppUserRepository;
 import com.pesatone.api.service.UserService;
+import com.querydsl.core.QueryResults;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -48,8 +49,8 @@ public class UserController {
 
     @Operation(summary = "Search Creators", description = "Search Creators by Name or Username")
     @GetMapping("/creators")
-    public ResponseEntity<ApiResponseObject<Page<CreatorSearchResponse>>> searchCreators(@ParameterObject @Valid CreatorSearchFilter filter) {
-        Page<CreatorSearchResponse> response = userService.searchCreators(filter);
+    public ResponseEntity<ApiResponseObject<QueryResults<CreatorSearchResponse>>> searchCreators(@ParameterObject @Valid CreatorSearchFilter filter) {
+        QueryResults<CreatorSearchResponse> response = userService.searchCreators(filter);
         return ResponseEntity.ok(new ApiResponseObject<>("Creators retrieved successfully",
                 true,response));
     }

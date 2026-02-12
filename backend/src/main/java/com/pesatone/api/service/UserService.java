@@ -25,5 +25,5 @@ public interface UserService {
 
     UserPojo getUserDetails(AppUser user);
 
-    Page<CreatorSearchResponse> searchCreators(CreatorSearchFilter filter);
+    QueryResults<CreatorSearchResponse> searchCreators(CreatorSearchFilter filter);
 }

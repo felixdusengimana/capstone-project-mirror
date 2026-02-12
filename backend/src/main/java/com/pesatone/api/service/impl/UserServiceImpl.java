@@ -17,6 +17,7 @@ import com.pesatone.api.model.search.CreatorSearchResponse;
 import com.pesatone.api.repository.*;
 import com.pesatone.api.service.PesatoneTokenService;
 import com.pesatone.api.service.UserService;
+import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -139,7 +140,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<CreatorSearchResponse> searchCreators(CreatorSearchFilter filter) {
+    public QueryResults<CreatorSearchResponse> searchCreators(CreatorSearchFilter filter) {
         CriteriaBuilder<CreatorSearchResponse> criteriaBuilder = builderFactory.create(entityManager, CreatorSearchResponse.class)
                 .from(AppUser.class, "u")
                 .selectNew(new ObjectBuilder<>() {
@@ -187,9 +188,7 @@ public class UserServiceImpl implements UserService {
                 .page((int) filter.getPageNumber(), (int) filter.getPageSize())
                 .getResultList();
 
-        return new PageImpl<CreatorSearchResponse>(result,
-                PageRequest.of(filter.getPageNumber(), filter.getPageSize()),
-                result.getTotalSize());
+        return new QueryResults<>(result,filter.getPageNumber().longValue(),filter.getPageSize().longValue(),result.getTotalSize());
     }
 
     private void setSocialLinks(AppUser user, List<SocialLinkDto> linkDtos) {
