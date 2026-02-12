@@ -16,4 +16,13 @@ public class UserPojo extends AppUser {
     private String countryName;
     private String industryName;
     private List<SocialLinkDto> socialLinks;
+
+    public static UserPojo stripDetails(UserPojo userPojo){
+        userPojo.setEmail(null);
+        userPojo.setCreatedAt(null);
+        userPojo.setCreatedAt(null);
+        userPojo.setUpdatedAt(null);
+        userPojo.setPhoneNumber(null);
+        return userPojo;
+    }
 }

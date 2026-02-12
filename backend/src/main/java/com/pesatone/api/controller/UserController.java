@@ -1,13 +1,15 @@
 package com.pesatone.api.controller;
 
-import com.blazebit.persistence.PagedList;
 import com.pesatone.api.configuration.auth.RequestPrincipal;
+import com.pesatone.api.exception.PesatoneNotFoundException;
 import com.pesatone.api.model.dto.ApiResponseObject;
 import com.pesatone.api.model.dto.UserDetailDto;
 import com.pesatone.api.model.entity.AppUser;
+import com.pesatone.api.model.enumeration.RoleEnum;
 import com.pesatone.api.model.pojo.UserPojo;
 import com.pesatone.api.model.search.CreatorSearchFilter;
 import com.pesatone.api.model.search.CreatorSearchResponse;
+import com.pesatone.api.repository.AppUserRepository;
 import com.pesatone.api.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,12 +44,7 @@ import java.util.UUID;
 public class UserController {
     private final RequestPrincipal principal;
     private final UserService userService;
-
-    @Operation(summary = "Get User", description = "Get an Existing User")
-    @GetMapping("{id}")
-    public ResponseEntity<ApiResponseObject<Object>> getUser(@PathVariable(name ="id") UUID id) {
-        return ResponseEntity.ok(new ApiResponseObject<>("",true, null));
-    }
+    private final AppUserRepository userRepository;
 
     @Operation(summary = "Search Creators", description = "Search Creators by Name or Username")
     @GetMapping("/creators")
@@ -55,6 +52,15 @@ public class UserController {
         Page<CreatorSearchResponse> response = userService.searchCreators(filter);
         return ResponseEntity.ok(new ApiResponseObject<>("Creators retrieved successfully",
                 true,response));
+    }
+
+    @Operation(summary = "Get Creator's Profile", description = "Get Creators profile by Id")
+    @GetMapping("/creators/{id}")
+    public ResponseEntity<ApiResponseObject<UserPojo>> getCreator(@PathVariable Long id) {
+        AppUser user = userRepository.findActiveByIdAndRole(id, RoleEnum.CREATOR)
+                .orElseThrow(() -> new PesatoneNotFoundException("Creator not found"));
+        return ResponseEntity.ok(new ApiResponseObject<>("Creator profile retrieved successfully",
+                true, UserPojo.stripDetails(userService.getUserDetails(user))));
     }
 
     @Operation(summary = "Get User Profile", description = "Get LoggedIn User Profile")
