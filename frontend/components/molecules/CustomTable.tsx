@@ -1,6 +1,6 @@
 import type { Table } from "@tanstack/react-table";
 import { flexRender } from "@tanstack/react-table";
-import { ComponentProps } from "react";
+import { ComponentProps, useMemo } from "react";
 import Pagination, { PaginationProps } from "./Pagination";
 
 export interface CustomTableProps<Tdata> {
@@ -77,100 +77,74 @@ const CustomTable = <TData,>({
   checkBoxCol,
   ...props
 }: CustomTableProps<TData>) => {
+  const renderTableContent = useMemo(() => {
+    if (loading) {
+      return (
+        <>
+          {Array.from({ length: 3 }).map((_, key) => (
+            <Tr key={"row" + key + "-loading"} className="hover:bg-transparent">
+              {Array.from(
+                { length: table.getVisibleFlatColumns().length },
+                (_, colKey) => (
+                  <Td key={colKey}>
+                    <div className="h-2 bg-gray-200 w-1/2 animate-pulse"></div>
+                  </Td>
+                )
+              )}
+            </Tr>
+          ))}
+        </>
+      );
+    } else if (table.getRowModel().rows.length === 0) {
+      return (
+        <Tr key={"no-data-row"} className="hover:bg-inherit">
+          <Td
+            colSpan={table.getAllColumns().length}
+            className="capitalize text-center text-xs"
+          >
+            data is empty
+          </Td>
+        </Tr>
+      );
+    } else {
+      return table.getRowModel().rows.map((row, i) => (
+        <Tr key={row.id + i + "-drow"}>
+          {row.getVisibleCells().map((cell, j) => (
+            <Td
+              key={cell.id + i + j + "-dcell"}
+              className={checkBoxCol === cell.column.id ? "w-[3rem]" : ""}
+            >
+              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+            </Td>
+          ))}
+        </Tr>
+      ));
+    }
+  }, [loading, table, checkBoxCol]);
+
   return (
     <div {...props}>
       <Table>
         <THead>
           {table.getHeaderGroups().map((headerGroup, i) => (
             <Tr key={headerGroup.id + i + "-hrow"}>
-              {headerGroup.headers.map((header, j) =>
-                checkBoxCol && checkBoxCol === header.id ? (
-                  <Th
-                    data-colid="checkbox"
-                    className="w-[3rem]"
-                    key={header.id + i + j + "-hcell"}
-                  >
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                  </Th>
-                ) : (
-                  <Th data-colid="data" key={header.id}>
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                  </Th>
-                )
-              )}
+              {headerGroup.headers.map((header, j) => (
+                <Th
+                  key={header.id + i + j + "-hcell"}
+                  className={checkBoxCol === header.id ? "w-[3rem]" : ""}
+                >
+                  {flexRender(
+                    header.column.columnDef.header,
+                    header.getContext()
+                  )}
+                </Th>
+              ))}
             </Tr>
           ))}
         </THead>
-        <TBody>
-          {loading ? (
-            <>
-              {Array.from({ length: 3 }).map((_, key) => (
-                <Tr
-                  key={"row" + key + "-loading"}
-                  className="hover:bg-transparent"
-                >
-                  {Array.from({
-                    length: table.getVisibleFlatColumns().length,
-                  }).map((_, colKey) => (
-                    <Td key={colKey}>
-                      <div className="h-2 bg-gray-200 w-1/2 animate-pulse"></div>
-                    </Td>
-                  ))}
-                </Tr>
-              ))}
-            </>
-          ) : (
-            <>
-              {table.getRowModel().rows.length <= 0 ? (
-                <Tr key={"no-data-row"} className="hover:bg-inherit">
-                  <Td
-                    colSpan={table.getAllColumns().length}
-                    className="capitalize text-center text-xs"
-                  >
-                    data is empty
-                  </Td>
-                </Tr>
-              ) : (
-                <>
-                  {table.getRowModel().rows.map((row, i) => (
-                    <Tr key={row.id + i + "-drow"}>
-                      {row.getVisibleCells().map((cell, j) =>
-                        checkBoxCol && checkBoxCol === cell.column.id ? (
-                          <Td
-                            className="w-[3rem]"
-                            key={cell.id + i + j + "-dcell"}
-                          >
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
-                            )}
-                          </Td>
-                        ) : (
-                          <Td key={cell.id}>
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
-                            )}
-                          </Td>
-                        )
-                      )}
-                    </Tr>
-                  ))}
-                </>
-              )}
-            </>
-          )}
-        </TBody>
+        <TBody>{renderTableContent}</TBody>
       </Table>
-      {pagination?.total && !loading ? (
-        <Pagination {...pagination!} loading={loading} />
-      ) : null}
+      {pagination?.total && !loading && <Pagination {...pagination} />}
     </div>
   );
 };

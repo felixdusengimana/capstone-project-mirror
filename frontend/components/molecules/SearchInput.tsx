@@ -2,7 +2,7 @@
 import { ComponentProps, useEffect, useState } from "react";
 import Icon from "../atoms/Icon";
 
-interface SearchInputProps extends ComponentProps<"div"> {
+interface SearchInputProps extends ComponentProps<"label"> {
   placeholder?: string;
   onSearch?: (query: string) => void;
   onClear?: () => void;
@@ -28,7 +28,7 @@ export default function SearchInput({
   );
 
   return (
-    <div
+    <label
       {...props}
       className={`flex border-b border-gray-100 w-full px-5 py-4 gap-4 ${props.className}`}
     >
@@ -45,6 +45,6 @@ export default function SearchInput({
         placeholder={placeholder}
         className="w-full text-black text-left placeholder:text-gray-400 bg-transparent outline-none"
       />
-    </div>
+    </label>
   );
 }

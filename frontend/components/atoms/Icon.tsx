@@ -40,6 +40,7 @@ export type IconNames =
   | "tiktok"
   | "user-star"
   | "arrow-down"
+  | "chevron-left"
   | "copy"
   | "camera-center-focus"
   | "sun"
@@ -49,7 +50,8 @@ export type IconNames =
   | "close"
   | "attachment"
   | "web"
-  | "trash";
+  | "trash"
+  | "calendar";
 
 interface IconProps extends ComponentProps<"svg"> {
   name: IconNames;
@@ -1074,7 +1076,7 @@ function Transactions({ fill, stroke, ...props }: IconComponentProps) {
   );
 }
 
-function Close({ fill, stroke, ...props }: IconComponentProps) {
+function Close({ fill, stroke, ...rest }: IconComponentProps) {
   return (
     <svg
       width="24"
@@ -1082,6 +1084,7 @@ function Close({ fill, stroke, ...props }: IconComponentProps) {
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      {...rest}
     >
       <g clip-path="url(#clip0_1759_896)">
         <path
@@ -1192,6 +1195,54 @@ function Web({
   );
 }
 
+function ChevronLeft({
+  width = 20,
+  height = 20,
+  fill = "#000",
+  stroke,
+  ...rest
+}: IconComponentProps) {
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...rest}
+    >
+      <path
+        d="M12.8417 13.825L9.02499 10L12.8417 6.175L11.6667 5L6.66666 10L11.6667 15L12.8417 13.825Z"
+        fill={fill}
+        fill-opacity="0.37"
+      />
+    </svg>
+  );
+}
+
+function Calendar({
+  width = 16,
+  height = 16,
+  fill = "#6B7280",
+  stroke,
+  ...rest
+}: IconComponentProps) {
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...rest}
+    >
+      <path
+        d="M4.66667 7.33331H6V8.66665H4.66667V7.33331ZM14 3.99998V13.3333C14 14.0666 13.4 14.6666 12.6667 14.6666H3.33333C2.59333 14.6666 2 14.0666 2 13.3333L2.00667 3.99998C2.00667 3.26665 2.59333 2.66665 3.33333 2.66665H4V1.33331H5.33333V2.66665H10.6667V1.33331H12V2.66665H12.6667C13.4 2.66665 14 3.26665 14 3.99998ZM3.33333 5.33331H12.6667V3.99998H3.33333V5.33331ZM12.6667 13.3333V6.66665H3.33333V13.3333H12.6667ZM10 8.66665H11.3333V7.33331H10V8.66665ZM7.33333 8.66665H8.66667V7.33331H7.33333V8.66665Z"
+        fill={fill}
+      />
+    </svg>
+  );
+}
 export default function Icon({ name, ...props }: IconProps) {
   switch (name) {
     case "user":
@@ -1290,6 +1341,10 @@ export default function Icon({ name, ...props }: IconProps) {
       return <Attachment {...props} />;
     case "web":
       return <Web {...props} />;
+    case "chevron-left":
+      return <ChevronLeft {...props} />;
+    case "calendar":
+      return <Calendar {...props} />;
     default:
       return null;
   }
