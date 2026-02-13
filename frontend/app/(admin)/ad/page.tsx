@@ -9,7 +9,6 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useState } from "react";
 
 export default function AdminDashboard() {
   const columnHelper = createColumnHelper<{
@@ -111,7 +110,11 @@ export default function AdminDashboard() {
   return (
     <div className="w-full bg-gray-200">
       <div className="w-full max-w-[1124px] mx-auto bg-white py-4 rounded-lg">
-        {/* <SearchInput /> */}
+
+      <div className="font-medium text-base text-gray-700 flex justify-between mt-12 mb-4">
+        <p>Search</p>
+        <SearchInput />
+      </div>
         <Tab
           tabs={[
             {
