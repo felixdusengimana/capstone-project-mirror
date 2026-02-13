@@ -45,7 +45,7 @@ export default function Sidebar({
           user={{
             name: user?.name || "",
             photo: user?.profileImageUrl || "",
-            username: user?.username ? `@${user.username}` : "",
+            username: user?.username,
           }}
         />
 

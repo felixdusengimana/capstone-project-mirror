@@ -107,14 +107,17 @@ export default function AdminDashboard() {
     getCoreRowModel: getCoreRowModel(),
   });
 
+  console.log("re-render");
+
   return (
     <div className="w-full bg-gray-200">
       <div className="w-full max-w-[1124px] mx-auto bg-white py-4 rounded-lg">
-
-      <div className="font-medium text-base text-gray-700 flex justify-between mt-12 mb-4">
-        <p>Search</p>
-        <SearchInput />
-      </div>
+        <div className="mt-12 mb-4 px-4">
+          <p className="font-normal text-base text-gray-700 flex justify-between">
+            Search
+          </p>
+          <SearchInput />
+        </div>
         <Tab
           tabs={[
             {
