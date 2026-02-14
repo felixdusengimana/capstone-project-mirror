@@ -1,7 +1,7 @@
 package com.pesatone.api.model.dto;
 
 import com.pesatone.api.model.enumeration.CurrencyEnum;
-import com.pesatone.api.model.enumeration.PaymentChannelEnum;
+import com.pesatone.api.model.enumeration.PaymentProviderEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -20,6 +20,11 @@ public class TransactionDto {
     @NotBlank(message = "Creator username is required")
     private String creatorUserName;
 
+    @Schema(name = "donorUserName",
+            description = "PesaTag of donor",
+            example = "davido")
+    private String donorUserName;
+
     @Schema(name = "amount",
             description = "amount you want to gift",
             example = "1000")
@@ -33,11 +38,11 @@ public class TransactionDto {
     @NotNull(message = "Currency is required")
     private CurrencyEnum currency;
 
-    @Schema(name = "paymentChannel",
-            description = "Payment channel",
-            example = "MOMO")
-    @NotNull(message = "Payment Channel is required")
-    private PaymentChannelEnum paymentChannel;
+    @Schema(name = "paymentProvider",
+            description = "Payment Provider",
+            example = "FLUTTERWAVE")
+    @NotNull(message = "Payment Provider is required")
+    private PaymentProviderEnum paymentProvider;
 
     @Schema(name = "name",
             description = "A name your favorite can call you")

@@ -1,7 +1,6 @@
 package com.pesatone.api.model.entity;
 
 import com.pesatone.api.model.enumeration.CurrencyEnum;
-import com.pesatone.api.model.enumeration.PaymentChannelEnum;
 import com.pesatone.api.model.enumeration.PaymentStatusEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -25,8 +24,7 @@ public class Payout {
     @Enumerated(EnumType.STRING)
     private CurrencyEnum currency;
 
-    @Enumerated(EnumType.STRING)
-    private PaymentChannelEnum paymentChannel;
+    private String paymentChannel;
 
     @Enumerated(EnumType.STRING)
     private PaymentStatusEnum paymentStatus;

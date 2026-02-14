@@ -1,7 +1,7 @@
 package com.pesatone.api.model.entity;
 
 import com.pesatone.api.model.enumeration.CurrencyEnum;
-import com.pesatone.api.model.enumeration.PaymentChannelEnum;
+import com.pesatone.api.model.enumeration.PaymentProviderEnum;
 import com.pesatone.api.model.enumeration.PaymentStatusEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -12,23 +12,29 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Setter
 @Getter
-@Table(uniqueConstraints= @UniqueConstraint(columnNames={"email","username"}))
+@Table(uniqueConstraints= @UniqueConstraint(columnNames={"transaction_reference"}))
 public class PaymentTransaction {
     @Id
     @GeneratedValue
     private Long id;
 
+    @NotNull
     private BigDecimal amount;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     private CurrencyEnum currency;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
-    private PaymentChannelEnum paymentChannel;
+    private PaymentProviderEnum paymentProvider;
+
+    private String paymentChannel;
 
     @Enumerated(EnumType.STRING)
     private PaymentStatusEnum paymentStatus;
@@ -55,4 +61,9 @@ public class PaymentTransaction {
 
     @ManyToOne(fetch =  FetchType.LAZY)
     private AppUser donor;
+
+    public boolean canProcessPayment(){
+        return paymentStatus != null &&
+                List.of(PaymentStatusEnum.PENDING, PaymentStatusEnum.FAILED).contains(paymentStatus);
+    }
 }
