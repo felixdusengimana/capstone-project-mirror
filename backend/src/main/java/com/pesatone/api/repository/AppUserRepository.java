@@ -22,8 +22,11 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
             "and u.status = 'ACTIVE'")
     Optional<AppUser> findActiveByEmail(String email);
 
+    @Query("select u from AppUser  u where u.username = lower(?1) and u.role = ?2 and u.status = 'ACTIVE'")
+    Optional<AppUser> findActiveByUserNameAndRole(String username,RoleEnum role);
+
     @Query("select u from AppUser  u where u.username = lower(?1)")
-    Optional<AppUser> findByUserName(String email);
+    Optional<AppUser> findByUserName(String username);
 
     @Query("select u from AppUser  u where u.id = ?1" +
             "and u.status = 'ACTIVE'")
