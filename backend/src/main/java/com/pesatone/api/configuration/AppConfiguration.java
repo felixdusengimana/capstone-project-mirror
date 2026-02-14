@@ -11,10 +11,8 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.mailgun.api.v3.MailgunMessagesApi;
-import com.mailgun.client.MailgunClient;
-import feign.AsyncClient;
-import feign.Client;
+import com.mailjet.client.ClientOptions;
+import com.mailjet.client.MailjetClient;
 import org.hibernate.proxy.AbstractLazyInitializer;
 import org.hibernate.proxy.map.MapLazyInitializer;
 import org.hibernate.proxy.pojo.BasicLazyInitializer;
@@ -29,8 +27,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @author Felix Dusengimana <phelixdusengimana@gmail.com>
@@ -49,8 +45,10 @@ public class AppConfiguration implements WebMvcConfigurer {
     private String cloudinaryApiKey;
     @Value("${application.cloudinary.api-secret}")
     private String cloudinaryApiSecret;
-    @Value("${application.mailgun.api-key}")
-    private String mailGunApiKey;
+    @Value("${application.mailjet.public-key}")
+    private String mailJetPublicKey;
+    @Value("${application.mailjet.secret-key}")
+    private String mailJetSecretKey;
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
@@ -115,13 +113,12 @@ public class AppConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public MailgunMessagesApi mailgunMessagesApi() {
-        ExecutorService executor = Executors.newFixedThreadPool(2);
-        AsyncClient.Default<Object> asyncClient = new AsyncClient.Default<>(
-                new Client.Default(null, null), executor);
+    public MailjetClient mailjetClient() {
+        ClientOptions options = ClientOptions.builder()
+                .apiKey(mailJetPublicKey)
+                .apiSecretKey(mailJetSecretKey)
+                .build();
 
-        return MailgunClient.config(mailGunApiKey)
-                .client(asyncClient)
-                .createAsyncApi(MailgunMessagesApi.class);
+        return new MailjetClient(options);
     }
 }

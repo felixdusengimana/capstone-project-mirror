@@ -12,8 +12,9 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
-@Setter @Getter
-public class Payout {
+@Setter
+@Getter
+public class PaymentTransaction {
     @Id
     @GeneratedValue
     private Long id;

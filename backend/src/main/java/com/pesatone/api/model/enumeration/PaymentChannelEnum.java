@@ -1,5 +1,5 @@
 package com.pesatone.api.model.enumeration;
 
 public enum PaymentChannelEnum {
-    MOBILE_MONEY, BANK, 
+    MOBILE_MONEY, BANK
 }

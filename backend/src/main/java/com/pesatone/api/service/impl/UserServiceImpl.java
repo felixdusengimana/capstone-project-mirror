@@ -15,6 +15,7 @@ import com.pesatone.api.model.pojo.UserPojo;
 import com.pesatone.api.model.search.CreatorSearchFilter;
 import com.pesatone.api.model.search.CreatorSearchResponse;
 import com.pesatone.api.repository.*;
+import com.pesatone.api.service.NotificationService;
 import com.pesatone.api.service.PesatoneTokenService;
 import com.pesatone.api.service.UserService;
 import com.querydsl.core.QueryResults;
@@ -22,6 +23,7 @@ import com.querydsl.core.Tuple;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -46,9 +48,12 @@ public class UserServiceImpl implements UserService {
     private final SocialLinkRepository socialLinkRepository;
     private final Cloudinary cloudinary;
     private final PesatoneTokenService tokenService;
-    private final AppRepository appRepository;
     private final CriteriaBuilderFactory builderFactory;
     private final EntityManager entityManager;
+    private final NotificationService notificationService;
+
+    @Value("${application.passwordResetUrl}")
+    private String passwordResetUrl;
 
     @Transactional
     @Override
@@ -106,7 +111,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void initiatePasswordReset(AppUser user) {
         String token = tokenService.getPasswordResetToken(user);
-        //TODO send email
+        notificationService.sendEmail(user.getEmail(),"Password reset",
+                "<b>Hello "+ StringUtils.defaultIfBlank(user.getName()," ") +",</b> <br/>" +
+                        "Did you forget your password and would like to get new credentials? <br/>" +
+                        "Please reset your password by clicking the link below. <br/>" +
+                passwordResetUrl+token);
     }
 
     @Transactional
