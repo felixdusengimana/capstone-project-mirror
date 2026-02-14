@@ -1,8 +1,10 @@
 package com.pesatone.api.model.entity;
 
+import com.pesatone.api.model.enumeration.CurrencyEnum;
 import com.pesatone.api.model.enumeration.PaymentChannelEnum;
 import com.pesatone.api.model.enumeration.PaymentStatusEnum;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -21,10 +23,18 @@ public class Payout {
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
+    private CurrencyEnum currency;
+
+    @Enumerated(EnumType.STRING)
     private PaymentChannelEnum paymentChannel;
 
     @Enumerated(EnumType.STRING)
     private PaymentStatusEnum paymentStatus;
+
+    @NotNull
+    private String transactionReference;
+
+    private String providerReference;
 
     @CreationTimestamp
     private Date createdAt;
