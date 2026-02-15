@@ -7,7 +7,7 @@ import Input from "@/components/atoms/Input";
 import TextArea from "@/components/atoms/TextArea";
 import { useGetAllCountries } from "@/services/resources";
 import { useGetCreator } from "@/services/users";
-import { Tip, tip } from "@/types/pay";
+import { Tip, tip, TransactionData } from "@/types/pay";
 import { supportedSocials } from "@/utils/socials";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useParams } from "next/navigation";
@@ -15,6 +15,9 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import Script from "next/script";
+import { useMutation } from "@tanstack/react-query";
+import { InitiateTransaction } from "@/services/pay";
+import toast from "react-hot-toast";
 
 export default function SupportCreator() {
   const { creatorId } = useParams() as { creatorId: string };
@@ -33,17 +36,12 @@ export default function SupportCreator() {
     resolver: zodResolver(tip),
   });
 
-  useEffect(() => {
-    if (!isLoading && !isLoadingCountries) {
-      reset({
-        creatorUserName: data?.data.username ?? "",
-        currency: countries?.data?.[0].currency ?? "",
-        donorUserName: "test",
-        paymentProvider: "FLUTTERWAVE",
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoading, isLoadingCountries]);
+  const { mutate, isPending } = useMutation({
+    mutationFn: InitiateTransaction,
+    onSuccess(data, variables, context) {
+      toast.success("Payment sent successfully");
+    },
+  });
 
   function onSubmit(data: Tip) {
     // @ts-ignore
@@ -67,14 +65,27 @@ export default function SupportCreator() {
         description: data.note,
         logo: "https://checkout.flutterwave.com/assets/img/rave-logo.png",
       },
-      callback: function (data: any) {
-        console.log("payment callback:", data);
+      callback: function (success_data: TransactionData) {
+        mutate(data);
+        console.log({ success_data });
       },
       onclose: function () {
         console.log("Payment cancelled!");
       },
     });
   }
+
+  useEffect(() => {
+    if (!isLoading && !isLoadingCountries) {
+      reset({
+        creatorUserName: data?.data.username ?? "",
+        currency: countries?.data?.[0].currency ?? "",
+        donorUserName: "test",
+        paymentProvider: "FLUTTERWAVE",
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading, isLoadingCountries]);
 
   return (
     <>
@@ -202,7 +213,7 @@ export default function SupportCreator() {
                 ))}
               </div>
             )}
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" isLoading={isPending}>
               Pay {watch("amount")?.toLocaleString()} {watch("currency")}
             </Button>
           </div>

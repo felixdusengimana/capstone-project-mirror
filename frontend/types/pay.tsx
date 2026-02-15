@@ -27,3 +27,24 @@ export const tip = z.object({
 });
 
 export type Tip = z.infer<typeof tip>;
+
+interface Customer {
+  name: string;
+  email: string;
+  phone_number: string;
+}
+
+export interface TransactionData {
+  amount: number;
+  charge_response_code: string;
+  charge_response_message: string;
+  charged_amount: number;
+  created_at: string;
+  currency: string;
+  customer: Customer;
+  flw_ref: string;
+  redirectstatus: string | undefined;
+  status: string;
+  transaction_id: number;
+  tx_ref: string;
+}
