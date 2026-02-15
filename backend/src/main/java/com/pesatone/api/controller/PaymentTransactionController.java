@@ -8,6 +8,7 @@ import com.pesatone.api.model.dto.flw.FlwCallBackDto;
 import com.pesatone.api.model.entity.PaymentTransaction;
 import com.pesatone.api.model.pojo.PaymentTransactionPojo;
 import com.pesatone.api.service.PaymentTransactionService;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -54,6 +55,7 @@ public class PaymentTransactionController {
                         true, new PaymentTransactionPojo(txn))));
     }
 
+    @Hidden
     @CrossOrigin
     @PostMapping("/flw/callback")
     public ResponseEntity<ApiResponseObject<String>> processFlutterWaveCallBack(@RequestBody @Valid FlwCallBackDto dto,
