@@ -4,7 +4,7 @@ import DownloadApp from "@/components/molecules/DownloadApp";
 import Logo from "@/components/molecules/Logo";
 import Trusties from "@/components/molecules/Trusties";
 import { useParams } from "next/navigation";
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
 
 export default function Layout({ children }: { children: ReactNode }) {
   const params = useParams() as { creatorId: string };
@@ -17,7 +17,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           isCreator ? "pt-[78px]" : "py-0 pt-20 lg:py-[78px]"
         } px-0 md:px-16 lg:px-[120px] overflow-auto`}
       >
-        {children}
+        <Suspense fallback={<p>Loading...</p>}>{children}</Suspense>
       </div>
       <div className="w-[667px] overflow-hidden relative hidden md:block">
         {/* texts */}

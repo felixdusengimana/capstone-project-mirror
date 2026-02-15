@@ -15,7 +15,6 @@ import toast from "react-hot-toast";
 export default function Login() {
   const searchParams = useSearchParams();
   const token = searchParams.get("tkn");
-  const router = useRouter();
 
   const {
     handleSubmit,
