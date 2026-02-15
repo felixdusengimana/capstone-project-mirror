@@ -7,20 +7,78 @@ import Input from "@/components/atoms/Input";
 import TextArea from "@/components/atoms/TextArea";
 import { useGetAllCountries } from "@/services/resources";
 import { useGetCreator } from "@/services/users";
+import { Tip, tip } from "@/types/pay";
 import { supportedSocials } from "@/utils/socials";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+
+import Script from "next/script";
 
 export default function SupportCreator() {
-  const [tipAmount, setTipAmount] = useState(0);
   const { creatorId } = useParams() as { creatorId: string };
   const { data, isLoading } = useGetCreator(creatorId);
   const { data: countries, isLoading: isLoadingCountries } = useGetAllCountries(
     { enabled: true }
   );
 
+  const {
+    handleSubmit,
+    watch,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm<Tip>({
+    resolver: zodResolver(tip),
+  });
+
+  useEffect(() => {
+    if (!isLoading && !isLoadingCountries) {
+      reset({
+        creatorUserName: data?.data.username ?? "",
+        currency: countries?.data?.[0].currency ?? "",
+        donorUserName: "test",
+        paymentProvider: "FLUTTERWAVE",
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading, isLoadingCountries]);
+
+  function onSubmit(data: Tip) {
+    // @ts-ignore
+    FlutterwaveCheckout({
+      public_key: process.env.NEXT_PUBLIC_FLUTTER_WAVE_KEY,
+      tx_ref: String(Date.now()),
+      amount: data.amount,
+      currency: data.currency,
+      payment_options: "card, banktransfer, ussd",
+      meta: {
+        source: "docs-inline-test",
+        consumer_mac: "92a3-912ba-1192a",
+      },
+      customer: {
+        email: "test@mailinator.com",
+        phone_number: "08100000000",
+        name: data.name,
+      },
+      customizations: {
+        title: `Support ${data.creatorUserName}`,
+        description: data.note,
+        logo: "https://checkout.flutterwave.com/assets/img/rave-logo.png",
+      },
+      callback: function (data: any) {
+        console.log("payment callback:", data);
+      },
+      onclose: function () {
+        console.log("Payment cancelled!");
+      },
+    });
+  }
+
   return (
     <>
+      <Script src="https://checkout.flutterwave.com/v3.js"></Script>
       {isLoading ? (
         // add skeleton loader for below content
         <div className="flex flex-col items-center gap-24 h-full p-8 lg:p-0">
@@ -55,7 +113,10 @@ export default function SupportCreator() {
           </h1>
         </div>
       ) : (
-        <div className="flex flex-col items-center gap-24 h-full p-8 lg:p-0">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col items-center gap-24 h-full p-8 lg:p-0"
+        >
           <h1 className="text-[#374151] text-4xl font-mono text-center">
             Pesatone makes Supporting fun and easy.
           </h1>
@@ -94,8 +155,14 @@ export default function SupportCreator() {
               <Input
                 label="Tip amount"
                 placeholder="Tip amount"
-                onChange={(e) => setTipAmount(Number(e.target.value))}
-                value={Number(tipAmount) > 0 ? tipAmount : ""}
+                onChange={(e) =>
+                  setValue("amount", Number(e.target.value), {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  })
+                }
+                error={errors.amount?.message}
+                value={watch("amount") > 0 ? watch("amount") : ""}
                 type="number"
                 right={
                   <select className="bg-[#F7F9FB] text-[#475569] outline-none appearance-none">
@@ -108,17 +175,38 @@ export default function SupportCreator() {
                 }
               />
 
-              <Input label="Your name" placeholder="Your name" />
+              <Input
+                label="Your name"
+                placeholder="Your name"
+                value={watch("name")}
+                error={errors.name?.message}
+                onChange={(e) =>
+                  setValue("name", e.target.value, {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  })
+                }
+              />
               <TextArea
                 label="Say something nice"
                 placeholder="Type something ....."
+                error={errors.note?.message}
+                value={watch("note")}
+                onChange={(e) => setValue("note", e.target.value)}
               />
             </div>
-            <Button className="w-full" disabled={Number(tipAmount) <= 0}>
-              Pay {tipAmount.toLocaleString()} RWF
+            {Object.keys(errors).length > 0 && (
+              <div className="bg-red-100 text-red-500 p-4 rounded-lg">
+                {Object.values(errors).map((error, i) => (
+                  <p key={i}>{error.message}</p>
+                ))}
+              </div>
+            )}
+            <Button type="submit" className="w-full">
+              Pay {watch("amount")?.toLocaleString()} {watch("currency")}
             </Button>
           </div>
-        </div>
+        </form>
       )}
     </>
   );
