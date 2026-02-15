@@ -115,29 +115,30 @@ export default function page() {
           </div>
           <div className="grid grid-cols-2 mr-auto lg:mr-0 ml-auto w-fit">
             <Avatar
-              alt="Profile 1"
-              src="/profiles/profile4.png"
+              alt="Profile 5"
+              src="/profiles/profile5.png"
               size="2xl"
               circle={false}
               className="ml-[-20px]"
             />
             <Avatar
-              alt="Profile 2"
-              src={"/profiles/profile3.png"}
+              alt="Profile 8"
+              src={"/profiles/profile8.png"}
               size="2xl"
               circle={false}
               className="mt-[36px]"
             />
             <Avatar
-              alt="Profile 3"
-              src={"/profiles/profile2.png"}
+              alt="Profile 6"
+              src={"/profiles/profile6.png"}
               size="2xl"
               circle={false}
               className="ml-[-20px]"
             />
+
             <Avatar
-              alt="Profile 4"
-              src={"/profiles/profile1.png"}
+              alt="Profile 7"
+              src={"/profiles/profile7.png"}
               size="2xl"
               circle={false}
               className="mt-[36px]"
