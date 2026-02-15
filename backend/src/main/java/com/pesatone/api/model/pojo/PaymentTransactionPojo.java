@@ -6,6 +6,7 @@ import com.pesatone.api.model.enumeration.PaymentProviderEnum;
 import com.pesatone.api.model.enumeration.PaymentStatusEnum;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.Hibernate;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -40,6 +41,9 @@ public class PaymentTransactionPojo {
         setNote(txn.getNote());
         setPaidAt(txn.getPaidAt());
         setCreatedAt(txn.getPaidAt());
-        setCreatorUserName(txn.getCreator().getUsername());
+        if(Hibernate.isInitialized(txn.getCreator())){
+            setCreatorUserName(txn.getCreator().getUsername());
+        }
+
     }
 }

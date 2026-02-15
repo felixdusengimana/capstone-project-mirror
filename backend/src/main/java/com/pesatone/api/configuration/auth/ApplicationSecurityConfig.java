@@ -28,7 +28,10 @@ public class ApplicationSecurityConfig {
             "/swagger-ui/**",
             "/api-doc.html",
             "/resources/**",
-            "/users/creators/**"
+            "/users/creators/**",
+            "/transactions/initiate",
+            "/transactions/*/status",
+            "/transactions/flw/callback"
     };
 
     @Bean

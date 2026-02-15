@@ -1,5 +1,6 @@
 package com.pesatone.api.service.impl;
 
+import com.google.gson.Gson;
 import com.pesatone.api.configuration.properties.FlwConfig;
 import com.pesatone.api.exception.PesatoneNotFoundException;
 import com.pesatone.api.model.dto.PaymentDto;
@@ -16,11 +17,13 @@ import com.pesatone.api.repository.PaymentTransactionRepository;
 import com.pesatone.api.service.PaymentTransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
+import reactor.netty.http.client.HttpClient;
 
 import java.util.UUID;
 
@@ -30,8 +33,9 @@ import java.util.UUID;
 public class PaymentTransactionServiceImpl implements PaymentTransactionService {
     private final AppUserRepository appUserRepository;
     private final PaymentTransactionRepository paymentTransactionRepository;
-    private final WebClient webClient;
+    private final HttpClient httpClient;
     private final FlwConfig flwConfig;
+    private final Gson gson;
 
     @Override
     public PaymentTransaction getByTransactionReference(String transactionReference) {
@@ -75,7 +79,11 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
     @Override
     public Mono<PaymentTransaction> checkStatus(PaymentTransaction transaction) {
         if(transaction.canProcessPayment() && (transaction.getPaymentProvider().equals(PaymentProviderEnum.FLUTTERWAVE))){
+            try {
                 return checkFlwTransactionDetail(transaction);
+            }catch (Exception ex){
+                log.error(ex.getMessage(), ex);
+            }
         }
         return Mono.just(transaction);
     }
@@ -87,7 +95,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
             isValid = false;
           log.error("{} for {} : {}", paymentError, transaction.getTransactionReference(), "Mismatch currency"+paymentDto.currency());
         }
-        if(transaction.getAmount().compareTo(paymentDto.amount()) < 1){
+        if(transaction.getAmount().compareTo(paymentDto.amount()) < 0){
             isValid = false;
             log.error("{} for {} : {}", paymentError, transaction.getTransactionReference(), "Mismatch amount"+paymentDto.amount());
         }
@@ -95,22 +103,29 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
     }
 
     private Mono<PaymentTransaction> checkFlwTransactionDetail(PaymentTransaction transaction){
-        return webClient
+        return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .baseUrl(flwConfig.getFlwTransactionDetailUrl())
+                .build()
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(flwConfig.getFlwTransactionDetailUrl())
                         .queryParam("tx_ref", transaction.getTransactionReference())
                         .build())
                 .header("Authorization", "Bearer "+flwConfig.getFlwSecretKey())
                 .retrieve()
-                .bodyToMono(FlwTransactionDetailResponse.class)
-                .switchIfEmpty(Mono.error(new RuntimeException("Could not get transaction details from flutterwave")))
-                .onErrorMap(WebClientResponseException.class, ex -> {
-                    throw ex;
-                })
+                .bodyToMono(String.class)
                 .map(response -> {
-                    FlwTransactionDetail transactionDetail = response.getData();
+                    FlwTransactionDetailResponse detailResponse = gson.fromJson(response,FlwTransactionDetailResponse.class);
+                    FlwTransactionDetail transactionDetail = detailResponse.getData();
                     return processPayment(transaction,transactionDetail.getPaymentDto());
+                })
+                .onErrorResume( ex -> {
+                    if (ex instanceof WebClientResponseException webClientException) {
+                        log.error("FLUTTERWAVE API ERROR {} : {}", webClientException.getStatusCode(), webClientException.getResponseBodyAsString());
+                    } else {
+                        log.error("FLUTTERWAVE API ERROR: {}",ex.getMessage());
+                    }
+                    return Mono.just(transaction);
                 });
     }
 }

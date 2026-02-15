@@ -33,7 +33,7 @@ public class PaymentTransactionController {
     @CrossOrigin
     @Operation(summary = "Initiate Transaction", description = "Initiate payment transaction")
     @PostMapping("initiate")
-    public ResponseEntity<ApiResponseObject<PaymentTransaction>> initiateTransaction(@RequestBody @Valid TransactionDto dto,
+    public ResponseEntity<ApiResponseObject<PaymentTransactionPojo>> initiateTransaction(@RequestBody @Valid TransactionDto dto,
                                                                           BindingResult bindingResult) throws BindException {
         if (bindingResult.hasErrors()) {
             throw new BindException(bindingResult);
@@ -41,13 +41,13 @@ public class PaymentTransactionController {
 
         PaymentTransaction transaction = paymentTransactionService.initiateTransaction(dto);
 
-        return ResponseEntity.ok(new ApiResponseObject<>("User signup successful", true, transaction));
+        return ResponseEntity.ok(new ApiResponseObject<>("Payment initiated successfully", true, new PaymentTransactionPojo(transaction)));
     }
 
     @CrossOrigin
-    @Operation(summary = "Get Transaction", description = "Get payment transaction detail")
-    @GetMapping("{transactionReference}")
-    public Mono<ResponseEntity<ApiResponseObject<PaymentTransactionPojo>>> getTransactionDetail(@PathVariable String transactionReference) {
+    @Operation(summary = "Get Transaction Status", description = "Get payment transaction detail")
+    @GetMapping("/{transactionReference}/status")
+    public Mono<ResponseEntity<ApiResponseObject<PaymentTransactionPojo>>> getTransactionStatus(@PathVariable String transactionReference) {
         PaymentTransaction transaction = paymentTransactionService.getByTransactionReference(transactionReference);
         return paymentTransactionService.checkStatus(transaction)
                 .map(txn -> ResponseEntity.ok(new ApiResponseObject<>("Transaction retrieved successfully",
@@ -56,7 +56,7 @@ public class PaymentTransactionController {
 
     @CrossOrigin
     @PostMapping("/flw/callback")
-    public ResponseEntity<ApiResponseObject<Object>> processFlutterWaveCallBack(@RequestBody @Valid FlwCallBackDto dto,
+    public ResponseEntity<ApiResponseObject<String>> processFlutterWaveCallBack(@RequestBody @Valid FlwCallBackDto dto,
                                                                                      @RequestHeader("verif-hash") String verifyHash,
                                                                                      BindingResult bindingResult) throws BindException {
         if (bindingResult.hasErrors()) {
