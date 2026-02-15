@@ -39,11 +39,12 @@ export default function SupportCreator() {
   const { mutate, isPending } = useMutation({
     mutationFn: InitiateTransaction,
     onSuccess(data, variables, context) {
-      toast.success("Payment sent successfully");
+      // toast.success("Payment sent successfully");
     },
   });
 
-  function onSubmit(data: Tip) {
+  async function onSubmit(data: Tip) {
+    await mutate(data);
     // @ts-ignore
     FlutterwaveCheckout({
       public_key: process.env.NEXT_PUBLIC_FLUTTER_WAVE_KEY,
@@ -66,7 +67,6 @@ export default function SupportCreator() {
         logo: "https://checkout.flutterwave.com/assets/img/rave-logo.png",
       },
       callback: function (success_data: TransactionData) {
-        mutate(data);
         console.log({ success_data });
       },
       onclose: function () {

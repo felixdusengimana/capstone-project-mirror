@@ -1,7 +1,7 @@
 "use client";
 import { IconNames } from "@/components/atoms/Icon";
 import Sidebar from "@/components/organisms/Sidebar";
-import { ReactNode, useState } from "react";
+import { ReactNode, Suspense, useState } from "react";
 
 export default function DashBoardLayout({ children }: { children: ReactNode }) {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -38,7 +38,7 @@ export default function DashBoardLayout({ children }: { children: ReactNode }) {
       >
         <Sidebar links={links} isAdmin />
       </div>
-      {children}
+      <Suspense>{children}</Suspense>
     </div>
   );
 }
