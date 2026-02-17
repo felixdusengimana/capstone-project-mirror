@@ -98,7 +98,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
     @Override
     public DashboardPojo getDashboardDetails(AppUser creator) {
         CriteriaBuilder<CreatorSearchResponse> criteriaBuilder = builderFactory.create(entityManager, CreatorSearchResponse.class)
-                .from(AppUser.class, "u")
+                .from(AppUser.class, "u");
         return null;
     }
 

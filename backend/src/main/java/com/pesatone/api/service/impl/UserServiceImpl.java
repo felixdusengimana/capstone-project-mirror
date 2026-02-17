@@ -1,6 +1,7 @@
 package com.pesatone.api.service.impl;
 
 import com.blazebit.persistence.*;
+import com.blazebit.persistence.querydsl.BlazeJPAQuery;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.pesatone.api.exception.PesatoneNotFoundException;
@@ -8,26 +9,26 @@ import com.pesatone.api.model.dto.SignUpDto;
 import com.pesatone.api.model.dto.SocialLinkDto;
 import com.pesatone.api.model.dto.UserDetailDto;
 import com.pesatone.api.model.entity.AppUser;
+import com.pesatone.api.model.entity.QAppUser;
 import com.pesatone.api.model.entity.SocialLink;
 import com.pesatone.api.model.enumeration.RoleEnum;
 import com.pesatone.api.model.enumeration.StatusEnum;
 import com.pesatone.api.model.pojo.UserPojo;
 import com.pesatone.api.model.search.CreatorSearchFilter;
 import com.pesatone.api.model.search.CreatorSearchResponse;
-import com.pesatone.api.repository.*;
+import com.pesatone.api.repository.AppUserRepository;
+import com.pesatone.api.repository.CountryRepository;
+import com.pesatone.api.repository.IndustryRepository;
+import com.pesatone.api.repository.SocialLinkRepository;
 import com.pesatone.api.service.NotificationService;
 import com.pesatone.api.service.PesatoneTokenService;
 import com.pesatone.api.service.UserService;
 import com.querydsl.core.QueryResults;
-import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -150,53 +151,39 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public QueryResults<CreatorSearchResponse> searchCreators(CreatorSearchFilter filter) {
-        CriteriaBuilder<CreatorSearchResponse> criteriaBuilder = builderFactory.create(entityManager, CreatorSearchResponse.class)
-                .from(AppUser.class, "u")
-                .selectNew(new ObjectBuilder<>() {
-                    @Override
-                    public <X extends SelectBuilder<X>> void applySelects(X queryBuilder) {
-                        queryBuilder
-                                .select("id")
-                                .select("username")
-                                .select("name")
-                                .select("profileImageUrl")
-                                .select("verified");
-                    }
+        QAppUser qAppUser = QAppUser.appUser;
+        BlazeJPAQuery<AppUser> blazeQuery = new BlazeJPAQuery<>(entityManager, builderFactory);
 
-                    @Override
-                    public CreatorSearchResponse build(Object[] tuple) {
-                        return new CreatorSearchResponse(
-                                (Long) tuple[0],
-                                (String) tuple[1],
-                                (String) tuple[2],
-                                (String) tuple[3],
-                                tuple[4] != null && (Boolean) tuple[4]
-                        );
-                    }
-
-                    @Override
-                    public List<CreatorSearchResponse> buildList(List<CreatorSearchResponse> list) {
-                        return list;
-                    }
-                });
-
-        criteriaBuilder.where("u.role").eq(RoleEnum.CREATOR);
+        blazeQuery.from(qAppUser)
+                .where(qAppUser.status.eq(StatusEnum.ACTIVE)
+                        .and(qAppUser.role.eq(RoleEnum.CREATOR))
+                        .and(qAppUser.name.isNotNull())
+                        .and(qAppUser.username.isNotNull())
+                );
 
         if (StringUtils.isNotBlank(filter.getName())) {
-            criteriaBuilder
-                    .whereOr()
-                        .where("u.username").like().value("%" + filter.getName() + "%").noEscape()
-                        .where("u.name").like().value("%" + filter.getName() + "%").noEscape()
-                    .endOr();
+            blazeQuery.where(qAppUser.username.contains(filter.getName().toLowerCase())
+                            .or(qAppUser.name.containsIgnoreCase(filter.getName())));
         }
 
-        PagedList<CreatorSearchResponse> result = criteriaBuilder
-                .orderByAsc("u.id")
-                .orderByAsc("u.verified")
-                .page((int) filter.getPageNumber(), (int) filter.getPageSize())
-                .getResultList();
+        blazeQuery.orderBy(qAppUser.username.asc());
+        blazeQuery.orderBy(qAppUser.verified.desc().nullsLast());
 
-        return new QueryResults<>(result,filter.getPageNumber().longValue(),filter.getPageSize().longValue(),result.getTotalSize());
+        blazeQuery.limit(filter.getPageSize());
+        blazeQuery.offset(filter.getPageNumber());
+
+        List<CreatorSearchResponse> resultList = blazeQuery
+                .select(Projections.constructor(
+                                CreatorSearchResponse.class,
+                                qAppUser.id,
+                                qAppUser.username,
+                                qAppUser.name,
+                                qAppUser.profileImageUrl,
+                                qAppUser.verified
+                        ))
+                .fetch();
+
+        return new QueryResults<>(resultList,filter.getPageNumber().longValue(),filter.getPageSize().longValue(),blazeQuery.fetchCount());
     }
 
     private void setSocialLinks(AppUser user, List<SocialLinkDto> linkDtos) {

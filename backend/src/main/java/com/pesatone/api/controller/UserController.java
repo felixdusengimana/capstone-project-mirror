@@ -6,6 +6,7 @@ import com.pesatone.api.model.dto.ApiResponseObject;
 import com.pesatone.api.model.dto.UserDetailDto;
 import com.pesatone.api.model.entity.AppUser;
 import com.pesatone.api.model.enumeration.RoleEnum;
+import com.pesatone.api.model.pojo.DashboardPojo;
 import com.pesatone.api.model.pojo.UserPojo;
 import com.pesatone.api.model.search.CreatorSearchFilter;
 import com.pesatone.api.model.search.CreatorSearchResponse;
@@ -62,14 +63,14 @@ public class UserController {
                 true, UserPojo.stripDetails(userService.getUserDetails(user))));
     }
 
-    @Operation(summary = "Get Creator's Dashboard", description = "Get LoggedIn Creators Dashboard")
-    @GetMapping("/creators/dashboard")
-    @PreAuthorize("hasAnyAuthority(T(com.pesatone.api.model.enumeration.PermissionEnum).VIEW_CREATOR_DASHBOARD)")
-    public ResponseEntity<ApiResponseObject<UserPojo>> getCreatorDashboard() {
-        AppUser user = principal.getLoggedInUser();
-        return ResponseEntity.ok(new ApiResponseObject<>("Creator profile retrieved successfully",
-                true, UserPojo.stripDetails(userService.getUserDetails(user))));
-    }
+//    @Operation(summary = "Get Creator's Dashboard", description = "Get LoggedIn Creators Dashboard")
+//    @GetMapping("/creators/dashboard")
+//    @PreAuthorize("hasAnyAuthority(T(com.pesatone.api.model.enumeration.PermissionEnum).VIEW_CREATOR_DASHBOARD)")
+//    public ResponseEntity<ApiResponseObject<DashboardPojo>> getCreatorDashboard() {
+//        AppUser user = principal.getLoggedInUser();
+//        return ResponseEntity.ok(new ApiResponseObject<>("Creator profile retrieved successfully",
+//                true, UserPojo.stripDetails(userService.getUserDetails(user))));
+//    }
 
     @Operation(summary = "Get User Profile", description = "Get LoggedIn User Profile")
     @GetMapping("/profile")

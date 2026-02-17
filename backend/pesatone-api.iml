@@ -5,6 +5,7 @@
       <configuration>
         <webroots />
         <sourceRoots>
+          <root url="file://$MODULE_DIR$/generated-sources/java" />
           <root url="file://$MODULE_DIR$/src/main/java" />
           <root url="file://$MODULE_DIR$/src/main/resources" />
           <root url="file://$MODULE_DIR$/src/main/sources" />
@@ -35,6 +36,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/sources" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/target/generated-sources/annotations" isTestSource="false" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/generated-sources/java" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
@@ -198,12 +200,12 @@
     <orderEntry type="library" scope="TEST" name="Maven: com.github.docker-java:docker-java-transport:3.3.6" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: net.java.dev.jna:jna:5.13.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.mockito:mockito-inline:4.3.1" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.querydsl:querydsl-apt:jakarta:5.1.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.querydsl:querydsl-codegen:5.1.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.querydsl:codegen-utils:5.1.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.jdt:ecj:3.26.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: javax.inject:javax.inject:1" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: io.github.classgraph:classgraph:4.8.146" level="project" />
+    <orderEntry type="library" name="Maven: com.querydsl:querydsl-apt:jakarta:5.1.0" level="project" />
+    <orderEntry type="library" name="Maven: com.querydsl:querydsl-codegen:5.1.0" level="project" />
+    <orderEntry type="library" name="Maven: com.querydsl:codegen-utils:5.1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jdt:ecj:3.26.0" level="project" />
+    <orderEntry type="library" name="Maven: javax.inject:javax.inject:1" level="project" />
+    <orderEntry type="library" name="Maven: io.github.classgraph:classgraph:4.8.146" level="project" />
     <orderEntry type="library" name="Maven: com.querydsl:querydsl-jpa:jakarta:5.1.0" level="project" />
     <orderEntry type="library" name="Maven: com.querydsl:querydsl-core:5.1.0" level="project" />
     <orderEntry type="library" name="Maven: com.mysema.commons:mysema-commons-lang:0.2.4" level="project" />
@@ -211,6 +213,8 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: com.blazebit:blaze-persistence-core-impl-jakarta:1.6.11" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: com.blazebit:blaze-persistence-core-parser-jakarta:1.6.11" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: com.blazebit:blaze-common-utils:0.1.21" level="project" />
+    <orderEntry type="library" name="Maven: com.blazebit:blaze-persistence-integration-querydsl-expressions-jakarta:1.6.11" level="project" />
+    <orderEntry type="library" name="Maven: com.google.code.findbugs:jsr305:3.0.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: com.blazebit:blaze-persistence-integration-hibernate-6.2:1.6.11" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: com.blazebit:blaze-persistence-integration-hibernate6-base:1.6.11" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.javassist:javassist:3.29.2-GA" level="project" />
