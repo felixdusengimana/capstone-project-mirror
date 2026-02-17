@@ -19,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -28,7 +27,6 @@ import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Copyright (c) 2026. Pesatone. All rights reserved
@@ -60,6 +58,15 @@ public class UserController {
     public ResponseEntity<ApiResponseObject<UserPojo>> getCreator(@PathVariable Long id) {
         AppUser user = userRepository.findActiveByIdAndRole(id, RoleEnum.CREATOR)
                 .orElseThrow(() -> new PesatoneNotFoundException("Creator not found"));
+        return ResponseEntity.ok(new ApiResponseObject<>("Creator profile retrieved successfully",
+                true, UserPojo.stripDetails(userService.getUserDetails(user))));
+    }
+
+    @Operation(summary = "Get Creator's Dashboard", description = "Get LoggedIn Creators Dashboard")
+    @GetMapping("/creators/dashboard")
+    @PreAuthorize("hasAnyAuthority(T(com.pesatone.api.model.enumeration.PermissionEnum).VIEW_CREATOR_DASHBOARD)")
+    public ResponseEntity<ApiResponseObject<UserPojo>> getCreatorDashboard() {
+        AppUser user = principal.getLoggedInUser();
         return ResponseEntity.ok(new ApiResponseObject<>("Creator profile retrieved successfully",
                 true, UserPojo.stripDetails(userService.getUserDetails(user))));
     }

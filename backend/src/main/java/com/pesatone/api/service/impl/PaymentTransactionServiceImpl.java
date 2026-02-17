@@ -1,5 +1,7 @@
 package com.pesatone.api.service.impl;
 
+import com.blazebit.persistence.CriteriaBuilder;
+import com.blazebit.persistence.CriteriaBuilderFactory;
 import com.google.gson.Gson;
 import com.pesatone.api.configuration.properties.FlwConfig;
 import com.pesatone.api.exception.PesatoneNotFoundException;
@@ -12,9 +14,12 @@ import com.pesatone.api.model.entity.PaymentTransaction;
 import com.pesatone.api.model.enumeration.PaymentProviderEnum;
 import com.pesatone.api.model.enumeration.PaymentStatusEnum;
 import com.pesatone.api.model.enumeration.RoleEnum;
+import com.pesatone.api.model.pojo.DashboardPojo;
+import com.pesatone.api.model.search.CreatorSearchResponse;
 import com.pesatone.api.repository.AppUserRepository;
 import com.pesatone.api.repository.PaymentTransactionRepository;
 import com.pesatone.api.service.PaymentTransactionService;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
@@ -36,6 +41,8 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
     private final HttpClient httpClient;
     private final FlwConfig flwConfig;
     private final Gson gson;
+    private final CriteriaBuilderFactory builderFactory;
+    private final EntityManager entityManager;
 
     @Override
     public PaymentTransaction getByTransactionReference(String transactionReference) {
@@ -86,6 +93,13 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
             }
         }
         return Mono.just(transaction);
+    }
+
+    @Override
+    public DashboardPojo getDashboardDetails(AppUser creator) {
+        CriteriaBuilder<CreatorSearchResponse> criteriaBuilder = builderFactory.create(entityManager, CreatorSearchResponse.class)
+                .from(AppUser.class, "u")
+        return null;
     }
 
     private boolean isValidatePayment(PaymentTransaction transaction, PaymentDto paymentDto){

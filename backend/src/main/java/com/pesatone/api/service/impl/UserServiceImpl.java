@@ -153,7 +153,6 @@ public class UserServiceImpl implements UserService {
         CriteriaBuilder<CreatorSearchResponse> criteriaBuilder = builderFactory.create(entityManager, CreatorSearchResponse.class)
                 .from(AppUser.class, "u")
                 .selectNew(new ObjectBuilder<>() {
-
                     @Override
                     public <X extends SelectBuilder<X>> void applySelects(X queryBuilder) {
                         queryBuilder
