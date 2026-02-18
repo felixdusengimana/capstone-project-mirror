@@ -19,6 +19,13 @@ public class RequestPrincipalImpl implements RequestPrincipal {
     }
 
     @Override
+    public boolean isCreator() {
+        if(this.getLoggedInUser() != null)
+            return this.getLoggedInUser().getRole().equals(RoleEnum.CREATOR);
+        return false;
+    }
+
+    @Override
     public boolean isAdmin() {
         if(this.getLoggedInUser() != null)
             return this.getLoggedInUser().getRole().equals(RoleEnum.ADMIN);

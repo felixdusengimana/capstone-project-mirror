@@ -1,19 +1,25 @@
 package com.pesatone.api.controller;
 
 import com.google.gson.Gson;
-import com.pesatone.api.configuration.properties.FlwConfig;
+import com.pesatone.api.configuration.properties.PaymentConfig;
 import com.pesatone.api.model.dto.ApiResponseObject;
 import com.pesatone.api.model.dto.TransactionDto;
 import com.pesatone.api.model.dto.flw.FlwCallBackDto;
 import com.pesatone.api.model.entity.PaymentTransaction;
 import com.pesatone.api.model.pojo.PaymentTransactionPojo;
+import com.pesatone.api.model.search.CreatorSearchFilter;
+import com.pesatone.api.model.search.CreatorSearchResponse;
+import com.pesatone.api.model.search.TransactionSearchFilter;
+import com.pesatone.api.model.search.TransactionSearchResponse;
 import com.pesatone.api.service.PaymentTransactionService;
+import com.querydsl.core.QueryResults;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -28,7 +34,7 @@ import reactor.core.publisher.Mono;
 public class PaymentTransactionController {
     private final PaymentTransactionService paymentTransactionService;
     private final Gson gson;
-    private final FlwConfig flwConfig;
+    private final PaymentConfig paymentConfig;
 
 
     @CrossOrigin
@@ -74,8 +80,16 @@ public class PaymentTransactionController {
         return ResponseEntity.ok(new ApiResponseObject<>("Successful", true, "Notification received"));
     }
 
+    @Operation(summary = "Search Payment Transactions", description = "Search Payment transactions")
+    @GetMapping()
+    public ResponseEntity<ApiResponseObject<QueryResults<TransactionSearchResponse>>> searchPaymentTransactions(@ParameterObject @Valid TransactionSearchFilter filter) {
+        QueryResults<TransactionSearchResponse> response = paymentTransactionService.searchTransactions(filter);
+        return ResponseEntity.ok(new ApiResponseObject<>("Transactions retrieved successfully",
+                true,response));
+    }
+
     private void verifyCallBack(String verifyHash, FlwCallBackDto dto){
-       if(!verifyHash.equals(flwConfig.getFlwVerifyHash())){
+       if(!verifyHash.equals(paymentConfig.getFlwVerifyHash())){
            log.error("Invalid hash {} for FLW callback {}",verifyHash,gson.toJson(dto));
            throw new IllegalArgumentException("We could not validate callback");
        }

@@ -170,7 +170,7 @@ public class UserServiceImpl implements UserService {
         blazeQuery.orderBy(qAppUser.verified.desc().nullsLast());
 
         blazeQuery.limit(filter.getPageSize());
-        blazeQuery.offset(filter.getPageNumber());
+        blazeQuery.offset(filter.getOffset());
 
         List<CreatorSearchResponse> resultList = blazeQuery
                 .select(Projections.constructor(

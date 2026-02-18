@@ -26,6 +26,8 @@ public class PaymentTransaction {
     @NotNull
     private BigDecimal amount;
 
+    private BigDecimal transactionFee;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     private CurrencyEnum currency;

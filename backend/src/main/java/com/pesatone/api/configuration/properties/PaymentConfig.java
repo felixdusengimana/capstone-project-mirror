@@ -9,8 +9,9 @@ import org.springframework.stereotype.Component;
 @Setter
 @Component
 @ConfigurationProperties(prefix = "application.payment")
-public class FlwConfig {
+public class PaymentConfig {
     private String flwVerifyHash;
     private String flwSecretKey;
     private String flwTransactionDetailUrl;
+    private Integer transactionFeePercentage;
 }

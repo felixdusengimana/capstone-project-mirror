@@ -17,6 +17,8 @@ public interface RequestPrincipal {
 
     AppUser getLoggedInUser();
 
+    boolean isCreator();
+
     boolean isAdmin();
 }
 

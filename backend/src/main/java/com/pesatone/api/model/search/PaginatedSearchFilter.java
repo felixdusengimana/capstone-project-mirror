@@ -22,4 +22,8 @@ public class PaginatedSearchFilter {
     @Max(value = 100,message = "Page size cannot exceed 100")
     @Min(value = 1,message = "Page size cannot be less than One(1)")
     private Integer pageSize = 10;
+
+    public Integer getOffset(){
+        return  (this.pageNumber - 1) * this.pageSize;
+    }
 }

@@ -4,6 +4,6 @@ import java.math.BigDecimal;
 
 public record DashboardPojo(BigDecimal totalAmountReceived,
                             Integer totalTransactions,
-                            Integer totalSupporters,
+                            long totalSupporters,
                             BigDecimal biggestSupport) {
 }

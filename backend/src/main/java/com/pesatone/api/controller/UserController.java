@@ -11,6 +11,7 @@ import com.pesatone.api.model.pojo.UserPojo;
 import com.pesatone.api.model.search.CreatorSearchFilter;
 import com.pesatone.api.model.search.CreatorSearchResponse;
 import com.pesatone.api.repository.AppUserRepository;
+import com.pesatone.api.service.PaymentTransactionService;
 import com.pesatone.api.service.UserService;
 import com.querydsl.core.QueryResults;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,6 +46,7 @@ public class UserController {
     private final RequestPrincipal principal;
     private final UserService userService;
     private final AppUserRepository userRepository;
+    private final PaymentTransactionService transactionService;
 
     @Operation(summary = "Search Creators", description = "Search Creators by Name or Username")
     @GetMapping("/creators")
@@ -63,14 +65,14 @@ public class UserController {
                 true, UserPojo.stripDetails(userService.getUserDetails(user))));
     }
 
-//    @Operation(summary = "Get Creator's Dashboard", description = "Get LoggedIn Creators Dashboard")
-//    @GetMapping("/creators/dashboard")
-//    @PreAuthorize("hasAnyAuthority(T(com.pesatone.api.model.enumeration.PermissionEnum).VIEW_CREATOR_DASHBOARD)")
-//    public ResponseEntity<ApiResponseObject<DashboardPojo>> getCreatorDashboard() {
-//        AppUser user = principal.getLoggedInUser();
-//        return ResponseEntity.ok(new ApiResponseObject<>("Creator profile retrieved successfully",
-//                true, UserPojo.stripDetails(userService.getUserDetails(user))));
-//    }
+    @Operation(summary = "Get Creator's Dashboard", description = "Get LoggedIn Creators Dashboard")
+    @GetMapping("/creators/dashboard")
+    @PreAuthorize("hasAnyAuthority(T(com.pesatone.api.model.enumeration.PermissionEnum).VIEW_CREATOR_DASHBOARD)")
+    public ResponseEntity<ApiResponseObject<DashboardPojo>> getCreatorDashboard() {
+        AppUser user = principal.getLoggedInUser();
+        return ResponseEntity.ok(new ApiResponseObject<>("Creator dashboard retrieved successfully",
+                true, transactionService.getDashboardDetails(user)));
+    }
 
     @Operation(summary = "Get User Profile", description = "Get LoggedIn User Profile")
     @GetMapping("/profile")
