@@ -1,5 +1,6 @@
 package com.pesatone.api.controller;
 
+import com.blazebit.persistence.PagedList;
 import com.pesatone.api.configuration.auth.RequestPrincipal;
 import com.pesatone.api.exception.PesatoneNotFoundException;
 import com.pesatone.api.model.dto.ApiResponseObject;
@@ -10,6 +11,7 @@ import com.pesatone.api.model.pojo.DashboardPojo;
 import com.pesatone.api.model.pojo.UserPojo;
 import com.pesatone.api.model.search.CreatorSearchFilter;
 import com.pesatone.api.model.search.CreatorSearchResponse;
+import com.pesatone.api.model.search.QueryResultPojo;
 import com.pesatone.api.repository.AppUserRepository;
 import com.pesatone.api.service.PaymentTransactionService;
 import com.pesatone.api.service.UserService;
@@ -50,10 +52,9 @@ public class UserController {
 
     @Operation(summary = "Search Creators", description = "Search Creators by Name or Username")
     @GetMapping("/creators")
-    public ResponseEntity<ApiResponseObject<QueryResults<CreatorSearchResponse>>> searchCreators(@ParameterObject @Valid CreatorSearchFilter filter) {
-        QueryResults<CreatorSearchResponse> response = userService.searchCreators(filter);
+    public ResponseEntity<ApiResponseObject<QueryResultPojo<CreatorSearchResponse>>> searchCreators(@ParameterObject @Valid CreatorSearchFilter filter) {
         return ResponseEntity.ok(new ApiResponseObject<>("Creators retrieved successfully",
-                true,response));
+                true,userService.searchCreators(filter)));
     }
 
     @Operation(summary = "Get Creator's Profile", description = "Get Creators profile by Id")

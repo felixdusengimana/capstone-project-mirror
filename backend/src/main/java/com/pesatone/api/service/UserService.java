@@ -8,6 +8,7 @@ import com.pesatone.api.model.enumeration.RoleEnum;
 import com.pesatone.api.model.pojo.UserPojo;
 import com.pesatone.api.model.search.CreatorSearchFilter;
 import com.pesatone.api.model.search.CreatorSearchResponse;
+import com.pesatone.api.model.search.QueryResultPojo;
 import com.querydsl.core.QueryResults;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,5 +26,5 @@ public interface UserService {
 
     UserPojo getUserDetails(AppUser user);
 
-    QueryResults<CreatorSearchResponse> searchCreators(CreatorSearchFilter filter);
+    QueryResultPojo<CreatorSearchResponse> searchCreators(CreatorSearchFilter filter);
 }

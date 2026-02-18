@@ -24,6 +24,6 @@ public class PaginatedSearchFilter {
     private Integer pageSize = 10;
 
     public Integer getOffset(){
-        return  (this.pageNumber - 1) * this.pageSize;
+        return  Math.max(0, (this.pageNumber - 1) * this.pageSize);
     }
 }

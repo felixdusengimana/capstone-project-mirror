@@ -16,6 +16,7 @@ import com.pesatone.api.model.enumeration.StatusEnum;
 import com.pesatone.api.model.pojo.UserPojo;
 import com.pesatone.api.model.search.CreatorSearchFilter;
 import com.pesatone.api.model.search.CreatorSearchResponse;
+import com.pesatone.api.model.search.QueryResultPojo;
 import com.pesatone.api.repository.AppUserRepository;
 import com.pesatone.api.repository.CountryRepository;
 import com.pesatone.api.repository.IndustryRepository;
@@ -150,7 +151,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public QueryResults<CreatorSearchResponse> searchCreators(CreatorSearchFilter filter) {
+    public QueryResultPojo<CreatorSearchResponse> searchCreators(CreatorSearchFilter filter) {
         QAppUser qAppUser = QAppUser.appUser;
         BlazeJPAQuery<AppUser> blazeQuery = new BlazeJPAQuery<>(entityManager, builderFactory);
 
@@ -166,13 +167,9 @@ public class UserServiceImpl implements UserService {
                             .or(qAppUser.name.containsIgnoreCase(filter.getName())));
         }
 
-        blazeQuery.orderBy(qAppUser.username.asc());
-        blazeQuery.orderBy(qAppUser.verified.desc().nullsLast());
+        blazeQuery.orderBy(qAppUser.username.asc(),qAppUser.verified.desc().nullsLast(), qAppUser.id.asc());
 
-        blazeQuery.limit(filter.getPageSize());
-        blazeQuery.offset(filter.getOffset());
-
-        List<CreatorSearchResponse> resultList = blazeQuery
+        PagedList<CreatorSearchResponse> pagedList = blazeQuery
                 .select(Projections.constructor(
                                 CreatorSearchResponse.class,
                                 qAppUser.id,
@@ -181,9 +178,9 @@ public class UserServiceImpl implements UserService {
                                 qAppUser.profileImageUrl,
                                 qAppUser.verified
                         ))
-                .fetch();
+                .fetchPage(filter.getOffset(), filter.getPageSize());
 
-        return new QueryResults<>(resultList,filter.getPageNumber().longValue(),filter.getPageSize().longValue(),blazeQuery.fetchCount());
+        return new QueryResultPojo<>(pagedList, filter.getPageNumber(), filter.getPageSize(), pagedList.getTotalSize());
     }
 
     private void setSocialLinks(AppUser user, List<SocialLinkDto> linkDtos) {
