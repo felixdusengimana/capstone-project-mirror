@@ -1,7 +1,7 @@
 package com.pesatone.api.service.impl;
 
-import com.blazebit.persistence.CriteriaBuilder;
 import com.blazebit.persistence.CriteriaBuilderFactory;
+import com.blazebit.persistence.querydsl.BlazeJPAQuery;
 import com.google.gson.Gson;
 import com.pesatone.api.configuration.properties.FlwConfig;
 import com.pesatone.api.exception.PesatoneNotFoundException;
@@ -11,11 +11,11 @@ import com.pesatone.api.model.dto.flw.FlwTransactionDetail;
 import com.pesatone.api.model.dto.flw.FlwTransactionDetailResponse;
 import com.pesatone.api.model.entity.AppUser;
 import com.pesatone.api.model.entity.PaymentTransaction;
+import com.pesatone.api.model.entity.QPaymentTransaction;
 import com.pesatone.api.model.enumeration.PaymentProviderEnum;
 import com.pesatone.api.model.enumeration.PaymentStatusEnum;
 import com.pesatone.api.model.enumeration.RoleEnum;
 import com.pesatone.api.model.pojo.DashboardPojo;
-import com.pesatone.api.model.search.CreatorSearchResponse;
 import com.pesatone.api.repository.AppUserRepository;
 import com.pesatone.api.repository.PaymentTransactionRepository;
 import com.pesatone.api.service.PaymentTransactionService;
@@ -30,6 +30,9 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
+import java.math.BigDecimal;
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -97,9 +100,29 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
 
     @Override
     public DashboardPojo getDashboardDetails(AppUser creator) {
-        CriteriaBuilder<CreatorSearchResponse> criteriaBuilder = builderFactory.create(entityManager, CreatorSearchResponse.class)
-                .from(AppUser.class, "u");
-        return null;
+        QPaymentTransaction qPaymentTransaction = QPaymentTransaction.paymentTransaction;
+        BlazeJPAQuery<PaymentTransaction> blazeQuery = new BlazeJPAQuery<>(entityManager, builderFactory);
+
+        blazeQuery.from(qPaymentTransaction)
+                .where(qPaymentTransaction.paymentStatus.eq(PaymentStatusEnum.SUCCESSFUL)
+                        .and(qPaymentTransaction.creator.eq(creator)));
+
+        List<PaymentTransaction> transactions = blazeQuery.fetch();
+        BigDecimal totalAmountReceived = transactions.stream()
+                .map(PaymentTransaction::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        Integer totalTransactions = transactions.size();
+        BigDecimal biggestSupport = transactions.stream()
+                .map(PaymentTransaction::getAmount)
+                .max(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
+        Long totalSupporters = transactions.stream()
+                .map(PaymentTransaction::getDonorName)
+                .distinct()
+                .count();
+
+        return new DashboardPojo(totalAmountReceived
+                ,totalTransactions,
+                totalSupporters.intValue(), biggestSupport);
     }
 
     private boolean isValidatePayment(PaymentTransaction transaction, PaymentDto paymentDto){
