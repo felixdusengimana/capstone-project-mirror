@@ -92,7 +92,6 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
-
     @Transactional
     @Override
     public String uploadProfileImage(AppUser user, MultipartFile file) {
@@ -113,6 +112,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void initiatePasswordReset(AppUser user) {
         String token = tokenService.getPasswordResetToken(user);
+        System.out.println(token);
         notificationService.sendEmail(user.getEmail(),"Password reset",
                 "<b>Hello "+ StringUtils.defaultIfBlank(user.getName()," ") +",</b> <br/>" +
                         "Did you forget your password and would like to get new credentials? <br/>" +
@@ -180,7 +180,7 @@ public class UserServiceImpl implements UserService {
                         ))
                 .fetchPage(filter.getOffset(), filter.getPageSize());
 
-        return new QueryResultPojo<>(pagedList, filter.getPageNumber(), filter.getPageSize(), pagedList.getTotalSize());
+        return new QueryResultPojo<>(pagedList, filter.getPageNumber(), filter.getPageSize(), pagedList.getTotalPages());
     }
 
     private void setSocialLinks(AppUser user, List<SocialLinkDto> linkDtos) {

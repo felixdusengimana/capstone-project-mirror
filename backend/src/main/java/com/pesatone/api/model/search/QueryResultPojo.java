@@ -15,13 +15,13 @@ public final class QueryResultPojo<T> implements Serializable {
     private static final long serialVersionUID = -4591506147471300909L;
     private final Integer pageNumber;
     private final Integer pageSize;
-    private final long total;
+    private final Integer totalPages;
     private final List<T> results;
 
-    public QueryResultPojo(List<T> results, @Nullable Integer pageNumber, @Nullable Integer pageSize, long total) {
+    public QueryResultPojo(List<T> results, @Nullable Integer pageNumber, @Nullable Integer pageSize, Integer totalPages) {
         this.pageNumber = pageNumber;
         this.pageSize = pageSize;
-        this.total = total;
+        this.totalPages = totalPages;
         this.results = results;
     }
 
@@ -29,8 +29,8 @@ public final class QueryResultPojo<T> implements Serializable {
         return this.results;
     }
 
-    public long getTotal() {
-        return this.total;
+    public long getTotalPages() {
+        return this.totalPages;
     }
 
     public boolean isEmpty() {

@@ -5,10 +5,7 @@ import com.pesatone.api.model.dto.TransactionDto;
 import com.pesatone.api.model.entity.AppUser;
 import com.pesatone.api.model.entity.PaymentTransaction;
 import com.pesatone.api.model.pojo.DashboardPojo;
-import com.pesatone.api.model.search.CreatorSearchFilter;
-import com.pesatone.api.model.search.CreatorSearchResponse;
-import com.pesatone.api.model.search.TransactionSearchFilter;
-import com.pesatone.api.model.search.TransactionSearchResponse;
+import com.pesatone.api.model.search.*;
 import com.querydsl.core.QueryResults;
 import reactor.core.publisher.Mono;
 
@@ -23,5 +20,5 @@ public interface PaymentTransactionService {
 
     DashboardPojo getDashboardDetails(AppUser creator);
 
-    QueryResults<TransactionSearchResponse> searchTransactions(TransactionSearchFilter filter);
+    QueryResultPojo<TransactionSearchResponse> searchTransactions(TransactionSearchFilter filter);
 }

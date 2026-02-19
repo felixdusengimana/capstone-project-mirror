@@ -12,8 +12,8 @@ public class PaginatedSearchFilter {
     @Parameter(name = "pageNumber",
             description = "Page number of your search. This defaults to 0",
             example = "0")
-    @Min(value = 0,message = "Page number cannot be less than Zero(0)")
-    private Integer pageNumber = 0;
+    @Min(value = 1,message = "Page number cannot be less than Zero(0)")
+    private Integer pageNumber = 1;
 
     @Parameter(name = "pageSize",
             description = "Number of records to be returned. This defaults to 10." +

@@ -7,10 +7,7 @@ import com.pesatone.api.model.dto.TransactionDto;
 import com.pesatone.api.model.dto.flw.FlwCallBackDto;
 import com.pesatone.api.model.entity.PaymentTransaction;
 import com.pesatone.api.model.pojo.PaymentTransactionPojo;
-import com.pesatone.api.model.search.CreatorSearchFilter;
-import com.pesatone.api.model.search.CreatorSearchResponse;
-import com.pesatone.api.model.search.TransactionSearchFilter;
-import com.pesatone.api.model.search.TransactionSearchResponse;
+import com.pesatone.api.model.search.*;
 import com.pesatone.api.service.PaymentTransactionService;
 import com.querydsl.core.QueryResults;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -82,10 +79,9 @@ public class PaymentTransactionController {
 
     @Operation(summary = "Search Payment Transactions", description = "Search Payment transactions")
     @GetMapping()
-    public ResponseEntity<ApiResponseObject<QueryResults<TransactionSearchResponse>>> searchPaymentTransactions(@ParameterObject @Valid TransactionSearchFilter filter) {
-        QueryResults<TransactionSearchResponse> response = paymentTransactionService.searchTransactions(filter);
+    public ResponseEntity<ApiResponseObject<QueryResultPojo<TransactionSearchResponse>>> searchPaymentTransactions(@ParameterObject @Valid TransactionSearchFilter filter) {
         return ResponseEntity.ok(new ApiResponseObject<>("Transactions retrieved successfully",
-                true,response));
+                true,paymentTransactionService.searchTransactions(filter)));
     }
 
     private void verifyCallBack(String verifyHash, FlwCallBackDto dto){

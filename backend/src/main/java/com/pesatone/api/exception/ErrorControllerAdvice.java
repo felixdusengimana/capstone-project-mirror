@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -72,7 +73,7 @@ public class ErrorControllerAdvice {
     }
 
 
-    @ExceptionHandler({BindException.class,})
+    @ExceptionHandler({BindException.class})
     public ResponseEntity<Object> handleBindingException(BindException ex) {
         String errorMessage = ex.getBindingResult().getFieldErrors()
                 .stream()
@@ -98,8 +99,8 @@ public class ErrorControllerAdvice {
          return new ResponseEntity<>(new ApiResponseObject<>(errorMessage,false), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(PesatoneAuthenticationException.class)
-    public ResponseEntity<Object> handle(PesatoneAuthenticationException e) {
+    @ExceptionHandler({PesatoneAuthenticationException.class, BadCredentialsException.class})
+    public ResponseEntity<Object> handleAuthenticationException(Exception e) {
         log.info("AUTHORIZATION_EXCEPTION", e);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponseObject<>("Sorry, your credentials are invalid or the account is not active",false));
     }
