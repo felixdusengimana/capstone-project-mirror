@@ -12,14 +12,16 @@ export default function ResolveScreen() {
       if (!isLoading) {
         const info = user?.data;
         if (!info?.id) return router.replace("/login");
-        const step = !info?.bio
+        const step = !info.emailVerified
           ? 1
-          : !info.username
+          : !info?.bio
           ? 2
-          : !info.countryName
+          : !info.username
           ? 3
-          : info.socialLinks?.length <= 0
+          : !info.countryName
           ? 4
+          : info.socialLinks?.length <= 0
+          ? 5
           : -1;
         if (step === -1) return router.replace("/dashboard");
 
@@ -31,7 +33,7 @@ export default function ResolveScreen() {
   }, [isLoading]);
 
   return (
-    <div className="h-screen w-full">
+    <div className="h-screen w-full bg-white">
       <div className="flex justify-center items-center h-full">
         <div className="flex flex-col items-center">
           <h1 className="text-4xl font-bold text-gray-800">Loading...</h1>

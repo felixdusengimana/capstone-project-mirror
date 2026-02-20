@@ -22,9 +22,10 @@ import { UpdateUser, UploadProfileImage, useGetMe } from "@/services/users";
 import { ICreateUser, step1, step2, step3, step4 } from "@/types/user";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import OTPInput from "@/components/molecules/OTPInput";
 
 export default function Join() {
-  const STEPS = 4;
+  const STEPS = 5;
   const router = useRouter();
   const searchParams = useSearchParams();
   const step = searchParams.get("step");
@@ -48,7 +49,11 @@ export default function Join() {
     if (parseInt(step!) === STEPS) router.replace("/dashboard");
     else router.replace(`/join?step=${parseInt(step!) + 1}`);
   };
-  const { mutate, isPending } = useMutation({
+  const {
+    mutate,
+    isPending,
+    data: imageUp,
+  } = useMutation({
     onSuccess() {
       toast.success("Profile updated successfully!", { id: "update-profile" });
       navigate();
@@ -69,7 +74,7 @@ export default function Join() {
     formState: { errors, isDirty },
   } = useForm<ICreateUser>({
     resolver: zodResolver(
-      step === "1" ? step1 : step === "2" ? step2 : step === "3" ? step3 : step4
+      step === "2" ? step1 : step === "3" ? step2 : step === "4" ? step3 : step4
     ),
   });
 
@@ -78,7 +83,7 @@ export default function Join() {
       return navigate();
     }
 
-    if (profilePhoto) {
+    if (profilePhoto && !imageUp?.data?.success) {
       const data = new FormData();
       data.append("image", profilePhoto);
       const response = await UploadProfileImage(data);
@@ -115,9 +120,14 @@ export default function Join() {
       countryIsoCode: user?.data?.countryName,
       industryCode: user?.data?.industryName,
       socialLinks: user?.data?.socialLinks ?? [{ platform: "", link: "" }],
+      image: user?.data?.profileImageUrl,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.data, isGettingUser]);
+
+  const handleOTP = (otp: string) => {
+    console.log(otp);
+  };
 
   return (
     <form
@@ -134,6 +144,21 @@ export default function Join() {
       <div className="w-full pb-5 lg:pb-[100px]">
         <Progress active={parseInt(step!)} total={STEPS} />
         {step === "1" ? (
+          <>
+            <h1 className="text-[#374151] text-4xl font-mono mt-[30px]">
+              Verify email{" "}
+            </h1>
+            <p className="text-[#8A8A8B] mt-2">
+              Enter OTP code sent to{" "}
+              <span className="text-gray-700 font-normal">
+                nh****i001@gmail.com
+              </span>
+            </p>
+            <div className="mt-10">
+              <OTPInput onChange={handleOTP} />
+            </div>
+          </>
+        ) : step === "2" ? (
           <>
             <h1 className="text-[#374151] text-4xl font-mono mt-[30px]">
               Tell Us About You, Craft Your Identity&quot;
@@ -154,10 +179,21 @@ export default function Join() {
                   alt="Profile Photo"
                 />
                 <label htmlFor="upload-profile-photo">
-                  <div className="mt-6 text-xlfont-normal rounded-full border border-gray-200 flex gap-1 px-4 py-3">
+                  <div
+                    className={`mt-6 text-xl font-normal rounded-full border ${
+                      errors.image?.message
+                        ? "border-red-400"
+                        : "border-gray-200"
+                    } flex gap-1 px-4 py-3`}
+                  >
                     <Icon name="camera" />
                     <p>Upload Profile</p>
                   </div>
+                  {errors.image?.message && (
+                    <p className="text-red-500 text-center text-sm mt-2">
+                      Profile photo is required
+                    </p>
+                  )}
                 </label>
 
                 <input
@@ -207,7 +243,7 @@ export default function Join() {
               </div>
             </div>
           </>
-        ) : step === "2" ? (
+        ) : step === "3" ? (
           <>
             <h1 className="text-[#374151] text-4xl font-mono mt-[30px]">
               Find Your Identity in the Community&quot;
@@ -237,7 +273,7 @@ export default function Join() {
               error={errors.username?.message}
             />
           </>
-        ) : step === "3" ? (
+        ) : step === "4" ? (
           <>
             <h1 className="text-[#374151] text-4xl font-mono mt-[30px]">
               Discover Your World, Tailored to You&quot;
@@ -297,7 +333,7 @@ export default function Join() {
               ))}
             </Select>
           </>
-        ) : step === "4" ? (
+        ) : step === "5" ? (
           <>
             <h1 className="text-[#374151] text-4xl font-mono mt-[30px]">
               Share Your World, Connect Your Networks

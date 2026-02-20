@@ -47,6 +47,7 @@ export default function Sidebar({
             photo: user?.profileImageUrl || "",
             username: user?.username,
           }}
+          isUserLoading={isUserLoading}
         />
 
         <div className="mt-20">

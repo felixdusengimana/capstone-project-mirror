@@ -11,7 +11,7 @@ export default function Progress({ active, total, ...props }: ProgressProps) {
         <div
           key={i}
           className={`h-full rounded-full ${
-            i < active ? "bg-[#3B82F6]" : "bg-[#E5E7EB]"
+            i < active ? "bg-[#1F2937]" : "bg-[#E5E7EB]"
           }`}
           style={{ width: `${100 / total}%` }}
         />

@@ -3,6 +3,7 @@ import Button from "@/components/atoms/Button";
 import Icon from "@/components/atoms/Icon";
 import Input from "@/components/atoms/Input";
 import CardIcon from "@/components/molecules/CardIcon";
+import CreatorDashboard from "@/components/molecules/CreatorDashboard";
 import Profile from "@/components/molecules/Profile";
 import SupporterDialog from "@/components/molecules/SupporterDialog";
 import dynamic from "next/dynamic";
@@ -10,7 +11,7 @@ const ShareProfile = dynamic(
   () => import("@/components/molecules/ShareProfile"),
   { ssr: false }
 );
-export default function page() {
+export default function CreatorDashboardPage() {
   return (
     <div className="min-h-full w-full dashboard-padding text-black pb-32 ">
       <h1 className="text-4xl font-sans font-bold text-[#1A1A1A]">Dashboard</h1>
@@ -65,37 +66,8 @@ export default function page() {
         </div>
       </div>
 
-      <div className="w-full grid grid-cols-3 gap-10 items-center mt-10">
-        {/* Money Earned */}
-        <div className="w-full bg-white p-8 rounded-lg">
-          <CardIcon icon="coins" className="bg-gray-50" />
-          <h3 className="font-medium text-sm text-gray-400 mt-6">
-            Money Earned
-          </h3>
-          <h1 className="text-gray-800 font-medium text-4xl mt-4 flex items-center gap-2">
-            <span className="font-normal text-base text-gray-400">RWF</span>{" "}
-            200,000
-          </h1>
-        </div>
-
-        {/* Supporters */}
-        <div className="w-full bg-white p-8 rounded-lg">
-          <CardIcon icon="coins" className="bg-gray-50" />
-          <h3 className="font-medium text-sm text-gray-400 mt-6">Supporters</h3>
-          <h1 className="text-gray-800 font-medium text-4xl mt-4">1000</h1>
-        </div>
-
-        {/* Biggest supporter */}
-        <div className="w-full bg-white p-8 rounded-lg">
-          <CardIcon icon="user-star" className="bg-gray-50" />
-          <h3 className="font-medium text-sm text-gray-400 mt-6">
-            Single Biggest supporter
-          </h3>
-          <h1 className="text-gray-800 font-medium text-4xl mt-4 flex items-center gap-2">
-            <span className="font-normal text-base text-gray-400">RWF</span>{" "}
-            50,000
-          </h1>
-        </div>
+      <div className="mt-10">
+        <CreatorDashboard />
       </div>
 
       <div className="font-medium text-base text-gray-700 flex justify-between mt-12 mb-4">

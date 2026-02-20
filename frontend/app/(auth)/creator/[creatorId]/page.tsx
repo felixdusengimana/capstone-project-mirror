@@ -17,7 +17,6 @@ import { useForm } from "react-hook-form";
 import Script from "next/script";
 import { useMutation } from "@tanstack/react-query";
 import { InitiateTransaction } from "@/services/pay";
-import toast from "react-hot-toast";
 
 export default function SupportCreator() {
   const { creatorId } = useParams() as { creatorId: string };
@@ -57,14 +56,14 @@ export default function SupportCreator() {
         consumer_mac: "92a3-912ba-1192a",
       },
       customer: {
-        email: "test@mailinator.com",
-        phone_number: "08100000000",
+        email: data?.email ?? "",
+        // phone_number: "08100000000",
         name: data.name,
       },
       customizations: {
         title: `Support ${data.creatorUserName}`,
         description: data.note,
-        logo: "https://checkout.flutterwave.com/assets/img/rave-logo.png",
+        logo: "/logo.svg",
       },
       callback: function (success_data: TransactionData) {
         console.log({ success_data });
@@ -128,9 +127,9 @@ export default function SupportCreator() {
           onSubmit={handleSubmit(onSubmit)}
           className="flex flex-col items-center gap-24 h-full p-8 lg:p-0"
         >
-          <h1 className="text-[#374151] text-4xl font-mono text-center">
+          {/* <h1 className="text-[#374151] text-4xl font-mono text-center">
             Pesatone makes Supporting fun and easy.
-          </h1>
+          </h1> */}
           <div className="w-full lg:w-[598px] flex flex-col items-center justify-between gap-10  rounded-2xl border border-gray-200 pt-24 pb-[61px] px-20 relative">
             <div className="absolute -top-16">
               <Avatar src={data?.data.profileImageUrl ?? ""} size="xl" />
@@ -198,6 +197,20 @@ export default function SupportCreator() {
                   })
                 }
               />
+
+              <Input
+                label="Your email"
+                placeholder="Your email"
+                value={watch("email")}
+                error={errors.email?.message}
+                onChange={(e) =>
+                  setValue("email", e.target.value, {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  })
+                }
+              />
+
               <TextArea
                 label="Say something nice"
                 placeholder="Type something ....."

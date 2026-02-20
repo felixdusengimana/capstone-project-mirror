@@ -23,11 +23,9 @@ export interface ICreatorFilter {
 }
 
 export const step1 = z.object({
-  image: z
-    .string({
-      required_error: "Image is required",
-    })
-    .optional(),
+  image: z.string({
+    required_error: "Image is required",
+  }),
   name: z
     .string({
       required_error: "Name is required",
@@ -76,3 +74,17 @@ export type ICreateUser = z.infer<typeof step1> &
   z.infer<typeof step2> &
   z.infer<typeof step3> &
   z.infer<typeof step4>;
+
+export const updateUser = z
+  .object({
+    name: z.string().min(3, "Name must be at least 3 characters").optional(),
+    bio: z.string().min(10, "Bio must be at least 10 characters").optional(),
+    profileImageUrl: z.string().url("Invalid URL").optional(),
+    phoneNumber: z.string().optional(),
+    email: z.string().email("Invalid email").optional(),
+    countryIsoCode: z.string().optional(),
+    industryCode: z.string().optional(),
+  })
+  .merge(step4);
+
+export type IUpdateUser = z.infer<typeof updateUser>;
