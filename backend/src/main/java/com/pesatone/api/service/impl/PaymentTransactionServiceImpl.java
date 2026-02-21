@@ -24,7 +24,7 @@ import com.pesatone.api.model.search.TransactionSearchResponse;
 import com.pesatone.api.repository.AppUserRepository;
 import com.pesatone.api.repository.PaymentTransactionRepository;
 import com.pesatone.api.service.PaymentTransactionService;
-import com.pesatone.api.util.DateTimeUtil;
+import com.pesatone.api.util.AppUtil;
 import com.querydsl.core.types.Projections;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import reactor.netty.http.client.HttpClient;
 
 import java.math.BigDecimal;
@@ -91,7 +92,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
             transaction.setPaymentStatus(paymentDto.paymentStatus());
             transaction.setPaidAt(paymentDto.paidAt());
             transaction.setProviderReference(paymentDto.providerReference());
-            transaction.setPaymentChannel(paymentDto.paymentChannel());
+            transaction.setPaymentChannel(paymentDto.paymentChannel().toUpperCase());
 
             RoundingMode roundingMode = RoundingMode.HALF_UP;
 
@@ -163,13 +164,13 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
 
         if (StringUtils.isNotBlank(filter.getStartDate())) {
             try {
-                blazeQuery.where(qPaymentTransaction.paidAt.goe(DateTimeUtil.getDateFromStringValue(filter.getStartDate())));
+                blazeQuery.where(qPaymentTransaction.paidAt.goe(AppUtil.getDateFromStringValue(filter.getStartDate())));
             }catch (ParseException ex){log.error("Could not get start date {}", filter.getStartDate());}
         }
 
         if (StringUtils.isNotBlank(filter.getEndDate())) {
             try {
-                blazeQuery.where(qPaymentTransaction.paidAt.loe(DateTimeUtil.getDateFromStringValue(filter.getEndDate())));
+                blazeQuery.where(qPaymentTransaction.paidAt.loe(AppUtil.getDateFromStringValue(filter.getEndDate())));
             }catch (ParseException ex){log.error("Could not get end date {}", filter.getEndDate());}
         }
 
@@ -216,6 +217,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
                 .header("Authorization", "Bearer "+ paymentConfig.getFlwSecretKey())
                 .retrieve()
                 .bodyToMono(String.class)
+                .publishOn(Schedulers.boundedElastic())
                 .map(response -> {
                     FlwTransactionDetailResponse detailResponse = gson.fromJson(response,FlwTransactionDetailResponse.class);
                     FlwTransactionDetail transactionDetail = detailResponse.getData();

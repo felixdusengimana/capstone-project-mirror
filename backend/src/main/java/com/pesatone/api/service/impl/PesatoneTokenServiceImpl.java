@@ -20,6 +20,8 @@ public class PesatoneTokenServiceImpl implements PesatoneTokenService {
     private final SecretKey secretKey;
     @Value("${application.jwtExpiry}")
     Integer jwtExpiry;
+    private static final String USER_ID_CLAIM = "userId";
+
 
     @Override
     public String getLoginToken(AppUser user) {
@@ -28,7 +30,7 @@ public class PesatoneTokenServiceImpl implements PesatoneTokenService {
 
         return Jwts.builder()
                 .subject(user.getEmail())
-                .claim("userId", user.getId())
+                .claim(USER_ID_CLAIM, user.getId())
                 .claim("email", user.getEmail())
                 .claim("sessionId", UUID.randomUUID().toString())
                 .issuedAt(new Date())
@@ -44,7 +46,7 @@ public class PesatoneTokenServiceImpl implements PesatoneTokenService {
 
         return Jwts.builder()
                 .subject("Password Reset")
-                .claim("userId", user.getId())
+                .claim(USER_ID_CLAIM, user.getId())
                 .issuedAt(new Date())
                 .expiration(tokenExpiryDate)
                 .signWith(secretKey)
@@ -61,7 +63,7 @@ public class PesatoneTokenServiceImpl implements PesatoneTokenService {
                     .parseSignedClaims(token)
                     .getPayload();
 
-            userId = claims.get("userId", Long.class);
+            userId = claims.get(USER_ID_CLAIM, Long.class);
         } catch (Exception ex) {
             throw new IllegalArgumentException("Invalid password reset token");
         }

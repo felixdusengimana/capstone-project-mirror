@@ -36,8 +36,8 @@ public class ErrorControllerAdvice {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponseObject<>("Please select a file",false));
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Object> handle(IllegalArgumentException e) {
+    @ExceptionHandler({IllegalArgumentException.class, PesatoneException.class})
+    public ResponseEntity<Object> handleBadRequest(Exception e) {
         String errorMessage;
         if (e.getCause() != null) {
             errorMessage = e.getCause().getMessage();

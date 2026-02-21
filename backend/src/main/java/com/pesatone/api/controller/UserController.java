@@ -1,10 +1,11 @@
 package com.pesatone.api.controller;
 
-import com.blazebit.persistence.PagedList;
 import com.pesatone.api.configuration.auth.RequestPrincipal;
 import com.pesatone.api.exception.PesatoneNotFoundException;
 import com.pesatone.api.model.dto.ApiResponseObject;
+import com.pesatone.api.model.dto.OtpRequestDto;
 import com.pesatone.api.model.dto.UserDetailDto;
+import com.pesatone.api.model.dto.VerifyOtpDto;
 import com.pesatone.api.model.entity.AppUser;
 import com.pesatone.api.model.enumeration.RoleEnum;
 import com.pesatone.api.model.pojo.DashboardPojo;
@@ -13,14 +14,15 @@ import com.pesatone.api.model.search.CreatorSearchFilter;
 import com.pesatone.api.model.search.CreatorSearchResponse;
 import com.pesatone.api.model.search.QueryResultPojo;
 import com.pesatone.api.repository.AppUserRepository;
+import com.pesatone.api.service.OtpService;
 import com.pesatone.api.service.PaymentTransactionService;
 import com.pesatone.api.service.UserService;
-import com.querydsl.core.QueryResults;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +51,7 @@ public class UserController {
     private final UserService userService;
     private final AppUserRepository userRepository;
     private final PaymentTransactionService transactionService;
+    private final OtpService otpService;
 
     @Operation(summary = "Search Creators", description = "Search Creators by Name or Username")
     @GetMapping("/creators")
@@ -102,6 +105,29 @@ public class UserController {
         }
         return ResponseEntity.ok(new ApiResponseObject<>("Profile image uploaded successfully", true,
                 userService.uploadProfileImage(user, file)));
+    }
+
+    @Operation(summary = "Request OTP", description = "Request OTP for email, phone or payout verification")
+    @PostMapping("otp")
+    @PreAuthorize("hasAnyAuthority(T(com.pesatone.api.model.enumeration.PermissionEnum).VIEW_CREATOR_DASHBOARD)")
+    public ResponseEntity<ApiResponseObject<String>> requestOtp(@RequestBody @Valid OtpRequestDto dto) {
+        //TODO prevent DDos
+        AppUser user = principal.getLoggedInUser();
+        otpService.sendOtp(user, dto.getOtpType());
+        return ResponseEntity.ok(new ApiResponseObject<>("OTP generated and sent successfully", true, null));
+    }
+
+    @Operation(summary = "Verify OTP", description = "Verify OTP for email or phone")
+    @PostMapping("otp/verification")
+    @PreAuthorize("hasAnyAuthority(T(com.pesatone.api.model.enumeration.PermissionEnum).VIEW_CREATOR_DASHBOARD)")
+    public ResponseEntity<ApiResponseObject<String>> verifyOtp(@RequestBody @Valid VerifyOtpDto dto) {
+        AppUser user = principal.getLoggedInUser();
+        boolean verified = otpService.verifyOtp(user, dto.getOtpType(), dto.getOtp());
+        if(BooleanUtils.isTrue(verified)){
+            return ResponseEntity.ok(new ApiResponseObject<>("OTP verified successfully", true, null));
+        }else {
+            return ResponseEntity.badRequest().body(new ApiResponseObject<>("Could not verify OTP", false, null));
+        }
     }
     
 }

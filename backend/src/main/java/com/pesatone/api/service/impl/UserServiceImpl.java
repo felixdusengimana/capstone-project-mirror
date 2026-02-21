@@ -24,7 +24,6 @@ import com.pesatone.api.repository.SocialLinkRepository;
 import com.pesatone.api.service.NotificationService;
 import com.pesatone.api.service.PesatoneTokenService;
 import com.pesatone.api.service.UserService;
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Projections;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +55,8 @@ public class UserServiceImpl implements UserService {
 
     @Value("${application.passwordResetUrl}")
     private String passwordResetUrl;
+    @Value("${application.jwtExpiry}")
+    Integer jwtExpiry;
 
     @Transactional
     @Override
@@ -71,6 +72,9 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public AppUser updateUserDetails(AppUser user, UserDetailDto dto) {
+        if(!Boolean.TRUE.equals(user.getEmailVerified())){
+            throw new IllegalArgumentException("Please verify your email to proceed");
+        }
         if (StringUtils.isNotBlank(dto.getUsername())) user.setUsername(dto.getUsername().toLowerCase());
         if (StringUtils.isNotBlank(dto.getName())) user.setName(dto.getName());
         if (StringUtils.isNotBlank(dto.getPhoneNumber())) user.setPhoneNumber(dto.getPhoneNumber());
@@ -112,12 +116,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public void initiatePasswordReset(AppUser user) {
         String token = tokenService.getPasswordResetToken(user);
-        System.out.println(token);
         notificationService.sendEmail(user.getEmail(),"Password reset",
                 "<b>Hello "+ StringUtils.defaultIfBlank(user.getName()," ") +",</b> <br/>" +
                         "Did you forget your password and would like to get new credentials? <br/>" +
-                        "Please reset your password by clicking the link below. <br/>" +
-                passwordResetUrl+token);
+                        "Please reset your password by clicking the link below. <br/> " +
+                passwordResetUrl+token+
+                "<br/><br/> This token will expire in "+ jwtExpiry/60 +" minutes");
     }
 
     @Transactional

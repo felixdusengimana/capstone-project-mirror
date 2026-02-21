@@ -2,6 +2,7 @@ package com.pesatone.api.model.entity;
 
 import com.pesatone.api.model.enumeration.CurrencyEnum;
 import com.pesatone.api.model.enumeration.PaymentStatusEnum;
+import com.pesatone.api.model.enumeration.PayoutChannelEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -21,10 +22,13 @@ public class Payout {
 
     private BigDecimal amount;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     private CurrencyEnum currency;
 
-    private String paymentChannel;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private PayoutChannelEnum paymentChannel;
 
     @Enumerated(EnumType.STRING)
     private PaymentStatusEnum paymentStatus;

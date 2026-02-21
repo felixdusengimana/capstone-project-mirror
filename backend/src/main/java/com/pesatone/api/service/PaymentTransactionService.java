@@ -6,7 +6,6 @@ import com.pesatone.api.model.entity.AppUser;
 import com.pesatone.api.model.entity.PaymentTransaction;
 import com.pesatone.api.model.pojo.DashboardPojo;
 import com.pesatone.api.model.search.*;
-import com.querydsl.core.QueryResults;
 import reactor.core.publisher.Mono;
 
 public interface PaymentTransactionService {
