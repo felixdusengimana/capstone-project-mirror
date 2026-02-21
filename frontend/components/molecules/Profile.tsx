@@ -22,7 +22,7 @@ export default function Profile({
   return (
     <div className={`flex gap-2 items-start ${className}`} {...rest}>
       <Avatar src={user.photo} alt={user.name} />
-      <div className="font-medium flex items-start flex-col gap-1">
+      <div className="font-medium flex items-start flex-col">
         {isUserLoading ? (
           <span className="animate-pulse bg-gray-200 h-4 w-40 block"></span>
         ) : (

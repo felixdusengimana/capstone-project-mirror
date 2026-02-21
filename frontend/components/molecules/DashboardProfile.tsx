@@ -27,7 +27,7 @@ export default function DashboardProfile() {
       </div>
       <div className="flex flex-col lg:flex-row justify-between items-center">
         <div className="max-w-[476px]">
-          <h3 className="text-sm text-gray-400 uppercase">Bio</h3>
+          <h3 className="text-sm text-gray-400 uppercase">Cyusa</h3>
           <p className="text-[#475569] mt-0.5">
             {profile?.data.bio ?? "No bio"}
           </p>
