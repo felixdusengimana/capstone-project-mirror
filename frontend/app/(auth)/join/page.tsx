@@ -18,14 +18,22 @@ import { supportedSocials } from "@/utils/socials";
 import { ICountry } from "@/types/resources";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { UpdateUser, UploadProfileImage, useGetMe } from "@/services/users";
-import { ICreateUser, step1, step2, step3, step4 } from "@/types/user";
+import {
+  EOtpTypes,
+  UpdateUser,
+  UploadProfileImage,
+  useGetMe,
+  VerifyOTP,
+} from "@/services/users";
+import { ICreateUser, step0, step1, step2, step3, step4 } from "@/types/user";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import OTPInput from "@/components/molecules/OTPInput";
+import { convertEmail } from "@/utils/convertEmail";
 
 export default function Join() {
   const STEPS = 5;
+  const OTP_LENGTH = 6;
   const router = useRouter();
   const searchParams = useSearchParams();
   const step = searchParams.get("step");
@@ -66,6 +74,19 @@ export default function Join() {
     mutationFn: UpdateUser,
   });
 
+  const { mutate: verifyOTP } = useMutation({
+    onSuccess() {
+      toast.success("OTP verified successfully!", { id: "update-profile" });
+      navigate();
+    },
+    onError(error) {
+      toast.error(error.message ?? "OTP verification failed!", {
+        id: "update-profile",
+      });
+    },
+    mutationFn: VerifyOTP,
+  });
+
   const {
     handleSubmit,
     setValue,
@@ -74,11 +95,33 @@ export default function Join() {
     formState: { errors, isDirty },
   } = useForm<ICreateUser>({
     resolver: zodResolver(
-      step === "2" ? step1 : step === "3" ? step2 : step === "4" ? step3 : step4
+      step === "1"
+        ? step0
+        : step === "2"
+        ? step1
+        : step === "3"
+        ? step2
+        : step === "4"
+        ? step3
+        : step4
     ),
   });
 
   const onSubmit = async (data: Partial<ICreateUser>) => {
+    if (step === "1") {
+      if (!data.otp) {
+        return toast.error("OTP is required!", { id: "update-profile" });
+      }
+
+      toast.loading("Verifying OTP...", { id: "update-profile" });
+      verifyOTP({
+        otp: data.otp!,
+        otpType: EOtpTypes.EMAIL_VERIFICATION,
+      });
+
+      return;
+    }
+
     if (!isDirty) {
       return navigate();
     }
@@ -126,7 +169,13 @@ export default function Join() {
   }, [user?.data, isGettingUser]);
 
   const handleOTP = (otp: string) => {
-    console.log(otp);
+    setValue("otp", otp, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+    if (otp.length === OTP_LENGTH) {
+      handleSubmit(onSubmit)();
+    }
   };
 
   return (
@@ -151,11 +200,15 @@ export default function Join() {
             <p className="text-[#8A8A8B] mt-2">
               Enter OTP code sent to{" "}
               <span className="text-gray-700 font-normal">
-                nh****i001@gmail.com
+                {convertEmail(user?.data.email!)}
               </span>
             </p>
             <div className="mt-10">
-              <OTPInput onChange={handleOTP} />
+              <OTPInput
+                otpType={EOtpTypes.EMAIL_VERIFICATION}
+                error={errors.otp?.message}
+                onChange={handleOTP}
+              />
             </div>
           </>
         ) : step === "2" ? (
@@ -198,7 +251,7 @@ export default function Join() {
 
                 <input
                   type="file"
-                  accept=".png;.jpg;.jpeg"
+                  accept=".png,.jpg,.jpeg"
                   hidden
                   id="upload-profile-photo"
                   onChange={(e) => {
@@ -431,20 +484,25 @@ export default function Join() {
       </div>
 
       <div className="sticky bottom-0 p-6 bg-white flex items-center flex-wrap justify-between border-t border-gray-200">
-        <Button
-          type="button"
-          disabled={isPending}
-          outline={true}
-          onClick={() => {
-            if (step === "1") {
-              router.back();
-            } else {
-              router.replace(`/join?step=${parseInt(step!) - 1}`);
-            }
-          }}
-        >
-          Back
-        </Button>
+        <div>
+          {parseInt(step!) > 2 && (
+            <Button
+              type="button"
+              disabled={isPending}
+              outline={true}
+              onClick={() => {
+                if (step === "1") {
+                  router.back();
+                } else {
+                  router.replace(`/join?step=${parseInt(step!) - 1}`);
+                }
+              }}
+            >
+              Back
+            </Button>
+          )}
+        </div>
+
         <Button isLoading={isPending} className="px-[72px]">
           Next
         </Button>

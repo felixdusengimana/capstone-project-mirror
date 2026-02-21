@@ -11,7 +11,12 @@ export function useGetTransactions({
 }: Partial<ITransactionFilter>) {
   const params = ObjectToParams({ pageNumber, pageSize, ...rest });
   return useQuery<IResponse<ISorted<ITransaction>>>({
-    queryKey: ["creators", Object.values(rest).join(","), pageNumber, pageSize],
-    queryFn: async () => axiosInstance.get(`/users/creators?${params}`),
+    queryKey: [
+      "transactions",
+      Object.values(rest).join(","),
+      pageNumber,
+      pageSize,
+    ],
+    queryFn: async () => axiosInstance.get(`/transactions?${params}`),
   });
 }

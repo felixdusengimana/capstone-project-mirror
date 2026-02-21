@@ -9,6 +9,7 @@ import DateRagePicker from "@/components/molecules/DateRagePicker";
 import SearchInput from "@/components/molecules/SearchInput";
 import Tab from "@/components/molecules/Tab";
 import { useGetAllCountries } from "@/services/resources";
+import { useGetTransactions } from "@/services/transactions";
 import { useGetMe } from "@/services/users";
 import {
   createColumnHelper,
@@ -21,6 +22,14 @@ import { useState } from "react";
 
 export default function AdminDashboard() {
   const searchParams = useSearchParams();
+  const { data } = useGetTransactions({
+    pageSize: 10,
+    pageNumber: 1,
+    startDate: "2024-04-26",
+    endDate: "2024-04-26",
+  });
+  console.log({ data });
+
   const [filters, setFilters] = useState({} as Record<string, string>);
   const status = searchParams.get("status");
   const { data: user } = useGetMe();

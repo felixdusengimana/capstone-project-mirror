@@ -7,14 +7,14 @@ import { IResetPasswordInputs, resetPasswordSchema } from "@/types/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
 export default function Login() {
-  const searchParams = useSearchParams();
-  const token = searchParams.get("tkn");
+  const { token } = useParams() as { token: string };
+  const router = useRouter();
 
   const {
     handleSubmit,
@@ -30,9 +30,10 @@ export default function Login() {
 
   const { mutate, isPending } = useMutation({
     onSuccess() {
-      toast.success("Email sent!", {
+      toast.success("Password changed successfully", {
         id: "email",
       });
+      router.replace("/login");
     },
     onError(error) {
       toast.error(error.message, { id: "email" });
@@ -41,7 +42,7 @@ export default function Login() {
   });
 
   const onSubmit = (data: IResetPasswordInputs) => {
-    toast.loading("Sending email...", { id: "email" });
+    toast.loading("Changing password...", { id: "email" });
     mutate(data);
   };
 

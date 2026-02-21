@@ -33,6 +33,13 @@ axiosInstance.interceptors.response.use(
     return response.data;
   },
   (error) => {
+    const endpoint = error?.response?.config.url;
+    if (error?.response?.status === 401 && !endpoint.includes("auth")) {
+      document.cookie =
+        "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      localStorage.clear();
+      window.location.href = "/";
+    }
     return Promise.reject(error?.response?.data);
   }
 );

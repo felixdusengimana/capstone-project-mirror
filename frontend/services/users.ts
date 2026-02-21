@@ -4,6 +4,12 @@ import { IResponse, ISorted } from "@/types/common";
 import { ICreateUser, ICreatorFilter, IUser } from "@/types/user";
 import { ObjectToParams } from "@/utils/params";
 
+export enum EOtpTypes {
+  EMAIL_VERIFICATION = "EMAIL_VERIFICATION",
+  PHONE_VERIFICATION = "PHONE_VERIFICATION",
+  PAYOUT = "PAYOUT",
+}
+
 export function useGetMe() {
   return useQuery<IResponse<IUser>>({
     queryKey: ["users"],
@@ -47,4 +53,18 @@ export function useGetCreator(id: string) {
     queryKey: ["creator", id],
     queryFn: async () => axiosInstance.get(`/users/creators/${id}`),
   });
+}
+
+export function GenerateOTP({ otpType }: { otpType: EOtpTypes }) {
+  return axiosInstance.post(`/users/otp`, { otpType });
+}
+
+export function VerifyOTP({
+  otp,
+  otpType,
+}: {
+  otp: string;
+  otpType: EOtpTypes;
+}) {
+  return axiosInstance.post(`/users/otp/verification`, { otp, otpType });
 }

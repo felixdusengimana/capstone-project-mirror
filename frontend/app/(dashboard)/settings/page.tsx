@@ -4,6 +4,7 @@ import Button from "@/components/atoms/Button";
 import Icon, { IconNames } from "@/components/atoms/Icon";
 import Input from "@/components/atoms/Input";
 import TextArea from "@/components/atoms/TextArea";
+import VerifyPhoneModal from "@/components/molecules/VerifyPhoneModal";
 import { UpdateUser, useGetMe } from "@/services/users";
 import { IUpdateUser, updateUser } from "@/types/user";
 import { supportedSocials } from "@/utils/socials";
@@ -17,6 +18,7 @@ import { useDebouncedCallback } from "use-debounce";
 
 export default function UserSettings() {
   const { data: usr, isLoading } = useGetMe();
+  const [openPhoneModal, setOpenPhoneModal] = useState(false);
 
   const {
     reset,
@@ -27,10 +29,19 @@ export default function UserSettings() {
     resolver: zodResolver(updateUser),
   });
 
-  const { mutate: updateProfile, isPending: isUpdating } = useMutation({
+  const {
+    mutate: updateProfile,
+    isPending: isUpdating,
+    isSuccess,
+  } = useMutation({
     mutationFn: UpdateUser,
     onSuccess: () => {
       toast.success("Profile updated successfully");
+
+      // if phone number is updated, show the verify phone modal
+      if (dirtyFields.phoneNumber) {
+        setOpenPhoneModal(true);
+      }
     },
   });
 
@@ -58,14 +69,16 @@ export default function UserSettings() {
   const values = Object.values(watch()).join("-");
 
   useEffect(() => {
-    if (isDirty && Object.keys(errors).length <= 0) {
-      debouncedUpdateProfile();
+    if (isDirty && Object.keys(errors).length === 0) {
+      alert("Updating profile");
+      // debouncedUpdateProfile();
     }
 
     return () => {
       debouncedUpdateProfile.cancel();
     };
-  }, [isDirty, values, errors, debouncedUpdateProfile]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [values]);
 
   const handleChange = (name: keyof IUpdateUser, value: string) => {
     setValue(name, value, {
@@ -119,6 +132,12 @@ export default function UserSettings() {
             onChange={(e) => handleChange("phoneNumber", e.target.value)}
             error={errors.phoneNumber?.message}
           />
+          {(!usr?.data.phoneNumberVerified && usr?.data.phoneNumber) ||
+          (dirtyFields.phoneNumber && isSuccess) ? (
+            <p className="-mt-4">
+              <VerifyPhoneModal initialOpen={openPhoneModal} />
+            </p>
+          ) : null}
         </div>
       </div>
 
