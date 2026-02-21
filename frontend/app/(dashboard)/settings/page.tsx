@@ -1,20 +1,19 @@
 "use client";
 import Avatar from "@/components/atoms/Avatar";
 import Button from "@/components/atoms/Button";
-
 import Icon, { IconNames } from "@/components/atoms/Icon";
 import Input from "@/components/atoms/Input";
 import TextArea from "@/components/atoms/TextArea";
 import { UpdateUser, useGetMe } from "@/services/users";
 import { IUpdateUser, updateUser } from "@/types/user";
-import { debounce } from "@/utils/debounce";
 import { supportedSocials } from "@/utils/socials";
 import { extractDomainFromURL } from "@/utils/URL";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { useDebouncedCallback } from "use-debounce";
 
 export default function UserSettings() {
   const { data: usr, isLoading } = useGetMe();
@@ -37,6 +36,8 @@ export default function UserSettings() {
 
   const isUserLoading = isLoading || isUpdating;
 
+  const [isDirty, setIsDirty] = useState(false);
+
   useEffect(() => {
     if (!isLoading) {
       reset(usr?.data);
@@ -44,28 +45,35 @@ export default function UserSettings() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading]);
 
-  const debouncedUpdateProfile = () => {
-    console.log({ dirtyFields });
-    if (Object.keys(dirtyFields).length === 0) return;
+  const debouncedUpdateProfile = useDebouncedCallback(() => {
     const dirty = Object.keys(dirtyFields).reduce(
       // @ts-ignore
       (acc, key) => ({ ...acc, [key]: watch(key) }),
       {}
     );
 
-    console.log({ "calling updateProfile": dirty });
-    // submit the form
     updateProfile(dirty);
-  };
+  }, 1000); // Adjust debounce time as needed
 
-  useEffect(
-    () => {
+  const values = Object.values(watch()).join("-");
+
+  useEffect(() => {
+    if (isDirty && Object.keys(errors).length <= 0) {
       debouncedUpdateProfile();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [dirtyFields]
-  );
+    }
+
+    return () => {
+      debouncedUpdateProfile.cancel();
+    };
+  }, [isDirty, values, errors, debouncedUpdateProfile]);
+
+  const handleChange = (name: keyof IUpdateUser, value: string) => {
+    setValue(name, value, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setIsDirty(true);
+  };
 
   return (
     <div className="min-h-full w-full dashboard-padding text-black pb-10">
@@ -93,37 +101,22 @@ export default function UserSettings() {
             label="Your name"
             value={watch("name")}
             disabled={isUserLoading}
-            onChange={(e) => {
-              setValue("name", e.target.value, {
-                shouldDirty: true,
-                shouldValidate: true,
-              });
-            }}
+            onChange={(e) => handleChange("name", e.target.value)}
             error={errors.name?.message}
           />
           <TextArea
             label="Bio"
             disabled={isUserLoading}
-            onChange={(e) => {
-              setValue("bio", e.target.value, {
-                shouldDirty: true,
-                shouldValidate: true,
-              });
-            }}
+            onChange={(e) => handleChange("bio", e.target.value)}
             value={watch("bio")}
             error={errors.bio?.message}
-          ></TextArea>
+          />
           <Input label="Email" value={usr?.data.email} disabled />
           <Input
             label="Phone"
             value={watch("phoneNumber")}
             disabled={isUserLoading}
-            onChange={(e) => {
-              setValue("phoneNumber", e.target.value, {
-                shouldDirty: true,
-                shouldValidate: true,
-              });
-            }}
+            onChange={(e) => handleChange("phoneNumber", e.target.value)}
             error={errors.phoneNumber?.message}
           />
         </div>
@@ -133,74 +126,93 @@ export default function UserSettings() {
         <p className="flex-grow font-medium text-lg text-gray-600">
           Social Links
         </p>
-        <div className="flex flex-col gap-4 min-w-[486px]">
-          {watch("socialLinks")?.map((link, index) => {
-            const domain = extractDomainFromURL(link.link!);
-            const socialMedia = Boolean(domain) && String(domain).split(".")[0];
-            const isIcon = Boolean(socialMedia)
-              ? supportedSocials.includes(String(socialMedia))
-              : false;
-            return (
-              <div key={index} className="flex items-center">
-                <Input
-                  label="Social Media Link"
-                  className="flex-grow"
-                  value={link.link}
-                  onChange={(e) => {
-                    const newLinks = [...(watch("socialLinks") ?? [])];
-                    const inDomain = extractDomainFromURL(e.target.value);
-                    const inSocialMedia =
-                      Boolean(inDomain) && String(inDomain).split(".")[0];
+        <div>
+          <div className="flex flex-col gap-4 min-w-[486px]">
+            {watch("socialLinks")?.map((link, index) => {
+              const domain = extractDomainFromURL(link.link!);
+              const socialMedia =
+                Boolean(domain) && String(domain).split(".")[0];
+              const isIcon = Boolean(socialMedia)
+                ? supportedSocials.includes(String(socialMedia))
+                : false;
+              return (
+                <div key={index} className="flex items-center">
+                  <Input
+                    label="Social Media Link"
+                    className="flex-grow"
+                    value={link.link}
+                    onChange={(e) => {
+                      const newLinks = [...(watch("socialLinks") ?? [])];
+                      const inDomain = extractDomainFromURL(e.target.value);
+                      const inSocialMedia =
+                        Boolean(inDomain) && String(inDomain).split(".")[0];
 
-                    const others =
-                      Boolean(inSocialMedia) &&
-                      !supportedSocials.includes(String(inSocialMedia));
+                      const others =
+                        Boolean(inSocialMedia) &&
+                        !supportedSocials.includes(String(inSocialMedia));
 
-                    newLinks[index] = {
-                      link: e.target.value,
-                      platform:
-                        inSocialMedia === "twitter"
-                          ? "X"
-                          : others
-                          ? "OTHERS"
-                          : String(inSocialMedia)?.toLocaleUpperCase(),
-                    };
-                    setValue("socialLinks", newLinks, {
-                      shouldDirty: true,
-                      shouldValidate: true,
-                    });
-                  }}
-                  left={
-                    <div className="mr-2">
-                      <Icon
-                        width={20}
-                        height={20}
-                        name={isIcon ? (socialMedia as IconNames) : "alt"}
-                      />
-                    </div>
-                  }
-                  right={
-                    watch("socialLinks")?.length > 1 ? (
-                      <button
-                        className="bg-red-200 -mr-4 p-4 block border border-red-400 rounded-r-xl"
-                        onClick={() => {
-                          const newLinks = [...watch("socialLinks")];
-                          newLinks.splice(index, 1);
-                          setValue("socialLinks", newLinks, {
-                            shouldDirty: true,
-                            shouldValidate: true,
-                          });
-                        }}
-                        type="button"
-                      >
-                        <Icon name="trash" fill="#ff1515" />
-                      </button>
-                    ) : null
-                  }
-                />
-              </div>
-            );
-          })}
+                      newLinks[index] = {
+                        link: e.target.value,
+                        platform:
+                          inSocialMedia === "twitter"
+                            ? "X"
+                            : others
+                            ? "OTHERS"
+                            : String(inSocialMedia)?.toLocaleUpperCase(),
+                      };
+                      setValue("socialLinks", newLinks, {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      });
+                      setIsDirty(true);
+                    }}
+                    left={
+                      <div className="mr-2">
+                        <Icon
+                          width={20}
+                          height={20}
+                          name={isIcon ? (socialMedia as IconNames) : "alt"}
+                        />
+                      </div>
+                    }
+                    right={
+                      watch("socialLinks")?.length > 1 ? (
+                        <button
+                          className="bg-red-200 -mr-4 p-4 block border border-red-400 rounded-r-xl"
+                          onClick={() => {
+                            const newLinks = [...watch("socialLinks")];
+                            newLinks.splice(index, 1);
+                            setValue("socialLinks", newLinks, {
+                              shouldDirty: true,
+                              shouldValidate: true,
+                            });
+                            setIsDirty(true);
+                          }}
+                          type="button"
+                        >
+                          <Icon name="trash" fill="#ff1515" />
+                        </button>
+                      ) : null
+                    }
+                  />
+                </div>
+              );
+            })}
+          </div>
+          <Button
+            className="flex mt-4 items-center gap-2"
+            disabled={isUpdating}
+            outline={true}
+            onClick={() =>
+              setValue("socialLinks", [
+                ...watch("socialLinks"),
+                { platform: "", link: "" },
+              ])
+            }
+            type="button"
+          >
+            <Icon name="add" /> <p>Add new link</p>
+          </Button>
         </div>
       </div>
 

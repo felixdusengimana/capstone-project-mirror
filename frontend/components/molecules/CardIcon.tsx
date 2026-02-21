@@ -2,11 +2,13 @@
 
 import { ComponentProps } from "react";
 import Icon, { IconNames } from "../atoms/Icon";
+import Link from "next/link";
 
 interface CardIconProps extends ComponentProps<"svg"> {
   icon: IconNames;
   hovered?: boolean;
   onClick?: () => void;
+  link?: string;
 }
 export default function CardIcon({
   icon,
@@ -14,14 +16,20 @@ export default function CardIcon({
   className,
   onClick,
   children,
+  link,
   ...rest
 }: CardIconProps) {
   return (
-    <div
+    <a
+      href={link ?? "#"}
+      target="_blank"
       className={`relative z-10 w-fit h-fit`}
       onClick={() => {
         onClick?.();
       }}
+      title={`Click to go to creator ${
+        String(icon) == "others" ? "link" : `${icon} profile`
+      } `}
     >
       <div
         className={`w-16 h-16 ${
@@ -30,6 +38,6 @@ export default function CardIcon({
       >
         <Icon {...rest} name={icon} />
       </div>
-    </div>
+    </a>
   );
 }

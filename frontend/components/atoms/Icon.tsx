@@ -1346,6 +1346,6 @@ export default function Icon({ name, ...props }: IconProps) {
     case "calendar":
       return <Calendar {...props} />;
     default:
-      return null;
+      return <Alt />;
   }
 }
