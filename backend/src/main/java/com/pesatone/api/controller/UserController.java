@@ -3,18 +3,16 @@ package com.pesatone.api.controller;
 import com.pesatone.api.configuration.auth.RequestPrincipal;
 import com.pesatone.api.exception.PesatoneNotFoundException;
 import com.pesatone.api.model.dto.ApiResponseObject;
-import com.pesatone.api.model.dto.OtpRequestDto;
+import com.pesatone.api.model.dto.CreatorApprovalDto;
 import com.pesatone.api.model.dto.UserDetailDto;
-import com.pesatone.api.model.dto.VerifyOtpDto;
 import com.pesatone.api.model.entity.AppUser;
 import com.pesatone.api.model.enumeration.RoleEnum;
 import com.pesatone.api.model.pojo.DashboardPojo;
 import com.pesatone.api.model.pojo.UserPojo;
-import com.pesatone.api.model.search.CreatorSearchFilter;
-import com.pesatone.api.model.search.CreatorSearchResponse;
-import com.pesatone.api.model.search.QueryResultPojo;
+import com.pesatone.api.model.search.filter.CreatorSearchFilter;
+import com.pesatone.api.model.search.response.CreatorSearchResponse;
+import com.pesatone.api.model.search.response.QueryResultPojo;
 import com.pesatone.api.repository.AppUserRepository;
-import com.pesatone.api.service.OtpService;
 import com.pesatone.api.service.PaymentTransactionService;
 import com.pesatone.api.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,7 +20,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
@@ -45,19 +42,18 @@ import java.util.List;
 @Controller
 @RequestMapping("users")
 @Slf4j
-@Tag(name="2. User Management")
+@Tag(name = "2. User Management")
 public class UserController {
     private final RequestPrincipal principal;
     private final UserService userService;
     private final AppUserRepository userRepository;
     private final PaymentTransactionService transactionService;
-    private final OtpService otpService;
 
     @Operation(summary = "Search Creators", description = "Search Creators by Name or Username")
     @GetMapping("/creators")
     public ResponseEntity<ApiResponseObject<QueryResultPojo<CreatorSearchResponse>>> searchCreators(@ParameterObject @Valid CreatorSearchFilter filter) {
         return ResponseEntity.ok(new ApiResponseObject<>("Creators retrieved successfully",
-                true,userService.searchCreators(filter)));
+                true, userService.searchCreators(filter)));
     }
 
     @Operation(summary = "Get Creator's Profile", description = "Get Creators profile by Id")
@@ -99,35 +95,22 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority(T(com.pesatone.api.model.enumeration.PermissionEnum).UPDATE_PROFILE)")
     public ResponseEntity<ApiResponseObject<String>> updateProfileImage(@Valid @RequestParam("image") MultipartFile file) {
         AppUser user = principal.getLoggedInUser();
-        List<String> validImageFileTypes = List.of("image/png","image/jpg","image/jpeg");
-        if(StringUtils.isBlank(file.getContentType()) || !validImageFileTypes.contains(file.getContentType())){
+        List<String> validImageFileTypes = List.of("image/png", "image/jpg", "image/jpeg");
+        if (StringUtils.isBlank(file.getContentType()) || !validImageFileTypes.contains(file.getContentType())) {
             throw new MultipartException("Please upload a valid image file (jpeg, png or jpg)");
         }
         return ResponseEntity.ok(new ApiResponseObject<>("Profile image uploaded successfully", true,
                 userService.uploadProfileImage(user, file)));
     }
 
-    @Operation(summary = "Request OTP", description = "Request OTP for email, phone or payout verification")
-    @PostMapping("otp")
-    @PreAuthorize("hasAnyAuthority(T(com.pesatone.api.model.enumeration.PermissionEnum).VIEW_CREATOR_DASHBOARD)")
-    public ResponseEntity<ApiResponseObject<String>> requestOtp(@RequestBody @Valid OtpRequestDto dto) {
-        //TODO prevent DDOS attack
-        AppUser user = principal.getLoggedInUser();
-        otpService.sendOtp(user, dto.getOtpType());
-        return ResponseEntity.ok(new ApiResponseObject<>("OTP generated and sent successfully", true, null));
+    @Operation(summary = "Approve profile verification", description = "Approve user profile verification")
+    @PostMapping("approvals")
+    @PreAuthorize("hasAnyAuthority(T(com.pesatone.api.model.enumeration.PermissionEnum).APPROVE_USER)")
+    public ResponseEntity<ApiResponseObject<UserPojo>> approveUserProfileVerification(@RequestBody @Valid CreatorApprovalDto dto) {
+        AppUser creator = userRepository.findActiveById(dto.getCreatorId())
+                .orElseThrow(() -> new PesatoneNotFoundException("Creator does not exist"));
+        return ResponseEntity.ok(new ApiResponseObject<>("Profile approval request has been successfully processed", true,
+                userService.getUserDetails(userService.approveCreatorAccount(creator, dto.getApprovalStatus()))));
     }
 
-    @Operation(summary = "Verify OTP", description = "Verify OTP for email or phone")
-    @PostMapping("otp/verification")
-    @PreAuthorize("hasAnyAuthority(T(com.pesatone.api.model.enumeration.PermissionEnum).VIEW_CREATOR_DASHBOARD)")
-    public ResponseEntity<ApiResponseObject<String>> verifyOtp(@RequestBody @Valid VerifyOtpDto dto) {
-        AppUser user = principal.getLoggedInUser();
-        boolean verified = otpService.verifyOtp(user, dto.getOtpType(), dto.getOtp());
-        if(BooleanUtils.isTrue(verified)){
-            return ResponseEntity.ok(new ApiResponseObject<>("OTP verified successfully", true, null));
-        }else {
-            return ResponseEntity.badRequest().body(new ApiResponseObject<>("Could not verify OTP", false, null));
-        }
-    }
-    
 }

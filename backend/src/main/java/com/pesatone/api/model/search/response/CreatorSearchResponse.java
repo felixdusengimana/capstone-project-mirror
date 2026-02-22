@@ -1,4 +1,4 @@
-package com.pesatone.api.model.search;
+package com.pesatone.api.model.search.response;
 
 public record CreatorSearchResponse(Long id,
                                     String username,

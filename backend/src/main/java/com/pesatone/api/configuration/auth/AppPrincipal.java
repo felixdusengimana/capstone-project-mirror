@@ -26,5 +26,6 @@ public class AppPrincipal {
         setName(appUser.getName());
         setPhoneNumber(appUser.getPhoneNumber());
         setUserId(appUser.getId());
+        setApprovalStatus(appUser.getApprovalStatus());
     }
 }

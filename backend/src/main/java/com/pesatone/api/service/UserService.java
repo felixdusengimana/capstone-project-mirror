@@ -3,11 +3,12 @@ package com.pesatone.api.service;
 import com.pesatone.api.model.dto.SignUpDto;
 import com.pesatone.api.model.dto.UserDetailDto;
 import com.pesatone.api.model.entity.AppUser;
+import com.pesatone.api.model.enumeration.ApprovalStatusEnum;
 import com.pesatone.api.model.enumeration.RoleEnum;
 import com.pesatone.api.model.pojo.UserPojo;
-import com.pesatone.api.model.search.CreatorSearchFilter;
-import com.pesatone.api.model.search.CreatorSearchResponse;
-import com.pesatone.api.model.search.QueryResultPojo;
+import com.pesatone.api.model.search.filter.CreatorSearchFilter;
+import com.pesatone.api.model.search.response.CreatorSearchResponse;
+import com.pesatone.api.model.search.response.QueryResultPojo;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
@@ -24,4 +25,6 @@ public interface UserService {
     UserPojo getUserDetails(AppUser user);
 
     QueryResultPojo<CreatorSearchResponse> searchCreators(CreatorSearchFilter filter);
+
+    AppUser approveCreatorAccount(AppUser creator, ApprovalStatusEnum approvalStatus);
 }

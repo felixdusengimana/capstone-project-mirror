@@ -3,6 +3,7 @@ package com.pesatone.api.service.impl;
 import com.pesatone.api.model.entity.*;
 import com.pesatone.api.model.enumeration.CurrencyEnum;
 import com.pesatone.api.model.enumeration.LedgerTypeEnum;
+import com.pesatone.api.model.enumeration.StatusEnum;
 import com.pesatone.api.repository.WalletLedgerRepository;
 import com.pesatone.api.repository.WalletRepository;
 import com.pesatone.api.service.WalletService;
@@ -31,6 +32,7 @@ public class WalletServiceImpl implements WalletService {
                     wallet.setBalance(BigDecimal.ZERO);
                     wallet.setCreatedAt(new Date());
                     wallet.setUpdatedAt(new Date());
+                    wallet.setStatus(StatusEnum.ACTIVE);
                     walletRepository.save(wallet);
                     return wallet;
                 });

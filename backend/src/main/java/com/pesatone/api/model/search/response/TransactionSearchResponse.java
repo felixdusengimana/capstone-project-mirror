@@ -1,4 +1,4 @@
-package com.pesatone.api.model.search;
+package com.pesatone.api.model.search.response;
 
 import java.math.BigDecimal;
 import java.util.Date;

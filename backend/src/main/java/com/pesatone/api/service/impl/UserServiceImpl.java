@@ -4,6 +4,7 @@ import com.blazebit.persistence.*;
 import com.blazebit.persistence.querydsl.BlazeJPAQuery;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.pesatone.api.exception.PesatoneException;
 import com.pesatone.api.exception.PesatoneNotFoundException;
 import com.pesatone.api.model.dto.SignUpDto;
 import com.pesatone.api.model.dto.SocialLinkDto;
@@ -11,12 +12,13 @@ import com.pesatone.api.model.dto.UserDetailDto;
 import com.pesatone.api.model.entity.AppUser;
 import com.pesatone.api.model.entity.QAppUser;
 import com.pesatone.api.model.entity.SocialLink;
+import com.pesatone.api.model.enumeration.ApprovalStatusEnum;
 import com.pesatone.api.model.enumeration.RoleEnum;
 import com.pesatone.api.model.enumeration.StatusEnum;
 import com.pesatone.api.model.pojo.UserPojo;
-import com.pesatone.api.model.search.CreatorSearchFilter;
-import com.pesatone.api.model.search.CreatorSearchResponse;
-import com.pesatone.api.model.search.QueryResultPojo;
+import com.pesatone.api.model.search.filter.CreatorSearchFilter;
+import com.pesatone.api.model.search.response.CreatorSearchResponse;
+import com.pesatone.api.model.search.response.QueryResultPojo;
 import com.pesatone.api.repository.AppUserRepository;
 import com.pesatone.api.repository.CountryRepository;
 import com.pesatone.api.repository.IndustryRepository;
@@ -185,6 +187,17 @@ public class UserServiceImpl implements UserService {
                 .fetchPage(filter.getOffset(), filter.getPageSize());
 
         return new QueryResultPojo<>(pagedList, filter.getPageNumber(), filter.getPageSize(), pagedList.getTotalPages());
+    }
+
+    @Transactional
+    @Override
+    public AppUser approveCreatorAccount(AppUser creator, ApprovalStatusEnum approvalStatus) {
+        if(creator.getRole().equals(RoleEnum.CREATOR)){
+                creator.setApprovalStatus(approvalStatus);
+                userRepository.save(creator);
+                return creator;
+        }
+        throw new PesatoneException("Invalid user type");
     }
 
     private void setSocialLinks(AppUser user, List<SocialLinkDto> linkDtos) {

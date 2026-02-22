@@ -45,7 +45,7 @@ public class OtpServiceImpl implements OtpService {
         Date currentTime = Date.from(Instant.now());
         List<OneTimePassword> validOtps = otpRepository.findByAppUserAndOtpAndTypeAndExpiryAtAfter(recipient, otp, type, currentTime);
         if (validOtps.isEmpty()) {
-            throw new PesatoneException("Sorry, we could not validate your request. Kindly try again");
+            throw new PesatoneException("Sorry, we could not validate your OTP. Kindly try again");
         }
         expireOtps(validOtps);
 
@@ -117,8 +117,9 @@ public class OtpServiceImpl implements OtpService {
             case PAYOUT: {
                 notificationService.sendEmail(user.getEmail(), "Approve your withdrawal",
                         "<b>Hello " + StringUtils.defaultIfBlank(user.getName(), " ") + ",</b> <br/>" +
-                                "We are thrilled to share some exciting news with you. You have made money using Pesatone!. <br/>" +
-                                "Use this one time password: <b>" + otp.getOtp() + "</b> to approve your withdrawal. <br/>");
+                                "We are thrilled to share some exciting news with you. You have made money using Pesatone!. <br/><br/>" +
+                                "Use this one time password: <b>" + otp.getOtp() + "</b> to approve your withdrawal. <br/>"+
+                                "Your one time password would expire in <b>" + otpExpiry/60 + "</b> minutes. <br/>");
                 break;
             }
             default:

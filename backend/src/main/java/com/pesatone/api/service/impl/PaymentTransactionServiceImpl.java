@@ -3,31 +3,26 @@ package com.pesatone.api.service.impl;
 import com.blazebit.persistence.CriteriaBuilderFactory;
 import com.blazebit.persistence.PagedList;
 import com.blazebit.persistence.querydsl.BlazeJPAQuery;
-import com.github.javafaker.App;
 import com.google.gson.Gson;
 import com.pesatone.api.configuration.auth.RequestPrincipal;
-import com.pesatone.api.configuration.properties.PaymentConfig;
 import com.pesatone.api.exception.PesatoneNotFoundException;
-import com.pesatone.api.model.dto.PaymentDto;
 import com.pesatone.api.model.dto.TransactionDto;
 import com.pesatone.api.model.dto.flw.FlwTransactionDetail;
 import com.pesatone.api.model.dto.flw.FlwTransactionDetailResponse;
 import com.pesatone.api.model.entity.AppUser;
 import com.pesatone.api.model.entity.PaymentTransaction;
 import com.pesatone.api.model.entity.QPaymentTransaction;
-import com.pesatone.api.model.entity.Wallet;
 import com.pesatone.api.model.enumeration.PaymentProviderEnum;
 import com.pesatone.api.model.enumeration.PaymentStatusEnum;
 import com.pesatone.api.model.enumeration.RoleEnum;
 import com.pesatone.api.model.pojo.DashboardPojo;
-import com.pesatone.api.model.search.QueryResultPojo;
-import com.pesatone.api.model.search.TransactionSearchFilter;
-import com.pesatone.api.model.search.TransactionSearchResponse;
+import com.pesatone.api.model.search.response.QueryResultPojo;
+import com.pesatone.api.model.search.filter.TransactionSearchFilter;
+import com.pesatone.api.model.search.response.TransactionSearchResponse;
 import com.pesatone.api.repository.AppUserRepository;
 import com.pesatone.api.repository.PaymentTransactionRepository;
 import com.pesatone.api.service.PaymentProcessingService;
 import com.pesatone.api.service.PaymentTransactionService;
-import com.pesatone.api.service.WalletService;
 import com.pesatone.api.service.payment.FlutterWaveService;
 import com.pesatone.api.util.AppUtil;
 import com.querydsl.core.types.Projections;
@@ -35,21 +30,16 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import reactor.netty.http.client.HttpClient;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.ParseException;
 import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -62,12 +52,12 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
     private final CriteriaBuilderFactory builderFactory;
     private final EntityManager entityManager;
     private final RequestPrincipal requestPrincipal;
-   private final PaymentProcessingService paymentProcessingService;
+    private final PaymentProcessingService paymentProcessingService;
 
     @Override
     public PaymentTransaction getByTransactionReference(String transactionReference) {
         return paymentTransactionRepository.findByTransactionReference(transactionReference)
-                .orElseThrow(()-> new PesatoneNotFoundException("Payment transaction not found"));
+                .orElseThrow(() -> new PesatoneNotFoundException("Payment transaction not found"));
     }
 
     @Transactional
@@ -91,10 +81,10 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
 
     @Override
     public Mono<PaymentTransaction> checkStatus(PaymentTransaction transaction) {
-        if(transaction.canProcessPayment() && (transaction.getPaymentProvider().equals(PaymentProviderEnum.FLUTTERWAVE))){
+        if (transaction.canProcessPayment() && (transaction.getPaymentProvider().equals(PaymentProviderEnum.FLUTTERWAVE))) {
             try {
                 return checkFlwTransactionDetail(transaction);
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 log.error(ex.getMessage(), ex);
             }
         }
@@ -125,7 +115,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
                 .distinct()
                 .count();
 
-        return new DashboardPojo(totalAmountReceived,totalTransactions, totalSupporters, biggestSupport);
+        return new DashboardPojo(totalAmountReceived, totalTransactions, totalSupporters, biggestSupport);
     }
 
     @Override
@@ -136,7 +126,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
         blazeQuery.from(qPaymentTransaction)
                 .where(qPaymentTransaction.paymentStatus.eq(PaymentStatusEnum.SUCCESSFUL));
 
-        if(requestPrincipal.isCreator()){
+        if (requestPrincipal.isCreator()) {
             blazeQuery.where(qPaymentTransaction.creator.id.eq(requestPrincipal.getLoggedInUser().getId()));
         }
 
@@ -147,13 +137,17 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
         if (StringUtils.isNotBlank(filter.getStartDate())) {
             try {
                 blazeQuery.where(qPaymentTransaction.paidAt.goe(AppUtil.getDateFromStringValue(filter.getStartDate())));
-            }catch (ParseException ex){log.error("Could not get start date {}", filter.getStartDate());}
+            } catch (ParseException ex) {
+                log.error("Could not get start date {}", filter.getStartDate());
+            }
         }
 
         if (StringUtils.isNotBlank(filter.getEndDate())) {
             try {
                 blazeQuery.where(qPaymentTransaction.paidAt.loe(AppUtil.getDateFromStringValue(filter.getEndDate())));
-            }catch (ParseException ex){log.error("Could not get end date {}", filter.getEndDate());}
+            } catch (ParseException ex) {
+                log.error("Could not get end date {}", filter.getEndDate());
+            }
         }
 
         blazeQuery.orderBy(qPaymentTransaction.paidAt.desc(), qPaymentTransaction.id.desc());
@@ -173,19 +167,19 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
         return new QueryResultPojo<>(pagedList, filter.getPageNumber(), filter.getPageSize(), pagedList.getTotalPages());
     }
 
-    private Mono<PaymentTransaction> checkFlwTransactionDetail(PaymentTransaction transaction){
+    private Mono<PaymentTransaction> checkFlwTransactionDetail(PaymentTransaction transaction) {
         return flutterWaveService.getTransactionDetail(transaction.getTransactionReference())
                 .publishOn(Schedulers.boundedElastic())
                 .map(response -> {
-                    FlwTransactionDetailResponse detailResponse = gson.fromJson(response,FlwTransactionDetailResponse.class);
+                    FlwTransactionDetailResponse detailResponse = gson.fromJson(response, FlwTransactionDetailResponse.class);
                     FlwTransactionDetail transactionDetail = detailResponse.getData();
-                    return paymentProcessingService.processPayment(transaction,transactionDetail.getPaymentDto());
+                    return paymentProcessingService.processPayment(transaction, transactionDetail.getPaymentDto());
                 })
-                .onErrorResume( ex -> {
+                .onErrorResume(ex -> {
                     if (ex instanceof WebClientResponseException webClientException) {
                         log.error("FLUTTERWAVE API ERROR {} : {}", webClientException.getStatusCode(), webClientException.getResponseBodyAsString());
                     } else {
-                        log.error("FLUTTERWAVE API ERROR: {}",ex.getMessage());
+                        log.error("FLUTTERWAVE API ERROR: {}", ex.getMessage());
                     }
                     return Mono.just(transaction);
                 });

@@ -1,4 +1,4 @@
-package com.pesatone.api.model.search;
+package com.pesatone.api.model.search.filter;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.Getter;

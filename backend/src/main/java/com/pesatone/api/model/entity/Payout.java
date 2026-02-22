@@ -44,6 +44,8 @@ public class Payout {
     @UpdateTimestamp
     private Date updatedAt;
 
+    private Date processedAt;
+
     @ManyToOne(fetch =  FetchType.LAZY, optional = false)
     private AppUser creator;
 

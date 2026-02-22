@@ -1,6 +1,7 @@
 package com.pesatone.api.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pesatone.api.model.enumeration.ApprovalStatusEnum;
 import com.pesatone.api.model.enumeration.RoleEnum;
 import com.pesatone.api.model.enumeration.StatusEnum;
 import jakarta.persistence.*;
@@ -46,6 +47,9 @@ public class AppUser {
     @Enumerated(EnumType.STRING)
     @NotNull
     private StatusEnum status;
+
+    @Enumerated(EnumType.STRING)
+    private ApprovalStatusEnum approvalStatus;
 
     @Enumerated(EnumType.STRING)
     @NotNull
