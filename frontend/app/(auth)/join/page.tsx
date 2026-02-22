@@ -181,7 +181,7 @@ export default function Join() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col p-0 text-gray-700 justify-between h-full"
+      className="flex flex-col p-7 lg:p-0 text-gray-700 justify-between h-full"
     >
       <p className="text-right font-light text-lg text-gray-500">
         Already have an account,{" "}
@@ -190,7 +190,7 @@ export default function Join() {
         </Link>
       </p>
 
-      <div className="w-full pb-[100px]">
+      <div className="w-full pb-5 lg:pb-[100px]">
         <Progress active={parseInt(step!)} total={STEPS} />
         {step === "1" ? (
           <>
@@ -220,7 +220,7 @@ export default function Join() {
               Complete your to let others know who you are and what you&apos;re
               passionate about
             </p>
-            <div className="flex justify-between gap-10 items-center mt-10">
+            <div className="flex flex-col lg:flex-row justify-between gap-10 items-center mt-10">
               <div className="max-w-[307px] flex flex-col items-center justify-center">
                 <Avatar
                   size="sxl"

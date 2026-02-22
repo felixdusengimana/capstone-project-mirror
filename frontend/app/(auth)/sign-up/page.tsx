@@ -45,7 +45,7 @@ export default function RegisterPage() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col text-gray-700 justify-between h-full p-0"
+      className="flex flex-col text-gray-700 justify-between h-full p-8 lg:p-0"
     >
       <p className="text-right font-light text-lg text-gray-500">
         Already have an account,{" "}
