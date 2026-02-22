@@ -11,15 +11,15 @@ export default function Layout({ children }: { children: ReactNode }) {
   const isCreator = Boolean(params.creatorId);
 
   return (
-    <div className="flex h-screen">
+    <div className="zoom flex h-screen">
       <div
         className={`flex-grow bg-white ${
-          isCreator ? "pt-[78px]" : "py-0 pt-20 lg:py-[78px]"
-        } px-0 md:px-16 lg:px-[120px] overflow-auto`}
+          isCreator ? "pt-[78px]" : "py-[78px]"
+        } px-[120px] overflow-auto`}
       >
         <Suspense fallback={<p>Loading...</p>}>{children}</Suspense>
       </div>
-      <div className="w-[667px] overflow-hidden relative hidden md:block">
+      <div className="w-[667px] overflow-hidden relative ">
         {/* texts */}
         <div className="h-full w-full absolute z-20 bg-transparent px-12 py-[78px] flex flex-col justify-between">
           <div>

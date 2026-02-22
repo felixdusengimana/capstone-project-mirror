@@ -4,8 +4,6 @@ import Sidebar from "@/components/organisms/Sidebar";
 import { ReactNode, Suspense, useState } from "react";
 
 export default function DashBoardLayout({ children }: { children: ReactNode }) {
-  const [showSidebar, setShowSidebar] = useState(false);
-
   const links = [
     {
       label: "Home",
@@ -31,11 +29,7 @@ export default function DashBoardLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="h-screen flex bg-white relative">
-      <div
-        className={`bg-white ${
-          showSidebar ? "block" : "hidden"
-        } absolute lg:relative lg:block`}
-      >
+      <div className={`bg-white`}>
         <Sidebar links={links} isAdmin />
       </div>
       <Suspense>{children}</Suspense>

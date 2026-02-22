@@ -24,7 +24,7 @@ export default function ChangeCreatorStatus({
   return (
     <DialogRoot onOpenChange={setOpen} open={open}>
       <DialogTrigger className={className}>{trigger}</DialogTrigger>
-      <Dialog className="pt-4 min-w-full lg:min-w-[443px]">
+      <Dialog className="pt-4 min-w-[443px]">
         <div className="w-full py-6">
           <div className="flex items-center justify-between px-6">
             <h1 className="text-[#000000] font-medium text-lg ">

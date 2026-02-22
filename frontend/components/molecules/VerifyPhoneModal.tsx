@@ -56,7 +56,7 @@ export default function VerifyPhoneModal({
           Verify phone number
         </span>
       </DialogTrigger>
-      <Dialog className="pt-4 min-w-full lg:min-w-[600px]">
+      <Dialog className="pt-4 min-w-[600px]">
         <form className="p-4 text-black">
           <h1 className="text-2xl font-semibold mb-4">Verify phone number</h1>
 

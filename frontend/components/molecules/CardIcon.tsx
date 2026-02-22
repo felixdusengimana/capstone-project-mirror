@@ -2,7 +2,6 @@
 
 import { ComponentProps } from "react";
 import Icon, { IconNames } from "../atoms/Icon";
-import Link from "next/link";
 
 interface CardIconProps extends ComponentProps<"svg"> {
   icon: IconNames;

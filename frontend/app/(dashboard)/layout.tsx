@@ -4,8 +4,6 @@ import Sidebar from "@/components/organisms/Sidebar";
 import { ReactNode, useState } from "react";
 
 export default function DashBoardLayout({ children }: { children: ReactNode }) {
-  const [showSidebar, setShowSidebar] = useState(false);
-
   const links = [
     {
       label: "Home",
@@ -30,20 +28,11 @@ export default function DashBoardLayout({ children }: { children: ReactNode }) {
   ] as { label: string; icon: IconNames; href: string }[];
 
   return (
-    <div className="h-screen flex bg-white relative">
-      <div
-        className={`bg-white ${
-          showSidebar ? "block" : "hidden"
-        } absolute lg:relative lg:block`}
-      >
+    <div className="zoom h-screen flex bg-white relative">
+      <div className={`bg-white`}>
         <Sidebar links={links} />
       </div>
-      <div className="flex-grow bg-[#F0F2F7] overflow-auto pt-0 lg:pt-[112px]">
-        {/* <div className="lg:hidden py-4">
-          <Button onClick={() => setShowSidebar(!showSidebar)}>
-            Open Sidebar
-          </Button>
-        </div> */}
+      <div className="flex-grow bg-[#F0F2F7] overflow-auto pt-[112px]">
         {children}
       </div>
     </div>

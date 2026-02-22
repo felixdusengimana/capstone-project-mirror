@@ -91,11 +91,11 @@ export default function SupportCreator() {
       <Script src="https://checkout.flutterwave.com/v3.js"></Script>
       {isLoading ? (
         // add skeleton loader for below content
-        <div className="flex flex-col items-center gap-24 h-full p-8 lg:p-0">
+        <div className="flex flex-col items-center gap-24 h-full p-0">
           <h1 className="text-[#374151] text-4xl font-mono text-center">
             Pesatone makes Supporting fun and easy.
           </h1>
-          <div className="animate-pulse w-full lg:w-[598px] flex flex-col items-center justify-between gap-10  rounded-2xl border border-gray-200 pt-24 pb-[61px] px-20 relative">
+          <div className="animate-pulse w-[598px] flex flex-col items-center justify-between gap-10  rounded-2xl border border-gray-200 pt-24 pb-[61px] px-20 relative">
             <div className="absolute -top-16">
               <Avatar size="xl" src="" />
             </div>
@@ -117,7 +117,7 @@ export default function SupportCreator() {
           </div>
         </div>
       ) : !data?.data ? (
-        <div className="flex flex-col items-center gap-24 h-full p-8 lg:p-0">
+        <div className="flex flex-col items-center gap-24 h-full p-0">
           <h1 className="text-[#374151] text-4xl font-mono text-center">
             Creator not found
           </h1>
@@ -125,12 +125,12 @@ export default function SupportCreator() {
       ) : (
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col items-center gap-24 h-full p-8 lg:p-0"
+          className="flex flex-col items-center gap-24 h-full p-0"
         >
           {/* <h1 className="text-[#374151] text-4xl font-mono text-center">
             Pesatone makes Supporting fun and easy.
           </h1> */}
-          <div className="w-full lg:w-[598px] flex flex-col items-center justify-between gap-10  rounded-2xl border border-gray-200 pt-24 pb-[61px] px-20 relative">
+          <div className="w-[598px] flex flex-col items-center justify-between gap-10  rounded-2xl border border-gray-200 pt-24 pb-[61px] px-20 relative">
             <div className="absolute -top-16">
               <Avatar src={data?.data.profileImageUrl ?? ""} size="xl" />
             </div>

@@ -50,6 +50,10 @@ input:-webkit-autofill:active {
   font-size: clamp(2.25rem, 5.4vw, 64px);
 }
 
+.zoom {
+  zoom: 1;
+}
+
 .intro {
   background: url('/home-bg.png');
   background-size: contain;
@@ -91,12 +95,17 @@ input:-webkit-autofill:active {
   border-radius: 11px;
   height: 103%;
   width: 105%;
+  max-width: fit-content;
   background: linear-gradient(60%, #FFFFFF, rgba(252, 252, 252, 0));
 }
 
 @media screen and (max-width: 1024px) {
   body {
     font-size: 14px;
+  }
+
+  .zoom {
+    zoom: 0.9;
   }
 
   .page-padding {
@@ -115,6 +124,10 @@ input:-webkit-autofill:active {
 @media screen and (max-width: 768px) {
   body {
     font-size: 12px;
+  }
+
+  .zoom {
+    zoom: 0.3;
   }
 
   .page-padding {

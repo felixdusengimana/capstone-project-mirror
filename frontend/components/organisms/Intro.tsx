@@ -21,11 +21,11 @@ export default function Intro() {
 
           <div className="hidden md:block">
             <Trusties />
-            <div className="flex gap-2 lg:gap-6 mt-6 flex-wrap">
+            <div className="flex gap-6 mt-6 flex-wrap">
               <DownloadApp os="android" className="flex-grow  max-w-[202px]" />
               <DownloadApp
                 os="ios"
-                className="lg:px-[42px] flex-grow max-w-[202px]"
+                className="px-[42px] flex-grow max-w-[202px]"
               />
             </div>
           </div>
