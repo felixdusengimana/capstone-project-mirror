@@ -1,36 +1,56 @@
 package com.pesatone.api.service.impl;
 
+import com.pesatone.api.exception.PesatoneException;
 import com.pesatone.api.model.dto.PayoutRequestDto;
 import com.pesatone.api.model.entity.AppUser;
 import com.pesatone.api.model.entity.Payout;
+import com.pesatone.api.model.entity.Wallet;
+import com.pesatone.api.model.enumeration.OtpTypeEnum;
+import com.pesatone.api.model.enumeration.PaymentStatusEnum;
 import com.pesatone.api.repository.PayoutRepository;
+import com.pesatone.api.service.OtpService;
 import com.pesatone.api.service.PayoutService;
+import com.pesatone.api.service.WalletService;
+import com.pesatone.api.util.AppUtil;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class PayoutServiceImpl implements PayoutService {
-    private final PayoutRepository payloadRepository;
+    private final PayoutRepository payoutRepository;
+    private final OtpService otpService;
+    private final WalletService walletService;
 
     @Transactional
     @Override
     public Payout initiatePayout(AppUser creator, PayoutRequestDto dto) {
-        validatePayoutRequest(dto);
+        Wallet wallet = walletService.getOrCreateWallet(creator, dto.getCurrency());
+        validatePayoutRequest(creator, wallet ,dto);
         Payout payout = new Payout();
         payout.setAmount(dto.getAmount());
-//        payout.setCurrency(dto.getCurrency());
+        payout.setCurrency(dto.getCurrency());
         payout.setPaymentChannel(dto.getPaymentChannel());
         payout.setCreator(creator);
-        return null;
+        payout.setWallet(wallet);
+        payout.setPaymentStatus(PaymentStatusEnum.PENDING);
+        payout.setTransactionReference(AppUtil.getTransactionReference("WT"));
+        return payoutRepository.save(payout);
     }
 
-    private void validatePayoutRequest(PayoutRequestDto dto) {
-        // check balance
-        // check payout amount restriction
-        // check pending payouts
-        // check if user has setup and verified payout mode
-
+    private void validatePayoutRequest(AppUser user,Wallet wallet, PayoutRequestDto dto) {
+        if(dto.getAmount().compareTo(wallet.getBalance()) > 0){
+            throw new PesatoneException("Insufficient balance");
+        }
+        if(payoutRepository.countPendingPayouts(wallet) > 0){
+            throw new PesatoneException("You have pending payouts for this currency. Kindly cancel it to initiate another payout transaction");
+        }
+        // check if user has set-up and verified payout mode
+        boolean validOtp = otpService.verifyOtp(user, OtpTypeEnum.PAYOUT, dto.getOtp());
+        if(BooleanUtils.isFalse(validOtp)){
+            throw new PesatoneException("Cannot verify OTP. Please try again later");
+        }
     }
 }

@@ -1,10 +1,18 @@
 package com.pesatone.api.controller;
 
+import com.pesatone.api.configuration.auth.RequestPrincipal;
+import com.pesatone.api.model.dto.ApiResponseObject;
+import com.pesatone.api.model.dto.OtpRequestDto;
+import com.pesatone.api.model.dto.PayoutRequestDto;
+import com.pesatone.api.model.entity.AppUser;
+import com.pesatone.api.service.PayoutService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin
@@ -12,5 +20,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("payouts")
 @Tag(name="4. Payout Controller")
 public class PayoutController {
+private final PayoutService payoutService;
+private final RequestPrincipal principal;
 
+    @Operation(summary = "Initiate Payout", description = "Initiate a payout request")
+    @PostMapping()
+    @PreAuthorize("hasAnyAuthority(T(com.pesatone.api.model.enumeration.PermissionEnum).CREATE_PAYOUT)")
+    public ResponseEntity<ApiResponseObject<String>> requestOtp(@RequestBody @Valid PayoutRequestDto dto) {
+        AppUser user = principal.getLoggedInUser();
+        payoutService.initiatePayout(user, dto);
+        return ResponseEntity.ok(new ApiResponseObject<>("OTP generated and sent successfully", true, null));
+    }
 }

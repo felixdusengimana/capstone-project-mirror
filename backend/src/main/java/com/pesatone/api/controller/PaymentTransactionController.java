@@ -7,9 +7,11 @@ import com.pesatone.api.model.dto.TransactionDto;
 import com.pesatone.api.model.dto.flw.FlwCallBackDto;
 import com.pesatone.api.model.entity.PaymentTransaction;
 import com.pesatone.api.model.pojo.PaymentTransactionPojo;
-import com.pesatone.api.model.search.*;
+import com.pesatone.api.model.search.QueryResultPojo;
+import com.pesatone.api.model.search.TransactionSearchFilter;
+import com.pesatone.api.model.search.TransactionSearchResponse;
+import com.pesatone.api.service.PaymentProcessingService;
 import com.pesatone.api.service.PaymentTransactionService;
-import com.querydsl.core.QueryResults;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,6 +32,7 @@ import reactor.core.publisher.Mono;
 @Tag(name = "3. Transactions")
 public class PaymentTransactionController {
     private final PaymentTransactionService paymentTransactionService;
+    private final PaymentProcessingService paymentProcessingService;
     private final Gson gson;
     private final PaymentConfig paymentConfig;
 
@@ -72,7 +75,7 @@ public class PaymentTransactionController {
 
         PaymentTransaction transaction = paymentTransactionService.getByTransactionReference(dto.getData().getTxRef());
 
-        paymentTransactionService.processPayment(transaction, dto.getData().getPaymentDto());
+        paymentProcessingService.processPayment(transaction, dto.getData().getPaymentDto());
 
         return ResponseEntity.ok(new ApiResponseObject<>("Successful", true, "Notification received"));
     }

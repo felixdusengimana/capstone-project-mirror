@@ -111,7 +111,7 @@ public class UserController {
     @PostMapping("otp")
     @PreAuthorize("hasAnyAuthority(T(com.pesatone.api.model.enumeration.PermissionEnum).VIEW_CREATOR_DASHBOARD)")
     public ResponseEntity<ApiResponseObject<String>> requestOtp(@RequestBody @Valid OtpRequestDto dto) {
-        //TODO prevent DDos
+        //TODO prevent DDOS attack
         AppUser user = principal.getLoggedInUser();
         otpService.sendOtp(user, dto.getOtpType());
         return ResponseEntity.ok(new ApiResponseObject<>("OTP generated and sent successfully", true, null));

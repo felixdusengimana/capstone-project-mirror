@@ -3,6 +3,7 @@ package com.pesatone.api.service.impl;
 import com.blazebit.persistence.CriteriaBuilderFactory;
 import com.blazebit.persistence.PagedList;
 import com.blazebit.persistence.querydsl.BlazeJPAQuery;
+import com.github.javafaker.App;
 import com.google.gson.Gson;
 import com.pesatone.api.configuration.auth.RequestPrincipal;
 import com.pesatone.api.configuration.properties.PaymentConfig;
@@ -14,6 +15,7 @@ import com.pesatone.api.model.dto.flw.FlwTransactionDetailResponse;
 import com.pesatone.api.model.entity.AppUser;
 import com.pesatone.api.model.entity.PaymentTransaction;
 import com.pesatone.api.model.entity.QPaymentTransaction;
+import com.pesatone.api.model.entity.Wallet;
 import com.pesatone.api.model.enumeration.PaymentProviderEnum;
 import com.pesatone.api.model.enumeration.PaymentStatusEnum;
 import com.pesatone.api.model.enumeration.RoleEnum;
@@ -23,7 +25,10 @@ import com.pesatone.api.model.search.TransactionSearchFilter;
 import com.pesatone.api.model.search.TransactionSearchResponse;
 import com.pesatone.api.repository.AppUserRepository;
 import com.pesatone.api.repository.PaymentTransactionRepository;
+import com.pesatone.api.service.PaymentProcessingService;
 import com.pesatone.api.service.PaymentTransactionService;
+import com.pesatone.api.service.WalletService;
+import com.pesatone.api.service.payment.FlutterWaveService;
 import com.pesatone.api.util.AppUtil;
 import com.querydsl.core.types.Projections;
 import jakarta.persistence.EntityManager;
@@ -52,12 +57,12 @@ import java.util.UUID;
 public class PaymentTransactionServiceImpl implements PaymentTransactionService {
     private final AppUserRepository appUserRepository;
     private final PaymentTransactionRepository paymentTransactionRepository;
-    private final HttpClient httpClient;
-    private final PaymentConfig paymentConfig;
+    private final FlutterWaveService flutterWaveService;
     private final Gson gson;
     private final CriteriaBuilderFactory builderFactory;
     private final EntityManager entityManager;
     private final RequestPrincipal requestPrincipal;
+   private final PaymentProcessingService paymentProcessingService;
 
     @Override
     public PaymentTransaction getByTransactionReference(String transactionReference) {
@@ -73,8 +78,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
         transaction.setCurrency(dto.getCurrency());
         transaction.setPaymentProvider(dto.getPaymentProvider());
         transaction.setPaymentStatus(PaymentStatusEnum.PENDING);
-        transaction.setTransactionReference("PT-" + UUID.randomUUID().toString().replace("-", "")
-                .substring(0, 10));
+        transaction.setTransactionReference(AppUtil.getTransactionReference("PT"));
         transaction.setDonorName(dto.getName());
         transaction.setNote(dto.getNote());
         AppUser creator = appUserRepository.findActiveByUserNameAndRole(dto.getCreatorUserName(), RoleEnum.CREATOR)
@@ -83,28 +87,6 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
         appUserRepository.findActiveByUserNameAndRole(dto.getCreatorUserName(), RoleEnum.FAN)
                 .ifPresent(transaction::setDonor);
         return paymentTransactionRepository.save(transaction);
-    }
-
-    @Override
-    @Transactional
-    public PaymentTransaction processPayment(PaymentTransaction transaction, PaymentDto paymentDto) {
-        if(transaction.canProcessPayment() && isValidatePayment(transaction, paymentDto)){
-            transaction.setPaymentStatus(paymentDto.paymentStatus());
-            transaction.setPaidAt(paymentDto.paidAt());
-            transaction.setProviderReference(paymentDto.providerReference());
-            transaction.setPaymentChannel(paymentDto.paymentChannel().toUpperCase());
-
-            RoundingMode roundingMode = RoundingMode.HALF_UP;
-
-            BigDecimal transactionFee =  transaction.getAmount()
-                    .multiply(BigDecimal.valueOf(paymentConfig.getTransactionFeePercentage()))
-                            .divide(BigDecimal.valueOf(100), roundingMode)
-                    .setScale(2, roundingMode);
-
-            transaction.setTransactionFee(transactionFee);
-            return paymentTransactionRepository.save(transaction);
-        }
-        return transaction;
     }
 
     @Override
@@ -191,37 +173,13 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
         return new QueryResultPojo<>(pagedList, filter.getPageNumber(), filter.getPageSize(), pagedList.getTotalPages());
     }
 
-    private boolean isValidatePayment(PaymentTransaction transaction, PaymentDto paymentDto){
-        boolean isValid = true;
-        String paymentError = "PAYMENT_ERROR";
-        if(!transaction.getCurrency().equals(paymentDto.currency())){
-            isValid = false;
-          log.error("{} for {} : {}", paymentError, transaction.getTransactionReference(), "Mismatch currency"+paymentDto.currency());
-        }
-        if(transaction.getAmount().compareTo(paymentDto.amount()) < 0){
-            isValid = false;
-            log.error("{} for {} : {}", paymentError, transaction.getTransactionReference(), "Mismatch amount"+paymentDto.amount());
-        }
-        return isValid;
-    }
-
     private Mono<PaymentTransaction> checkFlwTransactionDetail(PaymentTransaction transaction){
-        return WebClient.builder()
-                .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .baseUrl(paymentConfig.getFlwTransactionDetailUrl())
-                .build()
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .queryParam("tx_ref", transaction.getTransactionReference())
-                        .build())
-                .header("Authorization", "Bearer "+ paymentConfig.getFlwSecretKey())
-                .retrieve()
-                .bodyToMono(String.class)
+        return flutterWaveService.getTransactionDetail(transaction.getTransactionReference())
                 .publishOn(Schedulers.boundedElastic())
                 .map(response -> {
                     FlwTransactionDetailResponse detailResponse = gson.fromJson(response,FlwTransactionDetailResponse.class);
                     FlwTransactionDetail transactionDetail = detailResponse.getData();
-                    return processPayment(transaction,transactionDetail.getPaymentDto());
+                    return paymentProcessingService.processPayment(transaction,transactionDetail.getPaymentDto());
                 })
                 .onErrorResume( ex -> {
                     if (ex instanceof WebClientResponseException webClientException) {

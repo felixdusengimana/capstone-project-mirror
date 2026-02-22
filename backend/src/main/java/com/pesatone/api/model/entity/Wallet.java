@@ -1,42 +1,38 @@
 package com.pesatone.api.model.entity;
 
 import com.pesatone.api.model.enumeration.CurrencyEnum;
-import com.pesatone.api.model.enumeration.PaymentStatusEnum;
-import com.pesatone.api.model.enumeration.PayoutChannelEnum;
+import com.pesatone.api.model.enumeration.StatusEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
-@Setter @Getter
-public class Payout {
+@Getter
+@Setter
+@SQLRestriction("status = 'ACTIVE'")
+public class Wallet {
     @Id
     @GeneratedValue
     private Long id;
 
-    private BigDecimal amount;
+    @NotNull
+    private BigDecimal balance;
 
     @NotNull
     @Enumerated(EnumType.STRING)
     private CurrencyEnum currency;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
-    private PayoutChannelEnum paymentChannel;
-
-    @Enumerated(EnumType.STRING)
-    private PaymentStatusEnum paymentStatus;
-
     @NotNull
-    private String transactionReference;
-
-    private String providerReference;
+    private StatusEnum status;
 
     @CreationTimestamp
     private Date createdAt;
@@ -45,8 +41,5 @@ public class Payout {
     private Date updatedAt;
 
     @ManyToOne(fetch =  FetchType.LAZY, optional = false)
-    private AppUser creator;
-
-    @ManyToOne(fetch =  FetchType.LAZY, optional = false)
-    private Wallet wallet;
+    private AppUser appUser;
 }
