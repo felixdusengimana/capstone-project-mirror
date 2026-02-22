@@ -19,7 +19,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       >
         <Suspense fallback={<p>Loading...</p>}>{children}</Suspense>
       </div>
-      <div className="w-[667px] overflow-hidden relative hidden md:block">
+      <div className="w-[800px] flex-grow overflow-hidden relative hidden md:block">
         {/* texts */}
         <div className="h-full w-full absolute z-20 bg-transparent px-12 py-[78px] flex flex-col justify-between">
           <div>
