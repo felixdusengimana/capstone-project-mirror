@@ -3,15 +3,21 @@ package com.pesatone.api.controller;
 import com.google.gson.Gson;
 import com.pesatone.api.configuration.properties.PaymentConfig;
 import com.pesatone.api.model.dto.ApiResponseObject;
+import com.pesatone.api.model.dto.PayoutDto;
 import com.pesatone.api.model.dto.TransactionDto;
 import com.pesatone.api.model.dto.flw.FlwCallBackDto;
+import com.pesatone.api.model.dto.flw.FlwPayoutDetail;
+import com.pesatone.api.model.dto.flw.FlwTransactionDetail;
 import com.pesatone.api.model.entity.PaymentTransaction;
+import com.pesatone.api.model.entity.Payout;
 import com.pesatone.api.model.pojo.PaymentTransactionPojo;
 import com.pesatone.api.model.search.response.QueryResultPojo;
 import com.pesatone.api.model.search.filter.TransactionSearchFilter;
 import com.pesatone.api.model.search.response.TransactionSearchResponse;
 import com.pesatone.api.service.PaymentProcessingService;
 import com.pesatone.api.service.PaymentTransactionService;
+import com.pesatone.api.service.PayoutService;
+import com.pesatone.api.util.AppUtil;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,6 +39,7 @@ import reactor.core.publisher.Mono;
 public class PaymentTransactionController {
     private final PaymentTransactionService paymentTransactionService;
     private final PaymentProcessingService paymentProcessingService;
+    private final PayoutService payoutService;
     private final Gson gson;
     private final PaymentConfig paymentConfig;
 
@@ -64,19 +71,24 @@ public class PaymentTransactionController {
     @Hidden
     @CrossOrigin
     @PostMapping("/flw/callback")
-    public ResponseEntity<ApiResponseObject<String>> processFlutterWaveCallBack(@RequestBody @Valid FlwCallBackDto dto,
+    public ResponseEntity<ApiResponseObject<String>> processFlutterWaveCallBack(@RequestBody @Valid FlwCallBackDto<?> dto,
                                                                                      @RequestHeader("verif-hash") String verifyHash,
                                                                                      BindingResult bindingResult) throws BindException {
         if (bindingResult.hasErrors()) {
             throw new BindException(bindingResult);
         }
 
-        verifyCallBack(verifyHash, dto);
+        AppUtil.verifyCallBack(verifyHash, paymentConfig.getFlwVerifyHash(), gson.toJson(dto));
 
-        PaymentTransaction transaction = paymentTransactionService.getByTransactionReference(dto.getData().getTxRef());
-
-        paymentProcessingService.processPayment(transaction, dto.getData().getPaymentDto());
-
+        if(dto.isPaymentCallback()) {
+            FlwCallBackDto<FlwTransactionDetail> request = (FlwCallBackDto<FlwTransactionDetail>) dto;
+            PaymentTransaction transaction = paymentTransactionService.getByTransactionReference(request.getData().getTxRef());
+            paymentProcessingService.processPayment(transaction, request.getData().getPaymentDto());
+        } else if (dto.isPayoutCallback()) {
+            FlwCallBackDto<FlwPayoutDetail> request = (FlwCallBackDto<FlwPayoutDetail>) dto;
+            Payout payout = payoutService.getByReference(request.getData().getReference());
+            paymentProcessingService.processPayout(payout, new PayoutDto(request.getData()));
+        }
         return ResponseEntity.ok(new ApiResponseObject<>("Successful", true, "Notification received"));
     }
 
@@ -87,7 +99,7 @@ public class PaymentTransactionController {
                 true,paymentTransactionService.searchTransactions(filter)));
     }
 
-    private void verifyCallBack(String verifyHash, FlwCallBackDto dto){
+    private void verifyCallBack(String verifyHash, FlwCallBackDto<FlwTransactionDetail> dto){
        if(!verifyHash.equals(paymentConfig.getFlwVerifyHash())){
            log.error("Invalid hash {} for FLW callback {}",verifyHash,gson.toJson(dto));
            throw new IllegalArgumentException("We could not validate callback");

@@ -8,11 +8,19 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class FlwCallBackDto {
+public class FlwCallBackDto<T> {
     @NotBlank
     private String event;
 
     @NotNull
     @Valid
-    private FlwTransactionDetail data;
+    private T data;
+
+    public boolean isPaymentCallback(){
+        return this.event.equalsIgnoreCase("charge.completed");
+    }
+
+    public boolean isPayoutCallback(){
+        return this.event.equalsIgnoreCase("transfer.completed");
+    }
 }

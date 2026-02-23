@@ -28,11 +28,9 @@ public class PayoutJob {
         try {
             List<Payout> eligiblePayouts = payoutService.fetchEligibleMomoPayouts(20);
             log.info("*** Processing Payout: " + eligiblePayouts.size());
-            eligiblePayouts.forEach(payout ->{
-//                payoutService.initiatePayout(payout.getCreator(), payout.getPayoutRequestDto());
-            });
+            eligiblePayouts.forEach(payoutService::initiateMomoPayout);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
         }
     }
 }

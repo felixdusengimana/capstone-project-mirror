@@ -3,12 +3,13 @@ package com.pesatone.api.service.impl;
 import com.blazebit.persistence.CriteriaBuilderFactory;
 import com.blazebit.persistence.PagedList;
 import com.blazebit.persistence.querydsl.BlazeJPAQuery;
+import com.google.gson.Gson;
 import com.pesatone.api.configuration.auth.RequestPrincipal;
 import com.pesatone.api.exception.PesatoneException;
+import com.pesatone.api.exception.PesatoneNotFoundException;
+import com.pesatone.api.model.dto.PayoutDto;
 import com.pesatone.api.model.dto.PayoutRequestDto;
-import com.pesatone.api.model.dto.flw.FlwPayoutRequestDto;
-import com.pesatone.api.model.dto.flw.FlwTransactionDetail;
-import com.pesatone.api.model.dto.flw.FlwTransactionDetailResponse;
+import com.pesatone.api.model.dto.flw.*;
 import com.pesatone.api.model.entity.*;
 import com.pesatone.api.model.enumeration.*;
 import com.pesatone.api.model.search.filter.PayoutSearchFilter;
@@ -16,6 +17,7 @@ import com.pesatone.api.model.search.response.PayoutSearchResponse;
 import com.pesatone.api.model.search.response.QueryResultPojo;
 import com.pesatone.api.repository.PayoutRepository;
 import com.pesatone.api.service.OtpService;
+import com.pesatone.api.service.PaymentProcessingService;
 import com.pesatone.api.service.PayoutService;
 import com.pesatone.api.service.WalletService;
 import com.pesatone.api.service.payment.FlutterWaveService;
@@ -45,13 +47,21 @@ public class PayoutServiceImpl implements PayoutService {
     private final EntityManager entityManager;
     private final RequestPrincipal requestPrincipal;
     private final FlutterWaveService flutterWaveService;
+    private final Gson gson;
+    private final PaymentProcessingService paymentProcessingService;
 
+    @Override
+    public Payout getByReference(String reference) {
+        return payoutRepository.findByTransactionReference(reference)
+                .orElseThrow(() -> new PesatoneNotFoundException("Payout not found"));
+    }
 
     @Transactional
     @Override
     public Payout initiatePayout(AppUser creator, PayoutRequestDto dto) {
+        //TODO where do we settle if method is BANKACCOUNT?
         Wallet wallet = walletService.getOrCreateWallet(creator, dto.getCurrency());
-        validatePayoutRequest(creator, wallet ,dto);
+        validatePayoutRequest(creator, wallet, dto);
         Payout payout = new Payout();
         payout.setAmount(dto.getAmount());
         payout.setCurrency(dto.getCurrency());
@@ -68,16 +78,16 @@ public class PayoutServiceImpl implements PayoutService {
         QPayout qPayout = QPayout.payout;
         BlazeJPAQuery<Payout> blazeQuery = new BlazeJPAQuery<>(entityManager, builderFactory);
         blazeQuery.from(qPayout);
-        if(requestPrincipal.isCreator()){
+        if (requestPrincipal.isCreator()) {
             blazeQuery.where(qPayout.creator.id.eq(requestPrincipal.getLoggedInUser().getId()));
         }
-        if(filter.getCurrency() != null){
+        if (filter.getCurrency() != null) {
             blazeQuery.where(qPayout.currency.eq(filter.getCurrency()));
         }
-        if(filter.getPaymentStatus() != null){
+        if (filter.getPaymentStatus() != null) {
             blazeQuery.where(qPayout.paymentStatus.eq(filter.getPaymentStatus()));
         }
-        if(requestPrincipal.isAdmin() && StringUtils.isNotBlank(filter.getCreatorTag())){
+        if (requestPrincipal.isAdmin() && StringUtils.isNotBlank(filter.getCreatorTag())) {
             blazeQuery.where(qPayout.creator.username.containsIgnoreCase(filter.getCreatorTag()));
         }
 
@@ -110,6 +120,8 @@ public class PayoutServiceImpl implements PayoutService {
                 .and(qPayout.paymentStatus.eq(PaymentStatusEnum.PENDING)
                         .and(qPayout.payoutProcessingStatus.eq(PayoutProcessingStatusEnum.PENDING_EXECUTION))));
 
+        blazeQuery.leftJoin(qPayout.creator).fetchJoin();
+
         blazeQuery.orderBy(qPayout.id.asc());
 
         return blazeQuery
@@ -118,40 +130,43 @@ public class PayoutServiceImpl implements PayoutService {
     }
 
     @Override
-    public Mono<Payout> checkMomoPayoutStatus(Payout transaction) {
-        if (transaction.canProcessPayout() && (transaction.getPaymentChannel().equals(PayoutChannelEnum.MOBILE_MONEY))) {
-//            try {
-//                return checkFlwTransactionDetail(transaction);
-//            } catch (Exception ex) {
-//                log.error(ex.getMessage(), ex);
-//            }
+    public Mono<Payout> checkMomoPayoutStatus(Payout payout) {
+        if (payout.canProcessPayout() && (payout.getPaymentChannel().equals(PayoutChannelEnum.MOBILE_MONEY))) {
+            try {
+                return checkFlwPayoutDetail(payout);
+            } catch (Exception ex) {
+                log.error(ex.getMessage(), ex);
+            }
         }
-        return Mono.just(transaction);
+        return Mono.just(payout);
     }
 
     @Override
     public Mono<Payout> initiateMomoPayout(Payout transaction) {
-//        try {
-//            return initiateMomoTransfer(transaction);
-//        } catch (Exception ex) {
-//            log.error(ex.getMessage(), ex);
-//        }
+        try {
+            FlwPayoutRequestDto dto = new FlwPayoutRequestDto(transaction);
+            initiateMomoTransfer(dto);
+            transaction.setPayoutProcessingStatus(PayoutProcessingStatusEnum.PROCESSING);
+            payoutRepository.save(transaction);
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
+        }
         return Mono.just(transaction);
     }
 
-    private void validatePayoutRequest(AppUser user,Wallet wallet, PayoutRequestDto dto) {
-        if(BooleanUtils.isNotTrue(user.getVerified())){
+    private void validatePayoutRequest(AppUser user, Wallet wallet, PayoutRequestDto dto) {
+        if (BooleanUtils.isNotTrue(user.getVerified())) {
             throw new PesatoneException("Your account must be verified before you can proceed with withdrawals");
         }
-        if(dto.getAmount().compareTo(wallet.getBalance()) > 0){
+        if (dto.getAmount().compareTo(wallet.getBalance()) > 0) {
             throw new PesatoneException("Insufficient balance");
         }
-        if(payoutRepository.countPendingPayouts(wallet) > 0){
+        if (payoutRepository.countPendingPayouts(wallet) > 0) {
             throw new PesatoneException("You already have pending payouts for this currency.");
         }
         // check if user has set-up and verified payout mode
         boolean validOtp = otpService.verifyOtp(user, OtpTypeEnum.PAYOUT, dto.getOtp());
-        if(BooleanUtils.isFalse(validOtp)){
+        if (BooleanUtils.isFalse(validOtp)) {
             throw new PesatoneException("Cannot verify OTP. Please try again later");
         }
     }
@@ -161,11 +176,34 @@ public class PayoutServiceImpl implements PayoutService {
                 .publishOn(Schedulers.boundedElastic())
                 .onErrorResume(ex -> {
                     if (ex instanceof WebClientResponseException webClientException) {
-                        log.error("FLUTTERWAVE PAYOUT INITIATION API ERROR {} : {}", webClientException.getStatusCode(), webClientException.getResponseBodyAsString());
+                        log.error("FLUTTER WAVE PAYOUT INITIATION API ERROR {} : {}", webClientException.getStatusCode(), webClientException.getResponseBodyAsString());
                     } else {
-                        log.error("FLUTTERWAVE PAYOUT INITIATION API ERROR: {}", ex.getMessage());
+                        log.error("FLUTTER WAVE PAYOUT INITIATION API ERROR: {}", ex.getMessage());
                     }
                     return Mono.just("");
                 });
     }
+
+    private Mono<Payout> checkFlwPayoutDetail(Payout payout) {
+        return flutterWaveService.getTransferDetail(payout.getTransactionReference())
+                .publishOn(Schedulers.boundedElastic())
+                .map(response -> {
+                    FlwPayoutDetailResponseList detailResponse = gson.fromJson(response, FlwPayoutDetailResponseList.class);
+                    if (detailResponse.getData() != null && !detailResponse.getData().isEmpty()) {
+                        FlwPayoutDetail payoutDetail = detailResponse.getData().get(0);
+                        return paymentProcessingService.processPayout(payout, new PayoutDto(payoutDetail));
+                    } else {
+                        return payout;
+                    }
+                })
+                .onErrorResume(ex -> {
+                    if (ex instanceof WebClientResponseException webClientException) {
+                        log.error("FLUTTER WAVE API ERROR {} : {}", webClientException.getStatusCode(), webClientException.getResponseBodyAsString());
+                    } else {
+                        log.error("FLUTTER WAVE API ERROR: {}", ex.getMessage());
+                    }
+                    return Mono.just(payout);
+                });
+    }
+
 }

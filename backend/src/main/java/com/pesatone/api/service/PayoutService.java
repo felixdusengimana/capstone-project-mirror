@@ -12,6 +12,8 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 public interface PayoutService {
+    Payout getByReference(String reference);
+
     Payout initiatePayout(AppUser creator, PayoutRequestDto dto);
 
     QueryResultPojo<PayoutSearchResponse> searchPayouts(PayoutSearchFilter filter);

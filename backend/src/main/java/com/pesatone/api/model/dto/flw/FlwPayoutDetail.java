@@ -7,11 +7,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 @Getter
 @Setter
-public class FlwPayoutRequestDto {
+public class FlwPayoutDetail {
     @JsonProperty("accountBank")
     @JsonAlias("account_bank")
     private String accountBank = "MPS";
@@ -24,17 +23,13 @@ public class FlwPayoutRequestDto {
     private String narration;
     private String currency = "RWF";
 
-    @JsonProperty("beneficiaryName")
-    @JsonAlias("beneficiary_name")
-    private String beneficiaryName;
-
     private String reference;
 
-    public FlwPayoutRequestDto(Payout payout){
-        setAmount(payout.getAmount());
-        setReference(payout.getTransactionReference());
-        setBeneficiaryName(payout.getCreator().getName());
-        setNarration("Payout on "+ new Date());
-        setAccountNumber(payout.getCreator().getPhoneNumber());
+    private String status;
+
+    private String id;
+
+    public boolean successful(){
+        return this.status.equalsIgnoreCase("SUCCESSFUL");
     }
 }
