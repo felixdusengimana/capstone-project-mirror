@@ -58,7 +58,7 @@ input:-webkit-autofill:active {
   background: url('/home-bg.png');
   background-size: contain;
   background-repeat: no-repeat;
-  background-position-x: right;
+  background-position-x: calc(100% + 160px);
   background-position-y: -120px;
 }
 
@@ -99,7 +99,8 @@ input:-webkit-autofill:active {
   background: linear-gradient(60%, #FFFFFF, rgba(252, 252, 252, 0));
 }
 
-@media screen and (max-width: 1024px) {
+
+@media screen and (max-width: 1230px) {
   body {
     font-size: 14px;
   }
