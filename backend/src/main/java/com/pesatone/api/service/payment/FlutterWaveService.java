@@ -1,6 +1,7 @@
 package com.pesatone.api.service.payment;
 
 import com.pesatone.api.configuration.properties.PaymentConfig;
+import com.pesatone.api.model.dto.flw.FlwPayoutRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
@@ -28,16 +29,28 @@ public class FlutterWaveService {
                 .bodyToMono(String.class);
     }
 
-    public Mono<String> getPayoutDetail(String transactionReference){
+    public Mono<String> getTransferDetail(String transactionReference){
         return WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .baseUrl(paymentConfig.getFlwTransferDetailUrl())
+                .baseUrl(paymentConfig.getFlwTransferUrl())
                 .build()
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .pathSegment(transactionReference)
+                        .queryParam("reference", transactionReference)
                         .build())
                 .header("Authorization", "Bearer "+ paymentConfig.getFlwSecretKey())
+                .retrieve()
+                .bodyToMono(String.class);
+    }
+
+    public Mono<String> initiateMomoTransfer(FlwPayoutRequestDto requestDto){
+        return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .baseUrl(paymentConfig.getFlwTransferUrl())
+                .build()
+                .post()
+                .header("Authorization", "Bearer "+ paymentConfig.getFlwSecretKey())
+                .bodyValue(requestDto)
                 .retrieve()
                 .bodyToMono(String.class);
     }

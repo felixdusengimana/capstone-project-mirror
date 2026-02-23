@@ -13,6 +13,6 @@ public class PaymentConfig {
     private String flwVerifyHash;
     private String flwSecretKey;
     private String flwTransactionDetailUrl;
-    private String flwTransferDetailUrl;
+    private String flwTransferUrl;
     private Integer transactionFeePercentage;
 }
