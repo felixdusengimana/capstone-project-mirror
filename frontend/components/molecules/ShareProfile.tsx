@@ -20,7 +20,7 @@ export default function ShareProfile({
     window.location.hostname +
     (window.location.port ? `:${window.location.port}` : "") +
     "/creator/" +
-    profile?.id;
+    profile?.username;
 
   const qrCodeRef = useRef(null);
   const downloadQRCode = () => {

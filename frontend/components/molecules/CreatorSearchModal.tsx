@@ -61,7 +61,7 @@ export default function CreatorSearchModal({
               <Link
                 className="block py-3 px-4 hover:bg-gray-200"
                 key={i}
-                href={`/creator/${art.id}`}
+                href={`/creator/${art.username}`}
               >
                 <Profile
                   user={{
