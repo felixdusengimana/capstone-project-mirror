@@ -1,3 +1,4 @@
+"use client";
 import Button from "@/components/atoms/Button";
 
 import Icon from "@/components/atoms/Icon";
@@ -6,8 +7,16 @@ import CreatorDashboard from "@/components/molecules/CreatorDashboard";
 import DashboardProfile from "@/components/molecules/DashboardProfile";
 import Profile from "@/components/molecules/Profile";
 import SupporterDialog from "@/components/molecules/SupporterDialog";
+import { useGetTransactions } from "@/services/transactions";
+import { ITransactionFilter } from "@/types/transaction";
+import { useState } from "react";
 
 export default function CreatorDashboardPage() {
+  const [filters, setFilters] = useState<Partial<ITransactionFilter>>({
+    pageNumber: 1,
+    pageSize: 10,
+  });
+  const { data: userTransactions, isLoading } = useGetTransactions({});
   return (
     <div className="min-h-full w-full dashboard-padding text-black pb-32 ">
       <h1 className="text-4xl font-sans font-bold text-[#1A1A1A]">Dashboard</h1>
@@ -43,7 +52,7 @@ export default function CreatorDashboardPage() {
             <Icon name="arrow-down" />
           </Button>
         </div>
-        {Array.from({ length: 5 }).map((_, i) => (
+        {userTransactions?.data?.results?.map((transaction, i) => (
           <div
             className={`w-full px-6 p-4 ${
               i !== 4 ? "border-b border-gray-100" : ""
@@ -66,7 +75,7 @@ export default function CreatorDashboardPage() {
 
                   <h3 className="text-gray-800 font-medium text-sm">
                     <span className="text-[#838AA2] font-normal">RWF</span>{" "}
-                    35,000
+                    {transaction.amount.toString()}
                   </h3>
                 </div>
               }
