@@ -15,8 +15,9 @@ export default function CreatorDashboardPage() {
   const [filters, setFilters] = useState<Partial<ITransactionFilter>>({
     pageNumber: 1,
     pageSize: 10,
+    donorName: "",
   });
-  const { data: userTransactions, isLoading } = useGetTransactions({});
+  const { data: userTransactions, isPending } = useGetTransactions(filters);
   return (
     <div className="min-h-full w-full dashboard-padding text-black pb-32 ">
       <h1 className="text-4xl font-sans font-bold text-[#1A1A1A]">Dashboard</h1>
@@ -33,6 +34,9 @@ export default function CreatorDashboardPage() {
         <div className="flex items-center justify-between border-b border-gray-200 px-6 pb-6">
           <Input
             className="max-w-[323px]"
+            onChange={(e) => {
+              setFilters({ ...filters, donorName: e.target.value });
+            }}
             left={
               <Icon
                 name="search"
@@ -52,36 +56,45 @@ export default function CreatorDashboardPage() {
             <Icon name="arrow-down" />
           </Button>
         </div>
-        {userTransactions?.data?.results?.map((transaction, i) => (
-          <div
-            className={`w-full px-6 p-4 ${
-              i !== 4 ? "border-b border-gray-100" : ""
-            }`}
-            key={i}
-          >
-            <SupporterDialog
-              trigger={
-                <div
-                  key={i}
-                  className={`w-full flex justify-between items-center`}
-                >
-                  <Profile
-                    user={{
-                      name: "Nziranziza Rafael",
-                      photo: "/profiles/profile1.png",
-                      date: "Dec 9, 2022",
-                    }}
-                  />
+        {isPending ? (
+          <div className="text-gray-700 px-6">Loading</div>
+        ) : userTransactions?.data?.results &&
+          userTransactions?.data?.results.length <= 0 ? (
+          <div className="text-gray-700 px-6"> No information found</div>
+        ) : (
+          userTransactions?.data?.results?.map((transaction, i) => (
+            <div
+              className={`w-full px-6 p-4 ${
+                i !== 4 ? "border-b border-gray-100" : ""
+              }`}
+              key={i}
+            >
+              <SupporterDialog
+                trigger={
+                  <div
+                    key={i}
+                    className={`w-full flex justify-between items-center`}
+                  >
+                    <Profile
+                      user={{
+                        name: transaction.donorName,
+                        photo: "",
+                        date: transaction.paidAt,
+                      }}
+                    />
 
-                  <h3 className="text-gray-800 font-medium text-sm">
-                    <span className="text-[#838AA2] font-normal">RWF</span>{" "}
-                    {transaction.amount.toString()}
-                  </h3>
-                </div>
-              }
-            />
-          </div>
-        ))}
+                    <h3 className="text-gray-800 font-medium text-sm">
+                      <span className="text-[#838AA2] font-normal">
+                        {transaction.currency}
+                      </span>{" "}
+                      {transaction.amount.toString()}
+                    </h3>
+                  </div>
+                }
+              />
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

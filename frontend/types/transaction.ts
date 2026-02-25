@@ -1,3 +1,5 @@
+import { ECurrency } from ".";
+
 export interface ITransaction {
   amount: number;
   note: string;
@@ -5,6 +7,8 @@ export interface ITransaction {
   transactionFee: number;
   transactionReference: string;
   paidAt: string;
+  donorName: string;
+  currency: ECurrency;
 }
 
 export interface ITransactionFilter {
