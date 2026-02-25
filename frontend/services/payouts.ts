@@ -4,11 +4,15 @@ import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "./axiosInstance";
 import { ObjectToParams } from "@/utils/params";
 
-export function useGetAllPayouts(data: Partial<IPayoutsFilters>) {
+export function useGetAllPayouts(
+  data: Partial<IPayoutsFilters>,
+  enabled = true
+) {
   const params = ObjectToParams({ ...data });
   return useQuery<IResponse<ISorted<IPayouts>>>({
     queryKey: ["payouts", Object.values(data).join(",")],
     queryFn: async () => axiosInstance.get(`/payouts?${params}`),
+    enabled,
   });
 }
 

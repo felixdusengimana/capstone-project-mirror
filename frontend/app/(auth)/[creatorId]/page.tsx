@@ -11,7 +11,7 @@ import { Tip, tip, TransactionData } from "@/types/pay";
 import { supportedSocials } from "@/utils/socials";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 import Script from "next/script";

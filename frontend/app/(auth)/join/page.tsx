@@ -169,11 +169,8 @@ export default function Join() {
   }, [user?.data, isGettingUser]);
 
   const handleOTP = (otp: string) => {
-    setValue("otp", otp, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
-    if (otp.length === OTP_LENGTH) {
+    setValue("otp", otp);
+    if (otp.length === OTP_LENGTH && Boolean(otp)) {
       handleSubmit(onSubmit)();
     }
   };

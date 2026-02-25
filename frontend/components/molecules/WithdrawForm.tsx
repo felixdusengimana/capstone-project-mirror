@@ -9,7 +9,7 @@ import { IInitiatePayout, payout } from "@/types/payouts";
 import { useState } from "react";
 import { EChannel, ECurrency } from "@/types";
 import Select from "../atoms/Select";
-import { EOtpTypes, useGetMe } from "@/services/users";
+import { EOtpTypes, GenerateOTP, useGetMe } from "@/services/users";
 import { convertEmail } from "@/utils/convertEmail";
 import OTPInput from "./OTPInput";
 import { useMutation } from "@tanstack/react-query";
@@ -37,6 +37,17 @@ export default function WithdrawForm({
     },
   });
 
+  // set otp if user didn't verify email
+  const { mutate: sendFirstOtp, isPending: isSendingOTP } = useMutation({
+    mutationFn: () => GenerateOTP({ otpType: EOtpTypes.PAYOUT }),
+    onSuccess() {
+      setActive("otp");
+    },
+    onError(error) {
+      toast.error(error.message);
+    },
+  });
+
   const { mutate, isPending } = useMutation({
     mutationFn: InitiatePayouts,
     onSuccess() {
@@ -53,7 +64,7 @@ export default function WithdrawForm({
   });
 
   const onSubmit = (data: IInitiatePayout) => {
-    setActive("otp");
+    sendFirstOtp();
   };
 
   return (
@@ -143,6 +154,7 @@ export default function WithdrawForm({
                   <Button
                     disabled={Object.keys(errors).length > 0 || isLoading}
                     className="w-full mt-8"
+                    isLoading={isSendingOTP}
                   >
                     Withdraw{" "}
                     {Boolean(watch("amount"))
@@ -157,6 +169,7 @@ export default function WithdrawForm({
                     }}
                     type="button"
                     onClick={() => setOpen(false)}
+                    disabled={isSendingOTP}
                   >
                     Cancel
                   </Button>
@@ -179,7 +192,7 @@ export default function WithdrawForm({
                     mutate({ ...watch(), otp: value });
                   }
                 }}
-                otpType={EOtpTypes.EMAIL_VERIFICATION}
+                otpType={EOtpTypes.PAYOUT}
               />
             </div>
 

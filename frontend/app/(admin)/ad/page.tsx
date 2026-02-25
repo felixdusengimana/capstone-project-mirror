@@ -54,39 +54,55 @@ export default function AdminDashboard() {
           trigger={
             <div className="flex gap-2 items-center">
               <Avatar src="/profiles/profile1.png" />
-              <span className="font-medium text-sm">{info.getValue()}</span>
+              <span className="font-medium text-sm text-gray-500">
+                {info.getValue()}
+              </span>
             </div>
           }
         />
       ),
-      header: () => <span>Full Name</span>,
+      header: () => (
+        <span className="text-gray-500 font-medium text-xs">Fund Name</span>
+      ),
       footer: (info) => info.column.id,
     }),
 
     columnHelper.accessor("email", {
       id: "email",
       cell: (info) => (
-        <span className="font-normal text-sm">{info.getValue()}</span>
+        <span className="font-normal text-sm text-gray-500">
+          {info.getValue()}
+        </span>
       ),
-      header: () => <span>Email</span>,
+      header: () => (
+        <span className="text-gray-500 font-medium text-xs">Email</span>
+      ),
       footer: (info) => info.column.id,
     }),
 
     columnHelper.accessor("phoneNumber", {
       id: "phoneNumber",
       cell: (info) => (
-        <span className="font-normal text-sm">{info.getValue()}</span>
+        <span className="font-normal text-sm text-gray-500">
+          {info.getValue()}
+        </span>
       ),
-      header: () => <span>Phone</span>,
+      header: () => (
+        <span className="text-gray-500 font-medium text-xs">Phone</span>
+      ),
       footer: (info) => info.column.id,
     }),
 
     columnHelper.accessor("country", {
       id: "country",
       cell: (info) => (
-        <span className="font-normal text-sm">{info.getValue()}</span>
+        <span className="font-normal text-sm text-gray-500">
+          {info.getValue()}
+        </span>
       ),
-      header: () => <span>Country</span>,
+      header: () => (
+        <span className="text-gray-500 font-medium text-xs">Country</span>
+      ),
       footer: (info) => info.column.id,
     }),
 
@@ -95,10 +111,14 @@ export default function AdminDashboard() {
       cell: (info) => (
         <a className="flex gap-1 text-[#00B7FE] hover:underline">
           <Icon name="attachment" />
-          <span className="font-normal text-sm">{info.getValue()}</span>
+          <span className="font-normal text-sm text-gray-500">
+            {info.getValue()}
+          </span>
         </a>
       ),
-      header: () => <span>Attachement</span>,
+      header: () => (
+        <span className="text-gray-500 font-medium text-xs">Attachement</span>
+      ),
       footer: (info) => info.column.id,
     }),
 
@@ -130,7 +150,9 @@ export default function AdminDashboard() {
           </button>
         </div>
       ),
-      header: () => <span>Actions</span>,
+      header: () => (
+        <span className="text-gray-500 font-medium text-xs">Actions</span>
+      ),
       footer: (info) => info.column.id,
     }),
   ]);

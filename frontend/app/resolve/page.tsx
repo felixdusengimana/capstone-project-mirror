@@ -1,31 +1,46 @@
 "use client";
-import { useGetMe } from "@/services/users";
+import { EOtpTypes, GenerateOTP, useGetMe } from "@/services/users";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import toast from "react-hot-toast";
 
 export default function ResolveScreen() {
   const router = useRouter();
   const { data: user, isLoading } = useGetMe();
+
+  // set otp if user didn't verify email
+  const { mutate } = useMutation({
+    mutationFn: () => GenerateOTP({ otpType: EOtpTypes.EMAIL_VERIFICATION }),
+    onSuccess() {
+      router.replace(`/join?step=1`);
+    },
+    onError(error) {
+      toast.error(error.message);
+    },
+  });
 
   useEffect(() => {
     const resolver = () => {
       if (!isLoading) {
         const info = user?.data;
         if (!info?.id) return router.replace("/login");
-        const step = !info.emailVerified
-          ? 1
-          : !info?.bio
-          ? 2
-          : !info.username
-          ? 3
-          : !info.countryName
-          ? 4
-          : info.socialLinks?.length <= 0
-          ? 5
-          : -1;
-        if (step === -1) return router.replace("/dashboard");
+        if (!info.emailVerified) {
+          mutate();
+        } else {
+          const step = !info?.bio
+            ? 2
+            : !info.username
+            ? 3
+            : !info.countryName
+            ? 4
+            : info.socialLinks?.length <= 0
+            ? 5
+            : -1;
+          if (step === -1) return router.replace("/dashboard");
 
-        return router.replace(`/join?step=${step}`);
+          return router.replace(`/join?step=${step}`);
+        }
       }
     };
     resolver();

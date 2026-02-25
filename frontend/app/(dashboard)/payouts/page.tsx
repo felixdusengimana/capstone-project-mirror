@@ -14,11 +14,11 @@ const WithdrawForm = dynamic(
 export default function PayoutsPage() {
   const { data: creator } = useGetMe();
   const [filters, setFilters] = useState<Partial<IPayoutsFilters>>({
-    creatorTag: `@${creator?.data.username}`,
+    creatorTag: `@${creator?.data?.username ?? ""}`,
     pageNumber: 1,
     pageSize: 10,
   });
-  const { data: payouts } = useGetAllPayouts(filters);
+  const { data: payouts } = useGetAllPayouts(filters, !creator?.data?.username);
 
   return (
     <div className="min-h-full w-full dashboard-padding text-black pb-10">

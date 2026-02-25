@@ -66,5 +66,5 @@ export function VerifyOTP({
   otp: string;
   otpType: EOtpTypes;
 }) {
-  return axiosInstance.post(`/users/otp/verification`, { otp, otpType });
+  return axiosInstance.post(`/otp/verification`, { otp, otpType });
 }

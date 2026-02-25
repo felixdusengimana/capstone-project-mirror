@@ -6,14 +6,14 @@ import toast from "react-hot-toast";
 
 export default function OTPInput({
   onChange,
-  error,
+  error = "",
   otpType,
 }: {
   onChange: (value: string) => void;
   error?: string;
   otpType: EOtpTypes;
 }) {
-  const [countDown, setCountDown] = useState(0);
+  const [countDown, setCountDown] = useState(60);
 
   const { mutate, isPending } = useMutation({
     mutationFn: () => GenerateOTP({ otpType }),
@@ -25,11 +25,6 @@ export default function OTPInput({
       toast.error(error.message);
     },
   });
-
-  useEffect(() => {
-    if (!isPending) mutate();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     if (countDown > 0) {

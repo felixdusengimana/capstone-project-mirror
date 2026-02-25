@@ -1,7 +1,7 @@
 import { getCookie } from "@/utils/cookie";
 import axios, { AxiosInstance, AxiosResponse } from "axios";
 
-export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+export const BASE_URL = "/proxy-backend";
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: BASE_URL,
