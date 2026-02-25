@@ -2,11 +2,12 @@ import Dialog, { DialogRoot, DialogTrigger } from "./Dialog";
 import Icon from "../atoms/Icon";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { ApproveCreator, EOtpTypes } from "@/services/users";
+import { ApproveCreator } from "@/services/users";
 import toast from "react-hot-toast";
+import { EApprovalStatus } from "@/types";
 
 interface ChangeCreatorStatusProps {
-  newStatus: "approved" | "rejected";
+  newStatus: EApprovalStatus;
   userId: string;
   trigger: React.ReactNode;
   className?: string;
@@ -20,11 +21,11 @@ export default function ChangeCreatorStatus({
 }: ChangeCreatorStatusProps) {
   const [open, setOpen] = useState(false);
 
-  const { mutate: approveMutate, isPending } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: () =>
       ApproveCreator({
         creatorId: userId,
-        approvalStatus: EOtpTypes.EMAIL_VERIFICATION,
+        approvalStatus: newStatus,
       }),
     onSuccess: () => {
       handleClose();
@@ -63,12 +64,10 @@ export default function ChangeCreatorStatus({
             </p>
             <div className="w-fit ml-auto flex gap-2.5 mt-6">
               <button
-                onClick={() =>
-                  newStatus === "approved" ? approveMutate() : {}
-                }
+                onClick={() => mutate()}
                 disabled={isPending}
                 className={`${
-                  newStatus === "approved"
+                  newStatus === EApprovalStatus.APPROVED
                     ? "bg-[#34D399] border-[#34D399]"
                     : "bg-[#EF4444] border-[#EF4444]"
                 } flex gap-1 items-center flex-grow border text-center text-white font-normal rounded-md px-4 py-2 text-sm`}
@@ -76,7 +75,7 @@ export default function ChangeCreatorStatus({
                 {isPending && (
                   <div className="w-3 h-3 rounded-full border border-t-0 border-gray-200 animate-spin"></div>
                 )}
-                {newStatus === "approved" ? "Approve" : "Reject"}
+                {newStatus === EApprovalStatus.APPROVED ? "Approve" : "Reject"}
               </button>
 
               <button

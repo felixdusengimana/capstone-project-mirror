@@ -15,3 +15,9 @@ export enum EStatus {
   FAILED = "FAILED",
   CANCELLED = "CANCELLED",
 }
+
+export enum EApprovalStatus {
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
+}

@@ -79,7 +79,6 @@ const CustomTable = <TData,>({
 }: CustomTableProps<TData>) => {
   const data = table.getRowCount();
   const renderTableContent = useMemo(() => {
-    console.log({ calle: true });
     if (loading) {
       return (
         <>

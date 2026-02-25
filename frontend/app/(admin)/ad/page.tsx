@@ -10,6 +10,7 @@ import SearchInput from "@/components/molecules/SearchInput";
 import Tab from "@/components/molecules/Tab";
 import { useGetAllCountries } from "@/services/resources";
 import { useGetCreators, useGetMe } from "@/services/users";
+import { EApprovalStatus } from "@/types";
 import { ICreatorFilter, IUser } from "@/types/user";
 import {
   createColumnHelper,
@@ -124,7 +125,7 @@ export default function AdminDashboard() {
                 Approve
               </button>
             }
-            newStatus="approved"
+            newStatus={EApprovalStatus.APPROVED}
             userId={info.getValue()}
           />
           <ChangeCreatorStatus
@@ -133,7 +134,7 @@ export default function AdminDashboard() {
                 Reject
               </button>
             }
-            newStatus="rejected"
+            newStatus={EApprovalStatus.REJECTED}
             userId={info.getValue()}
           />
 

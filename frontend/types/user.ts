@@ -1,5 +1,5 @@
-import { EOtpTypes } from "@/services/users";
 import { z } from "zod";
+import { EApprovalStatus } from ".";
 
 export interface IUser {
   id: string;
@@ -19,7 +19,7 @@ export interface IUser {
 
 export interface IApprovalData {
   creatorId: string;
-  approvalStatus: EOtpTypes;
+  approvalStatus: EApprovalStatus;
 }
 
 export interface ICreatorFilter {

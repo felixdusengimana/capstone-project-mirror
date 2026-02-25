@@ -8,6 +8,7 @@ import Profile from "./Profile";
 import CardIcon from "./CardIcon";
 import { useState } from "react";
 import ChangeCreatorStatus from "./ChangeCreatorStatus";
+import { EApprovalStatus } from "@/types";
 
 interface CreatorDialogProps {
   trigger?: React.ReactNode;
@@ -82,7 +83,7 @@ export default function CreatorDialog({ trigger, userId }: CreatorDialogProps) {
                     Approve
                   </button>
                 }
-                newStatus="approved"
+                newStatus={EApprovalStatus.APPROVED}
                 userId="1"
               />
 
@@ -93,7 +94,7 @@ export default function CreatorDialog({ trigger, userId }: CreatorDialogProps) {
                     Reject
                   </button>
                 }
-                newStatus="rejected"
+                newStatus={EApprovalStatus.REJECTED}
                 userId="1"
               />
             </div>
