@@ -98,11 +98,4 @@ public class PaymentTransactionController {
         return ResponseEntity.ok(new ApiResponseObject<>("Transactions retrieved successfully",
                 true,paymentTransactionService.searchTransactions(filter)));
     }
-
-    private void verifyCallBack(String verifyHash, FlwCallBackDto<FlwTransactionDetail> dto){
-       if(!verifyHash.equals(paymentConfig.getFlwVerifyHash())){
-           log.error("Invalid hash {} for FLW callback {}",verifyHash,gson.toJson(dto));
-           throw new IllegalArgumentException("We could not validate callback");
-       }
-    }
 }

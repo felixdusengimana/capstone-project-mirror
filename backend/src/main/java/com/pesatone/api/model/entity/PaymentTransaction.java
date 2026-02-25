@@ -68,4 +68,8 @@ public class PaymentTransaction {
         return paymentStatus != null &&
                 List.of(PaymentStatusEnum.PENDING, PaymentStatusEnum.FAILED).contains(paymentStatus);
     }
+
+    public boolean isSuccessful(){
+        return paymentStatus != null && paymentStatus.equals(PaymentStatusEnum.SUCCESSFUL);
+    }
 }

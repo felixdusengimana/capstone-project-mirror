@@ -38,23 +38,36 @@ public class PaymentProcessingServiceImpl implements PaymentProcessingService {
     public PaymentTransaction processPayment(PaymentTransaction transaction, PaymentDto paymentDto) {
         if(transaction.canProcessPayment() && isValidPayment(transaction, paymentDto)){
             transaction.setPaymentStatus(paymentDto.paymentStatus());
-            transaction.setPaidAt(paymentDto.paidAt());
             transaction.setProviderReference(paymentDto.providerReference());
-            transaction.setPaymentChannel(paymentDto.paymentChannel().toUpperCase());
+            if(transaction.isSuccessful()){
+                transaction.setPaidAt(paymentDto.paidAt());
+                transaction.setPaymentChannel(paymentDto.paymentChannel().toUpperCase());
+                RoundingMode roundingMode = RoundingMode.HALF_UP;
 
-            RoundingMode roundingMode = RoundingMode.HALF_UP;
+                BigDecimal transactionFee =  transaction.getAmount()
+                        .multiply(BigDecimal.valueOf(paymentConfig.getTransactionFeePercentage()))
+                        .divide(BigDecimal.valueOf(100), roundingMode)
+                        .setScale(2, roundingMode);
 
-            BigDecimal transactionFee =  transaction.getAmount()
-                    .multiply(BigDecimal.valueOf(paymentConfig.getTransactionFeePercentage()))
-                    .divide(BigDecimal.valueOf(100), roundingMode)
-                    .setScale(2, roundingMode);
+                transaction.setTransactionFee(transactionFee);
 
-            transaction.setTransactionFee(transactionFee);
+                Wallet wallet = walletService.getOrCreateWallet(transaction.getCreator(), transaction.getCurrency());
+                walletService.credit(wallet, transaction);
+                walletService.debit(wallet, transaction, transactionFee);
 
-            Wallet wallet = walletService.getOrCreateWallet(transaction.getCreator(), transaction.getCurrency());
-            walletService.credit(wallet, transaction);
-            walletService.debit(wallet, transaction, transactionFee);
+                String donorName = StringUtils.defaultIfBlank(transaction.getDonorName(), "A fan ");
+                String creatorName = StringUtils.defaultIfBlank(transaction.getCreator().getName(), " ");
+                String emailBody = "<b>Hello " +  creatorName + ",</b> <br/>" +
+                        donorName + " gifted you <b>"+ AppUtil.formatAmount(transaction.getAmount())+ transaction.getCurrency().name() +"</b> <br/><br/>";
+                if(StringUtils.isNotBlank(transaction.getNote())){
+                    emailBody += "<b>With a note : </b>" + transaction.getNote() + "<br/><br/>";
+                }
+                emailBody+= "Your Pesatone balance is now <b>"+ AppUtil.formatAmount(wallet.getBalance())+ wallet.getCurrency().name() +"</b> <br/><br/>" +
+                        " <br/>";
 
+                notificationService.sendEmail(transaction.getCreator().getEmail(), "Funds Received", emailBody);
+
+            }
             return paymentTransactionRepository.save(transaction);
         }
         return transaction;
