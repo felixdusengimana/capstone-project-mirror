@@ -9,8 +9,8 @@ import DateRagePicker from "@/components/molecules/DateRagePicker";
 import SearchInput from "@/components/molecules/SearchInput";
 import Tab from "@/components/molecules/Tab";
 import { useGetAllCountries } from "@/services/resources";
-import { useGetTransactions } from "@/services/transactions";
-import { useGetMe } from "@/services/users";
+import { useGetCreators, useGetMe } from "@/services/users";
+import { ICreatorFilter, IUser } from "@/types/user";
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -22,29 +22,21 @@ import { useState } from "react";
 
 export default function AdminDashboard() {
   const searchParams = useSearchParams();
-  const { data } = useGetTransactions({
-    pageSize: 10,
+  const [filters, setFilters] = useState<Partial<ICreatorFilter>>({
     pageNumber: 1,
-    startDate: "2024-04-26",
-    endDate: "2024-04-26",
+    pageSize: 10,
+    name: "",
   });
-  console.log({ data });
+  const { data: creators, isPending: isLoadingCreators } =
+    useGetCreators(filters);
 
-  const [filters, setFilters] = useState({} as Record<string, string>);
   const status = searchParams.get("status");
   const { data: user } = useGetMe();
   const { data: countries, isPending } = useGetAllCountries({
     enabled: Boolean(user?.data.id),
   });
 
-  const columnHelper = createColumnHelper<{
-    id: string;
-    name: string;
-    email: string;
-    phoneNumber: string;
-    country: string;
-    attachment: string;
-  }>();
+  const columnHelper = createColumnHelper<IUser>();
 
   const [columns] = useState(() => [
     columnHelper.accessor("name", {
@@ -53,7 +45,7 @@ export default function AdminDashboard() {
         <CreatorDialog
           trigger={
             <div className="flex gap-2 items-center">
-              <Avatar src="/profiles/profile1.png" />
+              <Avatar src={info.row.original.profileImageUrl ?? ""} />
               <span className="font-medium text-sm text-gray-500">
                 {info.getValue()}
               </span>
@@ -93,7 +85,7 @@ export default function AdminDashboard() {
       footer: (info) => info.column.id,
     }),
 
-    columnHelper.accessor("country", {
+    columnHelper.accessor("countryName", {
       id: "country",
       cell: (info) => (
         <span className="font-normal text-sm text-gray-500">
@@ -106,7 +98,7 @@ export default function AdminDashboard() {
       footer: (info) => info.column.id,
     }),
 
-    columnHelper.accessor("attachment", {
+    columnHelper.accessor("bio", {
       id: "attachment",
       cell: (info) => (
         <a className="flex gap-1 text-[#00B7FE] hover:underline">
@@ -159,16 +151,7 @@ export default function AdminDashboard() {
 
   const table = useReactTable({
     columns,
-    data: [
-      {
-        id: "1",
-        name: "Brooklyn Simmons",
-        email: "wenzlaff@mac.com",
-        phoneNumber: "(316) 555-0116",
-        country: "Rwanda",
-        attachment: "ID_Proof.pdf",
-      },
-    ],
+    data: creators?.data?.results ?? [],
     getCoreRowModel: getCoreRowModel(),
   });
 
@@ -187,7 +170,10 @@ export default function AdminDashboard() {
               <p className="font-normal text-base text-gray-700 flex justify-between">
                 Search
               </p>
-              <SearchInput className="bg-gray-50 border border-gray-200 rounded-md w-[257px] py-2 px-4" />
+              <SearchInput
+                onSearch={(query) => setFilters({ ...filters, name: query })}
+                className="bg-gray-50 border border-gray-200 rounded-md w-[257px] py-2 px-4"
+              />
             </div>
 
             <div>
@@ -195,10 +181,10 @@ export default function AdminDashboard() {
                 isLoading={isPending}
                 label="Country"
                 className="w-[257px]"
-                onChange={(e) =>
-                  setFilters({ ...filters, country: e.target.value })
-                }
-                value={filters.country || "all"}
+                // onChange={(e) =>
+                // setFilters({ ...filters, country: e.target.value })
+                // }
+                // value={filters.country || "all"}
               >
                 <option value="all">All</option>
                 {countries?.data.map((country) => (
@@ -234,11 +220,14 @@ export default function AdminDashboard() {
           />
           <CustomTable
             table={table}
+            loading={isLoadingCreators}
             pagination={{
-              currentPage: 2,
-              onPageChange: () => {},
-              perPage: 10,
-              total: 1000,
+              currentPage: filters.pageNumber ?? 0,
+              onPageChange: (page) => {
+                setFilters({ ...filters, pageNumber: page });
+              },
+              perPage: filters?.pageSize ?? 0,
+              total: creators?.data?.total ?? 1000,
             }}
           />
         </div>

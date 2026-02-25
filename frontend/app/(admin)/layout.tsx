@@ -28,7 +28,7 @@ export default function DashBoardLayout({ children }: { children: ReactNode }) {
   ] as { label: string; icon: IconNames; href: string }[];
 
   return (
-    <div className="h-screen flex bg-white relative">
+    <div className="min-h-screen flex bg-white relative">
       <div className={`bg-white`}>
         <Sidebar links={links} isAdmin />
       </div>

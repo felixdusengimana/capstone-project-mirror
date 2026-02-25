@@ -1,8 +1,6 @@
 export const ObjectToParams = (obj: { [key: string]: unknown }) => {
   return Object.keys(obj)
-    .filter(
-      (key) => obj[key] !== undefined || obj[key] !== null || obj[key] !== ""
-    )
+    .filter((key) => obj[key] !== undefined || obj[key] !== null)
     .map((key) => key + "=" + obj[key])
     .join("&");
 };
