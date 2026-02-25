@@ -1,7 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "./axiosInstance";
 import { IResponse, ISorted } from "@/types/common";
-import { ICreateUser, ICreatorFilter, IUser } from "@/types/user";
+import {
+  IApprovalData,
+  ICreateUser,
+  ICreatorFilter,
+  IUser,
+} from "@/types/user";
 import { ObjectToParams } from "@/utils/params";
 
 export enum EOtpTypes {
@@ -53,6 +58,10 @@ export function useGetCreator(id: string) {
     queryKey: ["creator", id],
     queryFn: async () => axiosInstance.get(`/users/creators/${id}`),
   });
+}
+
+export function ApproveCreator(data: IApprovalData) {
+  return axiosInstance.post(`/users/approvals`, data);
 }
 
 export function GenerateOTP({ otpType }: { otpType: EOtpTypes }) {

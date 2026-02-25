@@ -125,7 +125,7 @@ export default function AdminDashboard() {
               </button>
             }
             newStatus="approved"
-            userId="1"
+            userId={info.getValue()}
           />
           <ChangeCreatorStatus
             trigger={
@@ -133,8 +133,8 @@ export default function AdminDashboard() {
                 Reject
               </button>
             }
-            newStatus="approved"
-            userId="1"
+            newStatus="rejected"
+            userId={info.getValue()}
           />
 
           <button className="bg-white px-4 py-2 font-medium text-sm text-white rounded-lg border border-[#E5E9F0]">

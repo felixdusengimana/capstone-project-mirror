@@ -1,3 +1,4 @@
+import { EOtpTypes } from "@/services/users";
 import { z } from "zod";
 
 export interface IUser {
@@ -14,6 +15,11 @@ export interface IUser {
   industryName: string;
   socialLinks: ISocialLink[];
   verified: boolean;
+}
+
+export interface IApprovalData {
+  creatorId: string;
+  approvalStatus: EOtpTypes;
 }
 
 export interface ICreatorFilter {
