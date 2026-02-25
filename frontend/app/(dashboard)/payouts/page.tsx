@@ -1,41 +1,25 @@
-import Button from "@/components/atoms/Button";
-
-import Icon from "@/components/atoms/Icon";
+"use client";
 import Pill from "@/components/atoms/Pill";
+import { useGetAllPayouts } from "@/services/payouts";
+import { useGetMe } from "@/services/users";
+import { EStatus } from "@/types";
+import { IPayoutsFilters } from "@/types/payouts";
 import dynamic from "next/dynamic";
+import { useState } from "react";
 const WithdrawForm = dynamic(
   () => import("@/components/molecules/WithdrawForm"),
   { ssr: false }
 );
 
-export default function page() {
-  const data = [
-    {
-      date: "15 January 2024",
-      amount: 150000,
-      status: "success",
-    },
-    {
-      date: "15 January 2024",
-      amount: 150000,
-      status: "pending",
-    },
-    {
-      date: "15 January 2024",
-      amount: 150000,
-      status: "pending",
-    },
-    {
-      date: "15 January 2024",
-      amount: 150000,
-      status: "success",
-    },
-    {
-      date: "15 January 2024",
-      amount: 150000,
-      status: "success",
-    },
-  ];
+export default function PayoutsPage() {
+  const { data: creator } = useGetMe();
+  const [filters, setFilters] = useState<Partial<IPayoutsFilters>>({
+    creatorTag: `@${creator?.data.username}`,
+    pageNumber: 1,
+    pageSize: 10,
+  });
+  const { data: payouts } = useGetAllPayouts(filters);
+
   return (
     <div className="min-h-full w-full dashboard-padding text-black pb-10">
       <h1 className="text-4xl font-sans font-bold text-[#1A1A1A]">Payouts</h1>
@@ -62,20 +46,27 @@ export default function page() {
           <p className="text-gray-400 text-sm font-normal pl-2">Amount</p>
           <p className="text-gray-400 text-sm font-normal pl-2">Status</p>
         </div>
-        {data.map((item, index) => (
+        {payouts?.data.results && payouts?.data.results.length <= 0 && (
+          <div className="mt-2">No payouts data found</div>
+        )}
+        {payouts?.data.results?.map((item, index) => (
           <div className="grid grid-cols-3 py-[11px]" key={index}>
             <p className="text-gray-600 font-normal text-sm pl-2">
-              {item.date}
+              {item.processedAt}
             </p>
             <p className="text-gray-600 font-normal text-sm pl-2">
               {item.amount}
             </p>
             <Pill
-              variant={item.status == "success" ? "success" : "warning"}
+              variant={
+                item.paymentStatus === EStatus.SUCCESSFUL
+                  ? "success"
+                  : "warning"
+              }
               className="py-1 capitalize"
               bordered
             >
-              {item.status}
+              {item.paymentStatus}
             </Pill>
           </div>
         ))}

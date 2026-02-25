@@ -56,7 +56,7 @@ export function useGetCreator(id: string) {
 }
 
 export function GenerateOTP({ otpType }: { otpType: EOtpTypes }) {
-  return axiosInstance.post(`/users/otp`, { otpType });
+  return axiosInstance.post(`/otp`, { otpType });
 }
 
 export function VerifyOTP({

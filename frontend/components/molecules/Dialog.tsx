@@ -9,6 +9,7 @@ export interface DialogProps extends React.HTMLAttributes<HTMLElement> {
   titleClassName?: string;
   children: React.ReactNode;
   className?: string;
+  preventCloseOnClickOutside?: boolean;
 }
 
 export default function Dialog({
@@ -16,6 +17,7 @@ export default function Dialog({
   titleClassName,
   children,
   className,
+  preventCloseOnClickOutside,
   ...rest
 }: DialogProps) {
   return (
@@ -33,7 +35,13 @@ export default function Dialog({
            scrollbar-track-gray-50 scrollbar-track-rounded-lg scrollbar-thumb-rounded-lg h-auto z-50 grid gap-4 overflow-y-auto rounded-b-2xl border bg-white shadow-lg ${className}`}
           style={{ maxWidth: "90%" }}
         >
-          <DialogPrimitives.Content>{children}</DialogPrimitives.Content>
+          <DialogPrimitives.Content
+            onInteractOutside={(e) => {
+              preventCloseOnClickOutside && e.preventDefault();
+            }}
+          >
+            {children}
+          </DialogPrimitives.Content>
         </motion.div>
       </motion.div>
     </DialogPrimitives.Portal>

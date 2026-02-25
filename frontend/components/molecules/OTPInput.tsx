@@ -27,6 +27,11 @@ export default function OTPInput({
   });
 
   useEffect(() => {
+    if (!isPending) mutate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     if (countDown > 0) {
       const timer = setTimeout(() => {
         setCountDown(countDown - 1);

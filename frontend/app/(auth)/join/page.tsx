@@ -183,13 +183,6 @@ export default function Join() {
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col p-7 lg:p-0 text-gray-700 justify-between h-full"
     >
-      <p className="text-right font-light text-lg text-gray-500">
-        Already have an account,{" "}
-        <Link href={"/login"} className="font-medium underline">
-          Login
-        </Link>
-      </p>
-
       <div className="w-full pb-5 lg:pb-[100px]">
         <Progress active={parseInt(step!)} total={STEPS} />
         {step === "1" ? (
