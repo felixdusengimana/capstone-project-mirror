@@ -160,7 +160,9 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
                         qPaymentTransaction.transactionFee,
                         qPaymentTransaction.transactionReference,
                         qPaymentTransaction.paidAt,
-                        qPaymentTransaction.note
+                        qPaymentTransaction.note,
+                        qPaymentTransaction.donorName,
+                        qPaymentTransaction.currency
                 ))
                 .fetchPage(filter.getOffset(), filter.getPageNumber());
 
