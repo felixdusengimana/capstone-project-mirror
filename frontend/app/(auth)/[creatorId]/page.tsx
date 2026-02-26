@@ -191,7 +191,7 @@ export default function SupportCreator() {
               <h1 className="text-[#374151] text-4xl font-mono text-center">
                 Pesatone makes Supporting fun and easy.
               </h1>
-              <div className="animate-pulse w-full lg:w-[598px] flex flex-col items-center justify-between gap-10  rounded-2xl border border-gray-200 pt-24 pb-[61px] px-20 relative">
+              <div className="animate-pulse w-full lg:w-[598px] flex flex-col items-center justify-between gap-10  rounded-2xl border border-gray-200 pt-24 pb-[61px] px-5 md:px-20 relative">
                 <div className="absolute -top-16">
                   <Avatar size="xl" src="" />
                 </div>
@@ -221,7 +221,7 @@ export default function SupportCreator() {
           ) : (
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className="flex flex-col items-center gap-24 h-full p-8 lg:p-0"
+              className="flex flex-col items-center gap-2 lg:gap-24 h-full py-8 lg:py-0"
             >
               <div className="w-full lg:w-[598px] flex flex-col items-center justify-between gap-10  rounded-2xl border border-gray-200 pt-24 pb-[61px] px-20 relative">
                 <div className="absolute -top-16">

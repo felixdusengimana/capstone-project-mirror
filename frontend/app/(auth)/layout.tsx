@@ -14,7 +14,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     <div className="flex h-screen">
       <div
         className={`flex-grow bg-white ${
-          isCreator ? "pt-[78px]" : "py-0 pt-20 lg:py-[78px]"
+          isCreator ? "pt-10 lg:pt-[78px]" : "py-0 pt-20 lg:py-[78px]"
         } px-0 md:px-16 lg:px-[120px] overflow-auto`}
       >
         <Suspense fallback={<p>Loading...</p>}>{children}</Suspense>

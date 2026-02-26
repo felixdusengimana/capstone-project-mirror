@@ -31,7 +31,7 @@ export default function Dialog({
           transition={{
             delay: 0.1,
           }}
-          className={`relative max-h-[90vh] min-w-[600px] scrollbar-thin rounded-lg scrollbar-thumb-[#c0c0c0]
+          className={`relative max-h-[90vh] min-w-[calc(100vw-50px)] md:min-w-[600px] scrollbar-thin rounded-lg scrollbar-thumb-[#c0c0c0]
            scrollbar-track-gray-50 scrollbar-track-rounded-lg scrollbar-thumb-rounded-lg h-auto z-50 grid gap-4 overflow-y-auto rounded-b-2xl border bg-white shadow-lg ${className}`}
           style={{ maxWidth: "90%" }}
         >

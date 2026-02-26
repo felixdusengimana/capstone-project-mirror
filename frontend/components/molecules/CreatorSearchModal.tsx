@@ -51,7 +51,7 @@ export default function CreatorSearchModal({
           className={`mt-8 ${className}`}
         />
       </DialogTrigger>
-      <Dialog className="pt-4 min-w-[600px]">
+      <Dialog className="pt-4 max-w-[calc(100vw-200px)] lg:min-w-[600px]">
         <SearchInput onSearch={(query) => setQuery(query)} />
         <div className="">
           {isLoading ? (
