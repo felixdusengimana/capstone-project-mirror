@@ -2,6 +2,7 @@
 import Pill from "@/components/atoms/Pill";
 import { useGetAllPayouts } from "@/services/payouts";
 import { useGetMe } from "@/services/users";
+import { useGetWallet } from "@/services/wallet";
 import { EStatus } from "@/types";
 import { IPayoutsFilters } from "@/types/payouts";
 import dynamic from "next/dynamic";
@@ -18,6 +19,8 @@ export default function PayoutsPage() {
     pageNumber: 1,
     pageSize: 10,
   });
+  const { data: wallet, isLoading: walletLoading } = useGetWallet();
+
   const { data: payouts } = useGetAllPayouts(filters, !creator?.data?.username);
 
   return (
@@ -29,10 +32,16 @@ export default function PayoutsPage() {
           <p className="text-gray-400 text-sm font-medium">
             Outstanding balance
           </p>
-          <h3 className=" text-gray-800 font-medium text-4xl flex items-center gap-2 mt-4">
-            <span className="font-normal text-base text-gray-400">RWF</span>{" "}
-            150,000
-          </h3>
+          {walletLoading ? (
+            <div className="animate-pulse h-8 w-24 bg-gray-200 rounded-lg mt-4"></div>
+          ) : (
+            <h3 className=" text-gray-800 font-medium text-4xl flex items-center gap-2 mt-4">
+              <span className="font-normal text-base text-gray-400">
+                {wallet?.data?.currency}
+              </span>{" "}
+              {wallet?.data.balance.toLocaleString()}
+            </h3>
+          )}
         </div>
         <WithdrawForm />
       </div>

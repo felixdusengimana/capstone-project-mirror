@@ -52,28 +52,28 @@ export default function page() {
               src="/profiles/profile4.png"
               size="2xl"
               circle={false}
-              className="ml-[-20px]"
+              className="ml-[-20px]  bg-transparent"
             />
             <Avatar
               alt="Profile 2"
               src={"/profiles/profile3.png"}
               size="2xl"
               circle={false}
-              className="mt-[36px]"
+              className="mt-[36px]  bg-transparent"
             />
             <Avatar
               alt="Profile 3"
               src={"/profiles/profile2.png"}
               size="2xl"
               circle={false}
-              className="ml-[-20px]"
+              className="ml-[-20px]  bg-transparent"
             />
             <Avatar
               alt="Profile 4"
               src={"/profiles/profile1.png"}
               size="2xl"
               circle={false}
-              className="mt-[36px]"
+              className="mt-[36px]  bg-transparent"
             />
           </div>
           <div className="flex flex-col justify-center">
@@ -119,21 +119,21 @@ export default function page() {
               src="/profiles/profile5.png"
               size="2xl"
               circle={false}
-              className="ml-[-20px]"
+              className="ml-[-20px] bg-transparent"
             />
             <Avatar
               alt="Profile 8"
               src={"/profiles/profile8.png"}
               size="2xl"
               circle={false}
-              className="mt-[36px]"
+              className="mt-[36px]  bg-transparent"
             />
             <Avatar
               alt="Profile 6"
               src={"/profiles/profile6.png"}
               size="2xl"
               circle={false}
-              className="ml-[-20px]"
+              className="ml-[-20px]  bg-transparent"
             />
 
             <Avatar
@@ -141,7 +141,7 @@ export default function page() {
               src={"/profiles/profile7.png"}
               size="2xl"
               circle={false}
-              className="mt-[36px]"
+              className="mt-[36px]  bg-transparent"
             />
           </div>
         </div>

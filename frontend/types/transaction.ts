@@ -8,6 +8,7 @@ export interface ITransaction {
   transactionReference: string;
   paidAt: string;
   donorName: string;
+  donorEmail?: string;
   currency: ECurrency;
 }
 

@@ -60,12 +60,14 @@ export default function SupportCreator() {
             logo: "/app-logo.svg",
           },
           callback: function (success_data: TransactionData) {
-            seSuccessPayment(true);
+            if (success_data.status === "successful") {
+              seSuccessPayment(true);
+            } else {
+              toast.error("Payment failed");
+            }
           },
-
-          onclose: function () {
-            toast.error("Payment cancelled!");
-          },
+          // success_data
+          onclose: function () {},
         });
       } else {
         toast.error("Error initiating this payment");
@@ -172,7 +174,7 @@ export default function SupportCreator() {
               Thank you for supporting{" "}
               <span className="font-bold">{data?.data?.name}</span>
               <br />
-              You support have been sent
+              Your support have been sent
             </p>
           </div>
 

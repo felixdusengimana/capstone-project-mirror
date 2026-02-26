@@ -15,6 +15,8 @@ import OTPInput from "./OTPInput";
 import { useMutation } from "@tanstack/react-query";
 import { InitiatePayouts } from "@/services/payouts";
 import toast from "react-hot-toast";
+import { useGetWallet } from "@/services/wallet";
+import { z } from "zod";
 
 export default function WithdrawForm({
   trigger,
@@ -25,13 +27,37 @@ export default function WithdrawForm({
   const [active, setActive] = useState<"form" | "otp" | "success">("form");
   const [open, setOpen] = useState(false);
 
+  const { data: wallet, isLoading: walletLoading } = useGetWallet();
+
   const {
     handleSubmit,
     setValue,
     watch,
     formState: { errors },
   } = useForm<IInitiatePayout>({
-    resolver: zodResolver(payout),
+    resolver: zodResolver(
+      z.object({
+        amount: z
+          .number({
+            required_error: "Amount is required",
+          })
+          .min(1000, "Amount must be greater than 10")
+          .max(
+            wallet?.data.balance ?? 0,
+            `Amount must be less than ${wallet?.data.balance.toLocaleString()} ${
+              wallet?.data.currency
+            }`
+          ),
+        paymentChannel: z.nativeEnum(EChannel, {
+          required_error: "Payment channel is required",
+          invalid_type_error: "Pleas select payment channel",
+        }),
+        currency: z.nativeEnum(ECurrency, {
+          required_error: "Currency is required",
+          invalid_type_error: "Pleas select Currency",
+        }),
+      })
+    ),
     defaultValues: {
       currency: ECurrency.RWF,
     },
@@ -87,12 +113,16 @@ export default function WithdrawForm({
                 <p className="text-gray-500 text-base font-light">
                   Available to withdraw
                 </p>
-                <h1 className="text-gray-800 font-medium text-4xl flex items-center gap-2 mt-4">
-                  <span className="font-normal text-base text-gray-400">
-                    RWF
-                  </span>{" "}
-                  50,000
-                </h1>
+                {walletLoading ? (
+                  <div className="animate-pulse h-8 w-24 bg-gray-200 rounded-lg mt-4"></div>
+                ) : (
+                  <h3 className=" text-gray-800 font-medium text-4xl flex items-center gap-2 mt-4">
+                    <span className="font-normal text-base text-gray-400">
+                      {wallet?.data?.currency}
+                    </span>{" "}
+                    {wallet?.data.balance.toLocaleString()}
+                  </h3>
+                )}
               </div>
 
               <form
@@ -152,7 +182,11 @@ export default function WithdrawForm({
 
                 <div className="flex flex-col gap-4">
                   <Button
-                    disabled={Object.keys(errors).length > 0 || isLoading}
+                    disabled={
+                      Object.keys(errors).length > 0 ||
+                      isLoading ||
+                      walletLoading
+                    }
                     className="w-full mt-8"
                     isLoading={isSendingOTP}
                   >

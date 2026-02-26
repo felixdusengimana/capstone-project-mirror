@@ -72,7 +72,7 @@ export default function Sidebar({
         </div>
       </div>
 
-      {!isAdmin && (
+      {!isAdmin && !usr?.data?.verified ? (
         <div className="flex flex-col mt-[96px] mb-[76px] gap-[15px] items-center justify-center bg-gray-50 border border-gray-200 px-[39px] py-[31px] rounded-lg">
           <Image alt="" src="/dance.svg" width={204} height={130} />
           <p className="text-center text-[#475569] text-sm font-normal">
@@ -80,7 +80,7 @@ export default function Sidebar({
           </p>
           <VerifyAccount />
         </div>
-      )}
+      ) : null}
 
       <div>
         <Button

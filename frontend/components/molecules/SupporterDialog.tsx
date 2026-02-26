@@ -7,19 +7,22 @@ import SidebarDialog, {
 import Profile from "./Profile";
 import CardIcon from "./CardIcon";
 import { useState } from "react";
+import { useGetTransactionByReference } from "@/services/transactions";
 
 interface SupporterDialogProps {
   trigger?: React.ReactNode;
-  userId?: string;
+  referenceId: string;
 }
 export default function SupporterDialog({
   trigger,
-  userId,
+  referenceId,
 }: SupporterDialogProps) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => {
     setOpen(!open);
   };
+
+  const { data: transaction } = useGetTransactionByReference(referenceId);
 
   return (
     <SidebarDialogRoot open={open} onOpenChange={handleOpen}>
@@ -34,14 +37,14 @@ export default function SupporterDialog({
           <div className="mt-20">
             <Profile
               user={{
-                name: "TheHitmaker",
-                photo: "/profiles/profile1.png",
-                date: "Manziolivier250@gmail.com",
+                name: transaction?.data?.donorName ?? "",
+                photo: "",
+                date: transaction?.data?.donorEmail ?? "",
               }}
             />
 
             <p className="text-[#475569] mt-4 mx-w-[382px] p-4">
-              Hey TheBen, thank your for all the hits after hits, we stan you!
+              {transaction?.data?.note}
             </p>
 
             <div className="h-0.5 w-[273px] mx-auto bg-gray-200 my-16"></div>
@@ -52,17 +55,23 @@ export default function SupporterDialog({
               </h3>
               <div className="flex text-base font-normal text-gray-600 justify-between">
                 <p className="text-gray-400">Amount</p>
-                <p>RWF 50,000</p>
+                <p>
+                  {transaction?.data?.currency}{" "}
+                  {transaction?.data?.amount?.toLocaleString()}
+                </p>
               </div>
 
               <div className="flex text-base font-normal text-gray-600 justify-between">
                 <p className="text-gray-400">Payment fee</p>
-                <p>RWF 100</p>
+                <p>
+                  {transaction?.data?.currency}{" "}
+                  {transaction?.data?.transactionFee}
+                </p>
               </div>
 
               <div className="flex text-base font-normal text-gray-600 justify-between">
                 <p className="text-gray-400">Transaction ID</p>
-                <p>pi_3OkP1XJEtINljGAa0H3Xlm5E</p>
+                <p>{transaction?.data?.transactionReference}</p>
               </div>
             </div>
           </div>

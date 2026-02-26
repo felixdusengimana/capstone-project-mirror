@@ -20,3 +20,10 @@ export function useGetTransactions({
     queryFn: async () => axiosInstance.get(`/transactions?${params}`),
   });
 }
+
+export function useGetTransactionByReference(reference: string) {
+  return useQuery<IResponse<ITransaction>>({
+    queryKey: ["transaction", reference],
+    queryFn: async () => axiosInstance.get(`/transactions/${reference}/status`),
+  });
+}

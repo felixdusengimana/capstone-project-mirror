@@ -60,7 +60,7 @@ export default function CreatorDashboardPage() {
           <div className="text-gray-700 px-6">Loading</div>
         ) : userTransactions?.data?.results &&
           userTransactions?.data?.results.length <= 0 ? (
-          <div className="text-gray-700 px-6"> No information found</div>
+          <div className="text-gray-700 px-6">No information found</div>
         ) : (
           userTransactions?.data?.results?.map((transaction, i) => (
             <div
@@ -70,6 +70,7 @@ export default function CreatorDashboardPage() {
               key={i}
             >
               <SupporterDialog
+                referenceId={transaction.transactionReference}
                 trigger={
                   <div
                     key={i}
@@ -79,7 +80,10 @@ export default function CreatorDashboardPage() {
                       user={{
                         name: transaction.donorName,
                         photo: "",
-                        date: transaction.paidAt,
+                        date:
+                          new Date(transaction.paidAt).toLocaleDateString() +
+                          " " +
+                          new Date(transaction.paidAt).toLocaleTimeString(),
                       }}
                     />
 
@@ -87,7 +91,7 @@ export default function CreatorDashboardPage() {
                       <span className="text-[#838AA2] font-normal">
                         {transaction.currency}
                       </span>{" "}
-                      {transaction.amount.toString()}
+                      {transaction.amount.toLocaleString()}
                     </h3>
                   </div>
                 }
