@@ -40,7 +40,6 @@ export default function SupportCreator() {
     mutationFn: InitiateTransaction,
     onSuccess: async (data) => {
       if (data?.data?.transactionReference) {
-        alert("payment");
         // @ts-ignore
         FlutterwaveCheckout({
           public_key: process.env.NEXT_PUBLIC_FLUTTER_WAVE_KEY,
