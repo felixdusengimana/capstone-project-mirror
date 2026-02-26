@@ -1,9 +1,7 @@
 package com.pesatone.api.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.pesatone.api.configuration.properties.PaymentConfig;
 import com.pesatone.api.model.dto.ApiResponseObject;
 import com.pesatone.api.model.dto.PayoutDto;
@@ -14,8 +12,8 @@ import com.pesatone.api.model.dto.flw.FlwTransactionDetail;
 import com.pesatone.api.model.entity.PaymentTransaction;
 import com.pesatone.api.model.entity.Payout;
 import com.pesatone.api.model.pojo.PaymentTransactionPojo;
-import com.pesatone.api.model.search.response.QueryResultPojo;
 import com.pesatone.api.model.search.filter.TransactionSearchFilter;
+import com.pesatone.api.model.search.response.QueryResultPojo;
 import com.pesatone.api.model.search.response.TransactionSearchResponse;
 import com.pesatone.api.service.PaymentProcessingService;
 import com.pesatone.api.service.PaymentTransactionService;
@@ -34,8 +32,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
-
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -46,7 +42,6 @@ public class PaymentTransactionController {
     private final PaymentProcessingService paymentProcessingService;
     private final PayoutService payoutService;
     private final Gson gson;
-    private final ObjectMapper objectMapper;
     private final PaymentConfig paymentConfig;
 
 
@@ -74,12 +69,11 @@ public class PaymentTransactionController {
 
     @Hidden
     @PostMapping("/flw/callback")
-    public ResponseEntity<ApiResponseObject<String>> processFlutterWaveCallBack(@RequestBody String requestBody,
+    public ResponseEntity<ApiResponseObject<String>> processFlutterWaveCallBack(@RequestBody FlwCallBackDto<?> dto,
                                                                                 @RequestHeader("verif-hash") String verifyHash) {
-        log.info("Callback: {}: {}", requestBody, verifyHash);
+        log.info("Callback: {}: {}", gson.toJson(dto), verifyHash);
 
-        AppUtil.verifyCallBack(verifyHash, paymentConfig.getFlwVerifyHash(), requestBody);
-        FlwCallBackDto<?> dto =  getRequestObject(requestBody);
+        AppUtil.verifyCallBack(verifyHash, paymentConfig.getFlwVerifyHash(), gson.toJson(dto));
         if (dto == null) {
             return ResponseEntity.badRequest().body(new ApiResponseObject<>("Invalid request", false));
         }
@@ -102,12 +96,4 @@ public class PaymentTransactionController {
                 true,paymentTransactionService.searchTransactions(filter)));
     }
 
-    private FlwCallBackDto<?> getRequestObject(String requestBody){
-        try {
-            return objectMapper.readValue(requestBody, new TypeReference<>() {});
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 }
