@@ -40,6 +40,7 @@ export default function SupportCreator() {
     mutationFn: InitiateTransaction,
     onSuccess: async (data) => {
       if (data?.data?.transactionReference) {
+        alert("payment");
         // @ts-ignore
         FlutterwaveCheckout({
           public_key: process.env.NEXT_PUBLIC_FLUTTER_WAVE_KEY,
@@ -47,10 +48,9 @@ export default function SupportCreator() {
           amount: data?.data.amount,
           currency: data?.data.currency,
           payment_options: "card, banktransfer, ussd",
-          // meta: {
-          //   source: "docs-inline-test",
-          //   consumer_mac: "92a3-912ba-1192a",
-          // },
+          meta: {
+            source: "docs-inline-test",
+          },
           customer: {
             email: watch("email"),
             name: data?.data.donorName,
@@ -61,8 +61,10 @@ export default function SupportCreator() {
             logo: "/app-logo.svg",
           },
           callback: function (success_data: TransactionData) {
+            console.log({ success_data });
             seSuccessPayment(true);
           },
+
           onclose: function () {
             console.log("Payment cancelled!");
           },
@@ -91,10 +93,7 @@ export default function SupportCreator() {
 
   return (
     <>
-      <Script
-        src="https://checkout.flutterwave.com/v3.js"
-        strategy="beforeInteractive"
-      ></Script>
+      <Script src="https://checkout.flutterwave.com/v3.js"></Script>
 
       {successPayment ? (
         <div className="relative h-[calc(100vh-300px)] ">
