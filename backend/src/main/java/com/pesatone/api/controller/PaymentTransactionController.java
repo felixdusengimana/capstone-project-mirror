@@ -2,6 +2,7 @@ package com.pesatone.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.pesatone.api.configuration.properties.PaymentConfig;
 import com.pesatone.api.model.dto.ApiResponseObject;
 import com.pesatone.api.model.dto.PayoutDto;
@@ -69,22 +70,18 @@ public class PaymentTransactionController {
 
     @Hidden
     @PostMapping("/flw/callback")
-    public ResponseEntity<ApiResponseObject<String>> processFlutterWaveCallBack(@RequestBody FlwCallBackDto<?> dto,
+    public ResponseEntity<ApiResponseObject<String>> processFlutterWaveCallBack(@RequestBody FlwCallBackDto dto,
                                                                                 @RequestHeader("verif-hash") String verifyHash) {
         log.info("Callback: {}: {}", gson.toJson(dto), verifyHash);
-
         AppUtil.verifyCallBack(verifyHash, paymentConfig.getFlwVerifyHash(), gson.toJson(dto));
-        if (dto == null) {
-            return ResponseEntity.badRequest().body(new ApiResponseObject<>("Invalid request", false));
-        }
         if(dto.isPaymentCallback()) {
-            FlwCallBackDto<FlwTransactionDetail> request = (FlwCallBackDto<FlwTransactionDetail>) dto;
-            PaymentTransaction transaction = paymentTransactionService.getByTransactionReference(request.getData().getTx_ref());
-            paymentProcessingService.processPayment(transaction, request.getData().getPaymentDto());
+            FlwTransactionDetail data = gson.fromJson(gson.toJson(dto.getData()),new TypeToken<FlwTransactionDetail>(){}.getType());
+            PaymentTransaction transaction = paymentTransactionService.getByTransactionReference(data.getTx_ref());
+            paymentProcessingService.processPayment(transaction, data.getPaymentDto());
         } else if (dto.isPayoutCallback()) {
-            FlwCallBackDto<FlwPayoutDetail> request = (FlwCallBackDto<FlwPayoutDetail>) dto;
-            Payout payout = payoutService.getByReference(request.getData().getReference());
-            paymentProcessingService.processPayout(payout, new PayoutDto(request.getData()));
+            FlwPayoutDetail data = gson.fromJson(gson.toJson(dto.getData()),new TypeToken<FlwPayoutDetail>(){}.getType());
+            Payout payout = payoutService.getByReference(data.getReference());
+            paymentProcessingService.processPayout(payout, new PayoutDto(data));
         }
         return ResponseEntity.ok(new ApiResponseObject<>("Successful", true, "Notification received"));
     }

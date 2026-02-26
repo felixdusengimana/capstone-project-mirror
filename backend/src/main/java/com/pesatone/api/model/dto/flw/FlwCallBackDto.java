@@ -1,20 +1,18 @@
 package com.pesatone.api.model.dto.flw;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.LinkedHashMap;
+
 @Getter
 @Setter
-public class FlwCallBackDto<T> {
+public class FlwCallBackDto {
     @NotBlank
     private String event;
 
-    @NotNull
-    @Valid
-    private T data;
+    private LinkedHashMap data;
 
     public boolean isPaymentCallback(){
         return this.event.equalsIgnoreCase("charge.completed");
