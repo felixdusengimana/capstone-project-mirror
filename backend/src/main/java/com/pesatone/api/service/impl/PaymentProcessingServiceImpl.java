@@ -1,5 +1,6 @@
 package com.pesatone.api.service.impl;
 
+import com.google.gson.Gson;
 import com.pesatone.api.configuration.properties.PaymentConfig;
 import com.pesatone.api.model.dto.PaymentDto;
 import com.pesatone.api.model.dto.PayoutDto;
@@ -32,6 +33,7 @@ public class PaymentProcessingServiceImpl implements PaymentProcessingService {
     private final PaymentConfig paymentConfig;
     private final WalletService walletService;
     private final NotificationService notificationService;
+    private final Gson gson;
 
     @Override
     @Transactional
@@ -40,6 +42,7 @@ public class PaymentProcessingServiceImpl implements PaymentProcessingService {
             transaction.setPaymentStatus(paymentDto.paymentStatus());
             transaction.setProviderReference(paymentDto.providerReference());
             if(transaction.isSuccessful()){
+                log.info("Payment: {}", gson.toJson(paymentDto));
                 transaction.setPaidAt(paymentDto.paidAt());
                 transaction.setPaymentChannel(paymentDto.paymentChannel().toUpperCase());
                 RoundingMode roundingMode = RoundingMode.HALF_UP;
