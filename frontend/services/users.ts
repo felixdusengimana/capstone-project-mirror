@@ -17,7 +17,7 @@ export enum EOtpTypes {
 
 export function useGetMe() {
   return useQuery<IResponse<IUser>>({
-    queryKey: ["users"],
+    queryKey: ["me"],
     queryFn: async () => axiosInstance.get("/users/profile"),
   });
 }

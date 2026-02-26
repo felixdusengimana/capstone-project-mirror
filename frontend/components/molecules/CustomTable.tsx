@@ -77,7 +77,6 @@ const CustomTable = <TData,>({
   checkBoxCol,
   ...props
 }: CustomTableProps<TData>) => {
-  const data = table.getRowCount();
   const renderTableContent = useMemo(() => {
     if (loading) {
       return (
@@ -122,7 +121,7 @@ const CustomTable = <TData,>({
       ));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, table, data, checkBoxCol]);
+  }, [loading, table, checkBoxCol]);
 
   return (
     <div {...props}>

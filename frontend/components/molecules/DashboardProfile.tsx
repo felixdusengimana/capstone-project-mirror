@@ -16,6 +16,7 @@ export default function DashboardProfile() {
     <div className="w-full flex flex-col gap-10 bg-white mt-8 px-6 py-7 rounded-lg">
       <div className="flex justify-between ">
         <Profile
+          isUserLoading={isFetchingUser}
           user={{
             name: profile?.data.name ?? "",
             photo: profile?.data.profileImageUrl ?? "",

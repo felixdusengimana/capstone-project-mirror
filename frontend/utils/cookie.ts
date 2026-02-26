@@ -19,7 +19,8 @@ export function removeCookie(name: string): void {
 
 export function getCookie(cookieName: string) {
   // Extract all cookies
-  const cookies = document.cookie.split("; ");
+  if (typeof window === "undefined") return;
+  const cookies = window?.document.cookie.split("; ");
 
   // Find the cookie with the given name
   const cookie = cookies.find((row) => row.startsWith(`${cookieName}=`));

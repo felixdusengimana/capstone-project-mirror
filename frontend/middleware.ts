@@ -34,12 +34,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(`/login`, request.url));
   }
 
-  // if (
-  //   passedCheckCookie?.value !== "true" &&
-  //   extraAuthorized.includes(pathname)
-  // ) {
-  //   return NextResponse.redirect(new URL(`/resolve`, request.url));
-  // }
+  const canAccessAdminPages = passedCheckCookie?.value === "true";
+
+  if (!canAccessAdminPages && extraAuthorized.includes(pathname)) {
+    return NextResponse.redirect(new URL(`/resolve`, request.url));
+  }
 
   return NextResponse.next();
 }

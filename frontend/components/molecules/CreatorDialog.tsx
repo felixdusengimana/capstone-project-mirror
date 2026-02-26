@@ -9,13 +9,16 @@ import CardIcon from "./CardIcon";
 import { useState } from "react";
 import ChangeCreatorStatus from "./ChangeCreatorStatus";
 import { EApprovalStatus } from "@/types";
+import { useGetCreator } from "@/services/users";
+import { IconNames } from "../atoms/Icon";
 
 interface CreatorDialogProps {
   trigger?: React.ReactNode;
-  userId?: string;
+  userId: string;
 }
 export default function CreatorDialog({ trigger, userId }: CreatorDialogProps) {
   const [open, setOpen] = useState(false);
+  const { data: creator, isPending } = useGetCreator(userId!);
   const handleOpen = () => {
     setOpen(!open);
   };
@@ -32,47 +35,30 @@ export default function CreatorDialog({ trigger, userId }: CreatorDialogProps) {
           />
           <div className="mt-20 flex flex-col gap-4">
             <Profile
+              isUserLoading={isPending}
               user={{
-                name: "TheHitmaker",
-                photo: "/profiles/profile1.png",
-                date: "Manziolivier250@gmail.com",
+                name: creator?.data?.name ?? "",
+                photo: creator?.data?.profileImageUrl ?? "",
+                date: creator?.data?.username,
               }}
             />
 
             <div className="max-w-[476px]">
               <h3 className="text-sm text-gray-400 uppercase">Bio</h3>
-              <p className="text-[#475569] mt-0.5">
-                Hey, I&apos;m Rafael a product designer on a mission to create
-                tech magic! I whip up interfaces that people adore and sprinkle
-                pixel-perfect details everywhere
-              </p>
+              <p className="text-[#475569] mt-0.5">{creator?.data?.bio}</p>
             </div>
 
             <div className="flex gap-3 items-center">
-              <CardIcon
-                icon="instagram"
-                className="bg-gray-50 border border-gray-200"
-              />
-              <CardIcon
-                icon="snapchat"
-                className="bg-gray-50 border border-gray-200"
-              />
-              <CardIcon
-                icon="tiktok"
-                className="bg-gray-50 border border-gray-200"
-              />
-              <CardIcon
-                icon="x"
-                className="bg-gray-50 border border-gray-200"
-                fill="#4B5563"
-                stroke="#4B5563"
-                width={20}
-                height={20}
-              />
-              <CardIcon
-                icon="more-horizontal"
-                className="bg-gray-50 border border-gray-200"
-              />
+              {creator?.data.socialLinks?.map((link, index) => (
+                <CardIcon
+                  key={index}
+                  link={link.link}
+                  icon={
+                    (link.platform.toLocaleLowerCase() as IconNames) ?? "alt"
+                  }
+                  className="bg-gray-50 border border-gray-200"
+                />
+              ))}
             </div>
 
             <div className="flex gap-2.5">
@@ -84,7 +70,7 @@ export default function CreatorDialog({ trigger, userId }: CreatorDialogProps) {
                   </button>
                 }
                 newStatus={EApprovalStatus.APPROVED}
-                userId="1"
+                userId={userId}
               />
 
               <ChangeCreatorStatus
@@ -95,7 +81,7 @@ export default function CreatorDialog({ trigger, userId }: CreatorDialogProps) {
                   </button>
                 }
                 newStatus={EApprovalStatus.REJECTED}
-                userId="1"
+                userId={userId}
               />
             </div>
           </div>

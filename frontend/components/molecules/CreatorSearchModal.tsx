@@ -26,7 +26,7 @@ export function SearchTrigger({
     >
       <Icon name="search" stroke={stroke} />
       <p
-        className={`w-full text-left bg-transparent outline-none ${placeholderClassName}`}
+        className={`w-full text-left bg-transparent font-medium text-lg outline-none ${placeholderClassName}`}
       >
         {placeholder}
       </p>

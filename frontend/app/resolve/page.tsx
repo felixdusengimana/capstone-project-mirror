@@ -43,7 +43,7 @@ export default function ResolveScreen() {
             setCookie("pesatoneMiddleMan", "true", 7200);
             return router.replace("/dashboard");
           }
-
+          setCookie("pesatoneMiddleMan", String(step), 7200);
           return router.replace(`/join?step=${step}`);
         }
       }

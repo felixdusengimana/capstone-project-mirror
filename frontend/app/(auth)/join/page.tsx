@@ -7,7 +7,6 @@ import Input from "@/components/atoms/Input";
 import Progress from "@/components/atoms/Progress";
 import Select from "@/components/atoms/Select";
 import TextArea from "@/components/atoms/TextArea";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import countriesFlags from "@/data/countries.json";
@@ -16,7 +15,7 @@ import { useEffect, useState } from "react";
 import { extractDomainFromURL } from "@/utils/URL";
 import { supportedSocials } from "@/utils/socials";
 import { ICountry } from "@/types/resources";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import {
   EOtpTypes,
@@ -25,11 +24,21 @@ import {
   useGetMe,
   VerifyOTP,
 } from "@/services/users";
-import { ICreateUser, step0, step1, step2, step3, step4 } from "@/types/user";
+import {
+  ICreateUser,
+  step0,
+  step1,
+  step2,
+  step3,
+  validateLinks,
+} from "@/types/user";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import OTPInput from "@/components/molecules/OTPInput";
 import { convertEmail } from "@/utils/convertEmail";
+import { getCookie, setCookie } from "@/utils/cookie";
+import ImageCrop from "@/components/organisms/ImageCrop";
+import ImageCropProvider from "@/providers/ImageCropProvider";
 
 export default function Join() {
   const STEPS = 5;
@@ -37,6 +46,8 @@ export default function Join() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const step = searchParams.get("step");
+  const cookieStep = getCookie("pesatoneMiddleMan");
+  const queryClient = useQueryClient();
 
   const { data: industries, isLoading: isLoadingIndustries } =
     useGetAllIndustries({
@@ -52,17 +63,24 @@ export default function Join() {
   const { data: user, isPending: isGettingUser } = useGetMe();
 
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
+  const [renderPage, setRenderPage] = useState(false);
 
   const navigate = () => {
-    if (parseInt(step!) === STEPS) router.replace("/dashboard");
-    else router.replace(`/join?step=${parseInt(step!) + 1}`);
+    if (parseInt(step!) === STEPS) {
+      setCookie("pesatoneMiddleMan", "true", 7200);
+      router.replace("/dashboard");
+    } else {
+      const nextStep = parseInt(step!) + 1;
+      setCookie("pesatoneMiddleMan", String(nextStep), 7200);
+      router.replace(`/join?step=${nextStep}`);
+    }
   };
-  const {
-    mutate,
-    isPending,
-    data: imageUp,
-  } = useMutation({
+
+  const { mutate, isPending } = useMutation({
     onSuccess() {
+      queryClient.invalidateQueries({
+        queryKey: ["me"],
+      });
       toast.success("Profile updated successfully!", { id: "update-profile" });
       navigate();
     },
@@ -87,6 +105,20 @@ export default function Join() {
     mutationFn: VerifyOTP,
   });
 
+  const { mutate: updateProfilePic } = useMutation({
+    mutationFn: UploadProfileImage,
+    onSuccess: () => {
+      toast.success("Profile picture updated successfully", {
+        id: "update-profile",
+      });
+    },
+    onError: () => {
+      toast.error("Error updating Profile picture", {
+        id: "update-profile",
+      });
+    },
+  });
+
   const {
     handleSubmit,
     setValue,
@@ -103,8 +135,11 @@ export default function Join() {
         ? step2
         : step === "4"
         ? step3
-        : step4
+        : validateLinks
     ),
+    defaultValues: {
+      socialLinks: [{ platform: "", link: "" }],
+    },
   });
 
   const onSubmit = async (data: Partial<ICreateUser>) => {
@@ -126,19 +161,16 @@ export default function Join() {
       return navigate();
     }
 
-    if (profilePhoto && !imageUp?.data?.success) {
+    toast.loading("Updating profile...", { id: "update-profile" });
+    if (profilePhoto) {
       const data = new FormData();
       data.append("image", profilePhoto);
-      const response = await UploadProfileImage(data);
-      if (response.data.success) {
-        return toast.error("Profile image upload failed!", {
-          id: "update-profile",
-        });
-      }
+      await updateProfilePic(data);
     }
 
-    toast.loading("Updating profile...", { id: "update-profile" });
-    const socialLinks = data.socialLinks?.filter((link) => link.link);
+    const socialLinks = data.socialLinks?.filter((link) =>
+      Boolean(link.link?.trim())
+    );
     mutate({
       ...data,
       ...(socialLinks && { socialLinks }),
@@ -147,6 +179,14 @@ export default function Join() {
   };
 
   useEffect(() => {
+    const c = Number(cookieStep);
+    if (Number.isNaN(c)) {
+      router.replace("/login");
+    } else if (Number(cookieStep) !== Number(step)) {
+      router.replace(`/join?step=${Number(cookieStep)}`);
+      return;
+    }
+
     if (
       !step ||
       String(parseInt(step)) != step ||
@@ -156,17 +196,22 @@ export default function Join() {
       return router.back();
     }
 
+    setRenderPage(true);
+
     reset({
       bio: user?.data?.bio,
       name: user?.data?.name,
       username: user?.data?.username,
       countryIsoCode: user?.data?.countryName,
       industryCode: user?.data?.industryName,
-      socialLinks: user?.data?.socialLinks ?? [{ platform: "", link: "" }],
+      socialLinks:
+        user?.data?.socialLinks && user?.data?.socialLinks.length > 0
+          ? user?.data?.socialLinks
+          : [{ platform: "", link: "" }],
       image: user?.data?.profileImageUrl,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.data, isGettingUser]);
+  }, [user?.data, isGettingUser, step]);
 
   const handleOTP = (otp: string) => {
     setValue("otp", otp);
@@ -175,6 +220,9 @@ export default function Join() {
     }
   };
 
+  if (!renderPage) return null;
+
+  console.log({ d: watch() });
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -211,51 +259,20 @@ export default function Join() {
               passionate about
             </p>
             <div className="flex flex-col lg:flex-row justify-between gap-10 items-center mt-10">
-              <div className="max-w-[307px] flex flex-col items-center justify-center">
-                <Avatar
-                  size="sxl"
-                  src={
-                    profilePhoto
-                      ? URL.createObjectURL(profilePhoto)
-                      : user?.data.profileImageUrl ?? ""
-                  }
-                  alt="Profile Photo"
-                />
-                <label htmlFor="upload-profile-photo">
-                  <div
-                    className={`mt-6 text-xl font-normal rounded-full border ${
-                      errors.image?.message
-                        ? "border-red-400"
-                        : "border-gray-200"
-                    } flex gap-1 px-4 py-3`}
-                  >
-                    <Icon name="camera" />
-                    <p>Upload Profile</p>
-                  </div>
-                  {errors.image?.message && (
-                    <p className="text-red-500 text-center text-sm mt-2">
-                      Profile photo is required
-                    </p>
-                  )}
-                </label>
-
-                <input
-                  type="file"
-                  accept=".png,.jpg,.jpeg"
-                  hidden
-                  id="upload-profile-photo"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      setProfilePhoto(file);
-                      setValue("image", file.name, {
+              <ImageCropProvider>
+                <ImageCrop
+                  defaultImage={user?.data.profileImageUrl ?? ""}
+                  callbackOnDone={(avatar) => {
+                    if (avatar) {
+                      setProfilePhoto(avatar);
+                      setValue("image", avatar.name, {
                         shouldValidate: true,
                         shouldDirty: true,
                       });
                     }
                   }}
                 />
-              </div>
+              </ImageCropProvider>
               <div className="flex flex-col gap-4 flex-grow max-w-[438px]">
                 <Input
                   label="Your name"
@@ -308,7 +325,7 @@ export default function Join() {
                 </div>
               }
               onChange={(e) =>
-                setValue("username", e.target.value, {
+                setValue("username", e.target.value.trim(), {
                   shouldDirty: true,
                   shouldValidate: true,
                 })
@@ -396,6 +413,10 @@ export default function Join() {
                 return (
                   <div key={index} className="flex items-center">
                     <Input
+                      error={
+                        errors?.socialLinks?.message ||
+                        errors?.socialLinks?.[index]?.link?.message
+                      }
                       label="Social Media Link"
                       className="flex-grow"
                       value={link.link}
@@ -484,7 +505,9 @@ export default function Join() {
                 if (step === "1") {
                   router.back();
                 } else {
-                  router.replace(`/join?step=${parseInt(step!) - 1}`);
+                  const currStep = parseInt(step!) - 1;
+                  setCookie("pesatoneMiddleMan", String(currStep), 7200);
+                  router.replace(`/join?step=${currStep}`);
                 }
               }}
             >

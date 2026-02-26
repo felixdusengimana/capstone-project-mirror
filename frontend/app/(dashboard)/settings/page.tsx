@@ -5,12 +5,14 @@ import Icon, { IconNames } from "@/components/atoms/Icon";
 import Input from "@/components/atoms/Input";
 import TextArea from "@/components/atoms/TextArea";
 import VerifyPhoneModal from "@/components/molecules/VerifyPhoneModal";
-import { UpdateUser, useGetMe } from "@/services/users";
+import ImageCrop from "@/components/organisms/ImageCrop";
+import ImageCropProvider from "@/providers/ImageCropProvider";
+import { UpdateUser, UploadProfileImage, useGetMe } from "@/services/users";
 import { IUpdateUser, updateUser } from "@/types/user";
 import { supportedSocials } from "@/utils/socials";
 import { extractDomainFromURL } from "@/utils/URL";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -19,7 +21,7 @@ import { useDebouncedCallback } from "use-debounce";
 export default function UserSettings() {
   const { data: usr, isLoading } = useGetMe();
   const [openPhoneModal, setOpenPhoneModal] = useState(false);
-
+  const queryClient = useQueryClient();
   const {
     reset,
     setValue,
@@ -27,6 +29,14 @@ export default function UserSettings() {
     formState: { dirtyFields, errors },
   } = useForm<IUpdateUser>({
     resolver: zodResolver(updateUser),
+    defaultValues: {
+      bio: usr?.data?.bio,
+      email: usr?.data?.email,
+      name: usr?.data?.name,
+      phoneNumber: usr?.data?.phoneNumber,
+      socialLinks: usr?.data?.socialLinks,
+      profileImageUrl: usr?.data?.profileImageUrl,
+    },
   });
 
   const {
@@ -35,18 +45,45 @@ export default function UserSettings() {
     isSuccess,
   } = useMutation({
     mutationFn: UpdateUser,
-    onSuccess: () => {
+    onSuccess: (data) => {
+      reset(data?.data);
+      setIsDirty(false);
+      queryClient.invalidateQueries({
+        queryKey: ["me"],
+      });
       toast.success("Profile updated successfully", {
         id: "updatingProfile",
       });
       // if phone number is updated, show the verify phone modal
-      if (dirtyFields.phoneNumber) {
+      if (dirtyFields.phoneNumber && Boolean(data.data?.phoneNumber)) {
         setOpenPhoneModal(true);
       }
     },
+    onError: (error) => {
+      toast.error(error?.message ?? "Error updating Profile", {
+        id: "updatingProfile",
+      });
+    },
   });
 
-  const isUserLoading = isLoading || isUpdating;
+  const { mutate: updateProfilePic, isPending: isUpdatingPic } = useMutation({
+    mutationFn: UploadProfileImage,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["me"],
+      });
+      toast.success("Profile picture updated successfully", {
+        id: "updatingProfile",
+      });
+    },
+    onError: () => {
+      toast.error("Error updating Profile picture", {
+        id: "updatingProfile",
+      });
+    },
+  });
+
+  const isUserLoading = isLoading || isUpdating || isUpdatingPic;
 
   const [isDirty, setIsDirty] = useState(false);
 
@@ -57,17 +94,22 @@ export default function UserSettings() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading]);
 
-  const debouncedUpdateProfile = useDebouncedCallback(() => {
+  const debouncedUpdateProfile = useDebouncedCallback(async () => {
     const dirty = Object.keys(dirtyFields).reduce(
       // @ts-ignore
       (acc, key) => ({ ...acc, [key]: watch(key) }),
       {}
     );
+
+    if (Object.keys(dirty).length <= 0) {
+      return;
+    }
     toast.loading("updating profile information", {
       id: "updatingProfile",
     });
+
     updateProfile(dirty);
-  }, 1000); // Adjust debounce time as needed
+  }, 1500);
 
   const values = Object.values(watch()).join("-");
 
@@ -80,7 +122,7 @@ export default function UserSettings() {
       debouncedUpdateProfile.cancel();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [values]);
+  }, [values, isDirty]);
 
   const handleChange = (name: keyof IUpdateUser, value: string) => {
     setValue(name, value, {
@@ -94,23 +136,21 @@ export default function UserSettings() {
     <div className="min-h-full w-full dashboard-padding text-black pb-10">
       <h1 className="text-4xl font-sans font-bold text-[#1A1A1A]">Settings</h1>
       <div className="max-w-[900px] bg-white px-[67px] py-[55px] w-full rounded-lg mt-8 flex gap-28 justify-between items-start">
-        <div className="max-w-[307px]">
-          <label htmlFor="upload-profile-photo">
-            <Avatar src={usr?.data?.profileImageUrl ?? ""} size="2xl" />
-            <div className="mt-6 text-xlfont-normal rounded-full border border-gray-200 flex gap-1 px-4 py-3">
-              <Icon name="camera" />
-              <p>Upload Profile</p>
-            </div>
-          </label>
-
-          <input
-            type="file"
-            accept=".png;.jpg;.jpeg"
-            hidden
-            id="upload-profile-photo"
-            disabled={isUserLoading}
+        <ImageCropProvider>
+          <ImageCrop
+            defaultImage={usr?.data?.profileImageUrl ?? ""}
+            callbackOnDone={async (avatar) => {
+              if (avatar) {
+                toast.loading("updating profile information", {
+                  id: "updatingProfile",
+                });
+                const data = new FormData();
+                data.append("image", avatar);
+                updateProfilePic(data);
+              }
+            }}
           />
-        </div>
+        </ImageCropProvider>
         <div className="flex flex-grow flex-col gap-4">
           <Input
             label="Your name"
@@ -225,10 +265,13 @@ export default function UserSettings() {
             disabled={isUpdating}
             outline={true}
             onClick={() =>
-              setValue("socialLinks", [
-                ...watch("socialLinks"),
-                { platform: "", link: "" },
-              ])
+              setValue(
+                "socialLinks",
+                [...watch("socialLinks"), { platform: "", link: "" }],
+                {
+                  shouldDirty: false,
+                }
+              )
             }
             type="button"
           >

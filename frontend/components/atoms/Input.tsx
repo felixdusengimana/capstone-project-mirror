@@ -67,7 +67,7 @@ export default function Input({ value, ...props }: InputProps) {
         <div
           className={`w-full flex items-center px-4 border rounded-xl  ${
             error ? "border-red-400 bg-red-50" : "border-[#E5E9F0] bg-slate-50 "
-          }`}
+          } ${props?.disabled ? "bg-gray-400" : ""}`}
         >
           {left && <>{left}</>}
           <input

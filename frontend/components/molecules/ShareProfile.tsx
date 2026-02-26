@@ -19,6 +19,7 @@ export default function ShareProfile({
   const creatorLink =
     window.location.hostname +
     (window.location.port ? `:${window.location.port}` : "") +
+    "/" +
     profile?.username;
 
   const qrCodeRef = useRef(null);
@@ -83,7 +84,12 @@ export default function ShareProfile({
             variant={linkCopied ? "success" : "gray"}
             onClick={() => {
               navigator.clipboard?.writeText(creatorLink ?? "");
-              setLinkCopied(!linkCopied);
+              setLinkCopied(true);
+
+              // Reset linkCopied state after 1.5 seconds
+              setTimeout(() => {
+                setLinkCopied(false);
+              }, 1500);
             }}
           >
             <p className="text-base font-medium">

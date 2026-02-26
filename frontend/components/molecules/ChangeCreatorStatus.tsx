@@ -1,7 +1,7 @@
 import Dialog, { DialogRoot, DialogTrigger } from "./Dialog";
 import Icon from "../atoms/Icon";
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ApproveCreator } from "@/services/users";
 import toast from "react-hot-toast";
 import { EApprovalStatus } from "@/types";
@@ -20,6 +20,7 @@ export default function ChangeCreatorStatus({
   className,
 }: ChangeCreatorStatusProps) {
   const [open, setOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
     mutationFn: () =>
@@ -29,6 +30,9 @@ export default function ChangeCreatorStatus({
       }),
     onSuccess: () => {
       handleClose();
+      queryClient.invalidateQueries({
+        queryKey: ["creators"],
+      });
       toast.success("Creator approved");
     },
     onError: () => toast.error("Error approving creator"),

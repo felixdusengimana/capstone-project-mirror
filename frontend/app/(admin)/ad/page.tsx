@@ -28,8 +28,9 @@ export default function AdminDashboard() {
     pageSize: 10,
     name: "",
   });
-  const { data: creators, isPending: isLoadingCreators } =
-    useGetCreators(filters);
+  const { data: creators, isLoading, isRefetching } = useGetCreators(filters);
+
+  const isLoadingCreators = isRefetching || isLoading;
 
   const status = searchParams.get("status");
   const { data: user } = useGetMe();
@@ -44,6 +45,7 @@ export default function AdminDashboard() {
       id: "name",
       cell: (info) => (
         <CreatorDialog
+          userId={info.row.original.id}
           trigger={
             <div className="flex gap-2 items-center">
               <Avatar src={info.row.original.profileImageUrl ?? ""} />
@@ -157,7 +159,7 @@ export default function AdminDashboard() {
   });
 
   return (
-    <div className="w-full bg-gray-200">
+    <div className="w-full px-10 bg-gray-200">
       <div className="w-full max-w-[1124px] mx-auto py-10">
         <div className="w-full flex justify-between items-center">
           <h1 className="text-2xl font-semibold text-gray-800 ">

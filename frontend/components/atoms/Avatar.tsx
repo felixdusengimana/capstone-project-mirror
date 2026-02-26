@@ -51,12 +51,12 @@ export default function Avatar({ ...props }: AvatarProps) {
       } flex items-center justify-center overflow-hidden relative ${className}`}
     >
       {!imageError && src ? (
-        <Image
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
           src={src}
           alt={alt ?? ""}
-          fill={true}
           className={`w-full h-full object-cover`}
-          onLoadingComplete={() => setImageLoading(false)}
+          onLoad={() => setImageLoading(false)}
           onError={() => {
             setImageError(true);
             setImageLoading(false);

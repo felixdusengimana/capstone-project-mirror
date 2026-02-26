@@ -42,11 +42,10 @@ export default function VerifyPhoneModal({
   };
 
   const handleVerifyOTP = (value: string) => {
-    setValue("otp", value, {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-    handleSubmit(onSubmit)();
+    setValue("otp", value);
+    if (value.length === 6 && Boolean(value)) {
+      handleSubmit(onSubmit)();
+    }
   };
 
   return (
@@ -57,15 +56,20 @@ export default function VerifyPhoneModal({
         </span>
       </DialogTrigger>
       <Dialog className="pt-4 min-w-[600px]">
-        <form className="p-4 text-black">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="p-4 text-black flex flex-col items-center"
+        >
           <h1 className="text-2xl font-semibold mb-4">Verify phone number</h1>
 
-          <OTPInput
-            error={errors.otp?.message}
-            onChange={handleVerifyOTP}
-            otpType={EOtpTypes.PHONE_VERIFICATION}
-          />
-          <div className="flex gap-4">
+          <div className="max-w-[500px]">
+            <OTPInput
+              error={errors.otp?.message}
+              onChange={handleVerifyOTP}
+              otpType={EOtpTypes.PHONE_VERIFICATION}
+            />
+          </div>
+          <div className="flex gap-4 my-4">
             <Button type="submit" disabled={!isDirty} isLoading={isPending}>
               Verify
             </Button>

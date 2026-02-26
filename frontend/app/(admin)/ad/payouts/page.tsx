@@ -47,6 +47,7 @@ export default function PayoutsDashboard() {
       id: "name",
       cell: (info) => (
         <CreatorDialog
+          userId="1"
           trigger={
             <div className="flex gap-2 items-center">
               <Avatar src="/profiles/profile1.png" />

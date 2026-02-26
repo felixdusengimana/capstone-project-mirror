@@ -43,7 +43,7 @@ export default function SearchInput({
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={placeholder}
-        className="w-full text-black text-left placeholder:text-gray-400 bg-transparent outline-none"
+        className="w-full text-black text-left placeholder:font-medium placeholder:text-lg placeholder:text-gray-400 bg-transparent outline-none"
       />
     </label>
   );

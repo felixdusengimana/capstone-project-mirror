@@ -49,12 +49,18 @@ export const step1 = z.object({
     .string({
       required_error: "Bio is required",
     })
-    .min(10, "Bio must be at least 10 characters"),
+    .min(20, "Bio must be at least 20 characters")
+    .max(250, "Bio should be less thank 250 characters"),
   // profileImageUrl: z.string().url("Invalid URL"),
 });
 
 export const step2 = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
+  username: z
+    .string({
+      required_error: "Pesatag is required",
+    })
+    .min(3, "Pesatag must be at least 3 characters")
+    .max(50, "Pesatag mus be less than 50 characters"),
 });
 
 export const step3 = z.object({
@@ -73,13 +79,24 @@ export const step4 = z.object({
         platform: z.string({
           required_error: "Platform is required",
         }),
-        link: z.string({
-          required_error: "URL is required",
-        }),
+        link: z
+          .string({
+            required_error: "URL is required",
+          })
+          .url("Invalid url"),
       })
     )
     .min(1, "You need to add at least 1 link"),
 });
+
+export const validateLinks = step4.refine(
+  (val) =>
+    val.socialLinks?.filter((d) => Boolean(d.platform?.trim())).length >= 1,
+  {
+    message: "You need to add at least 1 link",
+    path: ["socialLinks"],
+  }
+);
 
 export interface ISocialLink {
   platform: string;

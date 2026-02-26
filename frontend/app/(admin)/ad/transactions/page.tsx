@@ -41,6 +41,7 @@ export default function TransactionsDashboard() {
       id: "sender",
       cell: (info) => (
         <CreatorDialog
+          userId="1"
           trigger={
             <div className="flex gap-2 items-center">
               <Avatar src="/profiles/profile1.png" />
@@ -66,6 +67,7 @@ export default function TransactionsDashboard() {
       id: "creator",
       cell: (info) => (
         <CreatorDialog
+          userId="1"
           trigger={
             <div className="flex gap-2 items-center">
               <Avatar src="/profiles/profile1.png" />
@@ -148,6 +150,8 @@ export default function TransactionsDashboard() {
     ],
     getCoreRowModel: getCoreRowModel(),
   });
+
+  console.log("Hey");
 
   return (
     <div className="w-full bg-gray-200">
