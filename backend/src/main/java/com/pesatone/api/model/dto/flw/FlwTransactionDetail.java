@@ -22,13 +22,9 @@ public class FlwTransactionDetail {
     private String id;
 
     @NotBlank
-    @JsonProperty("txRef")
-    @JsonAlias("tx_ref")
-    private String txRef;
+    private String tx_ref;
 
-    @JsonProperty("flwRef")
-    @JsonAlias("flw_ref")
-    private String flwRef;
+    private String flw_ref;
 
     @NotNull
     private BigDecimal amount;
@@ -40,13 +36,9 @@ public class FlwTransactionDetail {
     @NotBlank
     private String status;
 
-    @JsonProperty("paymentType")
-    @JsonAlias("payment_type")
-    private String paymentType;
+    private String payment_type;
 
-    @JsonProperty("createdAt")
-    @JsonAlias("created_at")
-    private String createdAt;
+    private String created_at;
 
     public boolean successful(){
         return this.status.equalsIgnoreCase("successful");
@@ -55,18 +47,18 @@ public class FlwTransactionDetail {
     public PaymentDto getPaymentDto(){
         Date paymentDate = new Date();
         try {
-            paymentDate = DateUtils.parseDate(this.createdAt, "yyyy-MM-dd'T'HH:mm:ss.SSSX");
+            paymentDate = DateUtils.parseDate(this.created_at, "yyyy-MM-dd'T'HH:mm:ss.SSSX");
         }catch (Exception ignored){}
 
         CurrencyEnum curr = CurrencyEnum.valueOf(this.currency.toUpperCase());
         PaymentStatusEnum paymentStatus = this.successful() ? PaymentStatusEnum.SUCCESSFUL:PaymentStatusEnum.FAILED;
 
         return new PaymentDto(PaymentProviderEnum.FLUTTERWAVE,
-                this.paymentType,
+                this.payment_type,
                 this.amount,
                 curr,
                 paymentStatus,
-                this.flwRef,
+                this.flw_ref,
                 paymentDate);
     }
 }

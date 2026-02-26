@@ -11,14 +11,8 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class FlwPayoutDetail {
-    @JsonProperty("accountBank")
-    @JsonAlias("account_bank")
-    private String accountBank = "MPS";
-
-    @JsonProperty("accountNumber")
-    @JsonAlias("account_number")
-    private String accountNumber;
-
+    private String account_bank = "MPS";
+    private String account_number;
     private BigDecimal amount;
     private String narration;
     private String currency = "RWF";

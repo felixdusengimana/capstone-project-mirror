@@ -84,7 +84,7 @@ public class PaymentTransactionController {
 
         if(dto.isPaymentCallback()) {
             FlwCallBackDto<FlwTransactionDetail> request = (FlwCallBackDto<FlwTransactionDetail>) dto;
-            PaymentTransaction transaction = paymentTransactionService.getByTransactionReference(request.getData().getTxRef());
+            PaymentTransaction transaction = paymentTransactionService.getByTransactionReference(request.getData().getTx_ref());
             paymentProcessingService.processPayment(transaction, request.getData().getPaymentDto());
         } else if (dto.isPayoutCallback()) {
             FlwCallBackDto<FlwPayoutDetail> request = (FlwCallBackDto<FlwPayoutDetail>) dto;
