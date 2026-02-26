@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
  * @author phelixdusengimana@gmail.com
  **/
 
-@CrossOrigin
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("auth")

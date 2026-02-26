@@ -37,9 +37,8 @@ import java.util.List;
  * @author phelixdusengimana@gmail.com
  **/
 
-@CrossOrigin
 @RequiredArgsConstructor
-@Controller
+@RestController
 @RequestMapping("users")
 @Slf4j
 @Tag(name = "2. User Management")

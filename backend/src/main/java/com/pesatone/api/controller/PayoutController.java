@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController
-@CrossOrigin
 @RequiredArgsConstructor
 @RequestMapping("payouts")
 @Tag(name = "4. Payout Controller")

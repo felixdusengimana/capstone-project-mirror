@@ -1,6 +1,7 @@
 package com.pesatone.api.controller;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.pesatone.api.configuration.properties.PaymentConfig;
 import com.pesatone.api.model.dto.ApiResponseObject;
 import com.pesatone.api.model.dto.PayoutDto;
@@ -44,7 +45,6 @@ public class PaymentTransactionController {
     private final PaymentConfig paymentConfig;
 
 
-    @CrossOrigin
     @Operation(summary = "Initiate Transaction", description = "Initiate payment transaction")
     @PostMapping("initiate")
     public ResponseEntity<ApiResponseObject<PaymentTransactionPojo>> initiateTransaction(@RequestBody @Valid TransactionDto dto,
@@ -58,7 +58,6 @@ public class PaymentTransactionController {
         return ResponseEntity.ok(new ApiResponseObject<>("Payment initiated successfully", true, new PaymentTransactionPojo(transaction)));
     }
 
-    @CrossOrigin
     @Operation(summary = "Get Transaction Status", description = "Get payment transaction detail")
     @GetMapping("/{transactionReference}/status")
     public Mono<ResponseEntity<ApiResponseObject<PaymentTransactionPojo>>> getTransactionStatus(@PathVariable String transactionReference) {
@@ -69,19 +68,13 @@ public class PaymentTransactionController {
     }
 
     @Hidden
-    @CrossOrigin
     @PostMapping("/flw/callback")
-    public ResponseEntity<ApiResponseObject<String>> processFlutterWaveCallBack(@RequestBody @Valid FlwCallBackDto<?> dto,
-                                                                                     @RequestHeader("verif-hash") String verifyHash,
-                                                                                     BindingResult bindingResult) throws BindException {
-        if (bindingResult.hasErrors()) {
-            throw new BindException(bindingResult);
-        }
+    public ResponseEntity<ApiResponseObject<String>> processFlutterWaveCallBack(@RequestBody String requestBody,
+                                                                                @RequestHeader("verif-hash") String verifyHash) {
+        log.info("Callback: {}: {}", requestBody, verifyHash);
 
-        log.info("Callback: {}", gson.toJson(dto));
-
-        AppUtil.verifyCallBack(verifyHash, paymentConfig.getFlwVerifyHash(), gson.toJson(dto));
-
+        AppUtil.verifyCallBack(verifyHash, paymentConfig.getFlwVerifyHash(), requestBody);
+        FlwCallBackDto<?> dto =  gson.fromJson(requestBody, new TypeToken<FlwCallBackDto<?>>(){}.getType());
         if(dto.isPaymentCallback()) {
             FlwCallBackDto<FlwTransactionDetail> request = (FlwCallBackDto<FlwTransactionDetail>) dto;
             PaymentTransaction transaction = paymentTransactionService.getByTransactionReference(request.getData().getTx_ref());
