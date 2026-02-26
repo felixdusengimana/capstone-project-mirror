@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -103,6 +104,11 @@ public class ErrorControllerAdvice {
     public ResponseEntity<Object> handleAuthenticationException(Exception e) {
         log.info("AUTHORIZATION_EXCEPTION", e);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponseObject<>("Sorry, your credentials are invalid or the account is not active",false));
+    }
+
+    @ExceptionHandler({AccessDeniedException.class})
+    public ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponseObject<>("Sorry, your don't have the required permissions",false));
     }
 
     @ExceptionHandler(PesatoneNotFoundException.class)

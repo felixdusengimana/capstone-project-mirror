@@ -7,5 +7,9 @@ public enum SocialPlatformEnum {
     TIKTOK,
     SNAPCHAT,
     REDDIT,
+    YOUTUBE,
+    LINKEDIN,
+    WHATSAPP,
+    TELEGRAM,
     OTHERS
 }

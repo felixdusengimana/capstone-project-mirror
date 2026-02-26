@@ -38,6 +38,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -104,7 +105,7 @@ public class UserServiceImpl implements UserService {
         String secureUrl = null;
         try {
             Map uploadedFile = cloudinary.uploader().upload(file.getBytes(),
-                    ObjectUtils.asMap("public_id", file.getName(),
+                    ObjectUtils.asMap("public_id", file.getName()+"-"+System.currentTimeMillis(),
                             "folder", "profile_images"));
             secureUrl = (String) uploadedFile.get("secure_url");
             user.setProfileImageUrl(secureUrl);
@@ -194,6 +195,9 @@ public class UserServiceImpl implements UserService {
     public AppUser approveCreatorAccount(AppUser creator, ApprovalStatusEnum approvalStatus) {
         if(creator.getRole().equals(RoleEnum.CREATOR)){
                 creator.setApprovalStatus(approvalStatus);
+                if(approvalStatus.equals(ApprovalStatusEnum.APPROVED)) {
+                    creator.setVerified(true);
+                }
                 userRepository.save(creator);
                 return creator;
         }

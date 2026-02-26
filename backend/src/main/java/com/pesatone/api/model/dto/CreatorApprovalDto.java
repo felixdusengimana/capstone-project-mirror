@@ -18,6 +18,6 @@ public class CreatorApprovalDto {
     @NotNull(message = "Approval Status is required")
     @Schema(name = "approvalStatus",
             description = "Approval Status",
-            example = "EMAIL_VERIFICATION", requiredMode = Schema.RequiredMode.REQUIRED)
+            example = "APPROVED", requiredMode = Schema.RequiredMode.REQUIRED)
     private ApprovalStatusEnum approvalStatus;
 }
