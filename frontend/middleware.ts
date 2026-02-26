@@ -8,10 +8,9 @@ export function middleware(request: NextRequest) {
     "/reset-password",
   ];
 
-  const authorizedRoutes = ["/join"];
+  const authorizedRoutes = ["/join", "/resolve"];
 
   const extraAuthorized = [
-    "/resolve",
     "/dashboard",
     "/ad",
     "/payouts",

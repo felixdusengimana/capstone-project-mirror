@@ -60,12 +60,11 @@ export default function SupportCreator() {
             logo: "/app-logo.svg",
           },
           callback: function (success_data: TransactionData) {
-            console.log({ success_data });
             seSuccessPayment(true);
           },
 
           onclose: function () {
-            console.log("Payment cancelled!");
+            toast.error("Payment cancelled!");
           },
         });
       } else {

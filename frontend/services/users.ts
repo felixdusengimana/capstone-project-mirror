@@ -60,6 +60,10 @@ export function useGetCreator(id: string) {
   });
 }
 
+export function DeleteProfileAccount() {
+  return axiosInstance.delete(`/users`);
+}
+
 export function ApproveCreator(data: IApprovalData) {
   return axiosInstance.post(`/users/approvals`, data);
 }

@@ -14,6 +14,7 @@ export default function ResolveScreen() {
   const { mutate } = useMutation({
     mutationFn: () => GenerateOTP({ otpType: EOtpTypes.EMAIL_VERIFICATION }),
     onSuccess() {
+      setCookie("pesatoneMiddleMan", "1", 7200);
       router.replace(`/join?step=1`);
     },
     onError(error) {

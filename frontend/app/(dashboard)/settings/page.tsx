@@ -5,6 +5,7 @@ import Icon, { IconNames } from "@/components/atoms/Icon";
 import Input from "@/components/atoms/Input";
 import TextArea from "@/components/atoms/TextArea";
 import VerifyPhoneModal from "@/components/molecules/VerifyPhoneModal";
+import DeleteAccount from "@/components/organisms/DeleteAccount";
 import ImageCrop from "@/components/organisms/ImageCrop";
 import ImageCropProvider from "@/providers/ImageCropProvider";
 import { UpdateUser, UploadProfileImage, useGetMe } from "@/services/users";
@@ -288,7 +289,7 @@ export default function UserSettings() {
             deleted and cannot be restored.
           </p>
         </div>
-        <Button variant="danger-reverse">Delete my account</Button>
+        <DeleteAccount />
       </div>
     </div>
   );
