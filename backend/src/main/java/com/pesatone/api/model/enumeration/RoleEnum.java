@@ -27,10 +27,12 @@ public enum RoleEnum {
             PermissionEnum.VIEW_TRANSACTION,
             PermissionEnum.UPDATE_PROFILE,
             PermissionEnum.VIEW_CREATOR_DASHBOARD,
-            PermissionEnum.VIEW_WALLET),
+            PermissionEnum.VIEW_WALLET,
+            PermissionEnum.DELETE_ACCOUNT),
     FAN("Fan",
             PermissionEnum.VIEW_TRANSACTION,
-            PermissionEnum.UPDATE_PROFILE)
+            PermissionEnum.UPDATE_PROFILE,
+            PermissionEnum.DELETE_ACCOUNT)
 
 ;
 

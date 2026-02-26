@@ -118,4 +118,11 @@ public class UserController {
                 userService.getUserDetails(userService.approveCreatorAccount(creator, dto.getApprovalStatus()))));
     }
 
+    @Operation(summary = "Delete account", description = "Delete account")
+    @DeleteMapping()
+    @PreAuthorize("hasAnyAuthority(T(com.pesatone.api.model.enumeration.PermissionEnum).DELETE_ACCOUNT)")
+    public ResponseEntity<ApiResponseObject<String>> deleteAccount() {
+        userService.deleteAccount(principal.getLoggedInUser());
+        return ResponseEntity.ok(new ApiResponseObject<>("User account has been successfully deleted", true,null));
+    }
 }

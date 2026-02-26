@@ -204,6 +204,13 @@ public class UserServiceImpl implements UserService {
         throw new PesatoneException("Invalid user type");
     }
 
+    @Transactional
+    @Override
+    public void deleteAccount(AppUser user) {
+        user.setStatus(StatusEnum.DELETED);
+        userRepository.save(user);
+    }
+
     private void setSocialLinks(AppUser user, List<SocialLinkDto> linkDtos) {
         List<SocialLink> links = new ArrayList<>();
         for (SocialLinkDto linkDto : linkDtos) {

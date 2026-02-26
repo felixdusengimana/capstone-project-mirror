@@ -27,4 +27,6 @@ public interface UserService {
     QueryResultPojo<CreatorSearchResponse> searchCreators(CreatorSearchFilter filter);
 
     AppUser approveCreatorAccount(AppUser creator, ApprovalStatusEnum approvalStatus);
+
+    void deleteAccount(AppUser user);
 }

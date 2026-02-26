@@ -13,7 +13,8 @@ public enum PermissionEnum {
     VIEW_PAYOUT("View payout"),
     CREATE_PAYOUT("Create payout"),
     VIEW_TRANSACTION("View transactions"),
-    VIEW_WALLET("View wallet");
+    VIEW_WALLET("View wallet"),
+    DELETE_ACCOUNT("Delete account");
 
     private final String description;
 
