@@ -20,7 +20,7 @@ COPY . .
 RUN pnpm build
 
 # Stage 2: Serve the Next.js application
-FROM node:16-alpine
+FROM node:22
 
 # Install pnpm
 RUN npm install -g pnpm
