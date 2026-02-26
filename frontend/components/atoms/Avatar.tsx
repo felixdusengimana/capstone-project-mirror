@@ -1,5 +1,5 @@
 "use client";
-import { ComponentProps } from "react";
+import { ComponentProps, useState, useEffect } from "react";
 import Icon from "./Icon";
 import Image from "next/image";
 
@@ -23,6 +23,15 @@ export default function Avatar({ ...props }: AvatarProps) {
     ...rest
   } = props;
 
+  const [imageError, setImageError] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
+
+  useEffect(() => {
+    // Reset loading and error state when src changes
+    setImageLoading(true);
+    setImageError(false);
+  }, [src]);
+
   const sizeClasses = {
     sm: "w-10 h-10",
     md: "w-12 h-12",
@@ -35,20 +44,23 @@ export default function Avatar({ ...props }: AvatarProps) {
   return (
     <div
       {...rest}
-      className={`${src ? "bg-transparent" : "bg-gray-100"} ${
+      className={`${imageLoading ? "bg-gray-200" : "bg-transparent"} ${
         circle ? "rounded-full" : "rounded"
       } ${bordered ? "border-2 border-white" : ""} ${
         sizeClasses[size]
       } flex items-center justify-center overflow-hidden relative ${className}`}
     >
-      {src ? (
+      {!imageError && src ? (
         <Image
           src={src}
           alt={alt ?? ""}
-          // loading="eager"
-          // loader={({ src }) => src}
           fill={true}
           className={`w-full h-full object-cover`}
+          onLoadingComplete={() => setImageLoading(false)}
+          onError={() => {
+            setImageError(true);
+            setImageLoading(false);
+          }}
         />
       ) : fallBackText ? (
         fallBackText

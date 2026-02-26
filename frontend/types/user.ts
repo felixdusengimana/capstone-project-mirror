@@ -67,16 +67,18 @@ export const step3 = z.object({
 });
 
 export const step4 = z.object({
-  socialLinks: z.array(
-    z.object({
-      platform: z.string({
-        required_error: "Platform is required",
-      }),
-      link: z.string({
-        required_error: "URL is required",
-      }),
-    })
-  ),
+  socialLinks: z
+    .array(
+      z.object({
+        platform: z.string({
+          required_error: "Platform is required",
+        }),
+        link: z.string({
+          required_error: "URL is required",
+        }),
+      })
+    )
+    .min(1, "You need to add at least 1 link"),
 });
 
 export interface ISocialLink {

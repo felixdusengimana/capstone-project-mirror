@@ -8,10 +8,11 @@ export function middleware(request: NextRequest) {
     "/reset-password",
   ];
 
-  const authorizedRoutes = [
+  const authorizedRoutes = ["/join"];
+
+  const extraAuthorized = [
     "/resolve",
     "/dashboard",
-    "/join",
     "/ad",
     "/payouts",
     "/settings",
@@ -20,14 +21,25 @@ export function middleware(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
   const tokenCookie = request.cookies.get("token");
+  const passedCheckCookie = request.cookies.get("pesatoneMiddleMan");
 
   if (tokenCookie?.value && unAuthorizedRoutes.includes(pathname)) {
     return NextResponse.redirect(new URL(`/resolve`, request.url));
   }
 
-  if (!tokenCookie?.value && authorizedRoutes.includes(pathname)) {
+  if (
+    !tokenCookie?.value &&
+    (authorizedRoutes.includes(pathname) || extraAuthorized.includes(pathname))
+  ) {
     return NextResponse.redirect(new URL(`/login`, request.url));
   }
+
+  // if (
+  //   passedCheckCookie?.value !== "true" &&
+  //   extraAuthorized.includes(pathname)
+  // ) {
+  //   return NextResponse.redirect(new URL(`/resolve`, request.url));
+  // }
 
   return NextResponse.next();
 }

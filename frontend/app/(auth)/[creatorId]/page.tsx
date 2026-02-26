@@ -17,6 +17,7 @@ import { useForm } from "react-hook-form";
 import Script from "next/script";
 import { useMutation } from "@tanstack/react-query";
 import { InitiateTransaction } from "@/services/pay";
+import toast from "react-hot-toast";
 
 export default function SupportCreator() {
   const { creatorId } = useParams() as { creatorId: string };
@@ -37,41 +38,43 @@ export default function SupportCreator() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: InitiateTransaction,
-    onSuccess(data, variables, context) {
-      // toast.success("Payment sent successfully");
+    onSuccess: async (data) => {
+      if (data?.data?.transactionReference) {
+        // @ts-ignore
+        FlutterwaveCheckout({
+          public_key: process.env.NEXT_PUBLIC_FLUTTER_WAVE_KEY,
+          tx_ref: data?.data?.transactionReference,
+          amount: data?.data.amount,
+          currency: data?.data.currency,
+          payment_options: "card, banktransfer, ussd",
+          // meta: {
+          //   source: "docs-inline-test",
+          //   consumer_mac: "92a3-912ba-1192a",
+          // },
+          customer: {
+            email: watch("email"),
+            name: data?.data.donorName,
+          },
+          customizations: {
+            title: `Support ${data?.data.creatorUserName}`,
+            description: data?.data.note,
+            logo: "/logo.svg",
+          },
+          callback: function (success_data: TransactionData) {
+            console.log({ success_data });
+          },
+          onclose: function () {
+            console.log("Payment cancelled!");
+          },
+        });
+      } else {
+        toast.error("Error initiating this payment");
+      }
     },
   });
 
-  async function onSubmit(data: Tip) {
-    await mutate(data);
-    // @ts-ignore
-    FlutterwaveCheckout({
-      public_key: process.env.NEXT_PUBLIC_FLUTTER_WAVE_KEY,
-      tx_ref: String(Date.now()),
-      amount: data.amount,
-      currency: data.currency,
-      payment_options: "card, banktransfer, ussd",
-      meta: {
-        source: "docs-inline-test",
-        consumer_mac: "92a3-912ba-1192a",
-      },
-      customer: {
-        email: data?.email ?? "",
-        // phone_number: "08100000000",
-        name: data.name,
-      },
-      customizations: {
-        title: `Support ${data.creatorUserName}`,
-        description: data.note,
-        logo: "/logo.svg",
-      },
-      callback: function (success_data: TransactionData) {
-        console.log({ success_data });
-      },
-      onclose: function () {
-        console.log("Payment cancelled!");
-      },
-    });
+  function onSubmit(data: Tip) {
+    mutate(data);
   }
 
   useEffect(() => {
@@ -216,7 +219,12 @@ export default function SupportCreator() {
                 placeholder="Type something ....."
                 error={errors.note?.message}
                 value={watch("note")}
-                onChange={(e) => setValue("note", e.target.value)}
+                onChange={(e) =>
+                  setValue("note", e.target.value, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  })
+                }
               />
             </div>
             {Object.keys(errors).length > 0 && (

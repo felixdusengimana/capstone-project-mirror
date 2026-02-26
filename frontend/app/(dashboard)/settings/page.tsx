@@ -36,8 +36,9 @@ export default function UserSettings() {
   } = useMutation({
     mutationFn: UpdateUser,
     onSuccess: () => {
-      toast.success("Profile updated successfully");
-
+      toast.success("Profile updated successfully", {
+        id: "updatingProfile",
+      });
       // if phone number is updated, show the verify phone modal
       if (dirtyFields.phoneNumber) {
         setOpenPhoneModal(true);
@@ -62,7 +63,9 @@ export default function UserSettings() {
       (acc, key) => ({ ...acc, [key]: watch(key) }),
       {}
     );
-
+    toast.loading("updating profile information", {
+      id: "updatingProfile",
+    });
     updateProfile(dirty);
   }, 1000); // Adjust debounce time as needed
 
@@ -70,8 +73,7 @@ export default function UserSettings() {
 
   useEffect(() => {
     if (isDirty && Object.keys(errors).length === 0) {
-      alert("Updating profile");
-      // debouncedUpdateProfile();
+      debouncedUpdateProfile();
     }
 
     return () => {

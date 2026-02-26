@@ -1,5 +1,6 @@
 "use client";
 import { EOtpTypes, GenerateOTP, useGetMe } from "@/services/users";
+import { setCookie } from "@/utils/cookie";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -37,7 +38,11 @@ export default function ResolveScreen() {
             : info.socialLinks?.length <= 0
             ? 5
             : -1;
-          if (step === -1) return router.replace("/dashboard");
+
+          if (step === -1) {
+            setCookie("pesatoneMiddleMan", "true", 7200);
+            return router.replace("/dashboard");
+          }
 
           return router.replace(`/join?step=${step}`);
         }

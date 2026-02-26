@@ -21,9 +21,11 @@ export const tip = z.object({
   name: z.string({
     required_error: "Name is required",
   }),
-  email: z.string({
-    required_error: "Email is required",
-  }),
+  email: z
+    .string({
+      required_error: "Email is required",
+    })
+    .email("Email should be valid"),
   note: z.string({
     required_error: "Note is required",
   }),
