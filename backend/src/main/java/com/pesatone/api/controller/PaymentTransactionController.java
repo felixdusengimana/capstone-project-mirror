@@ -78,6 +78,8 @@ public class PaymentTransactionController {
             throw new BindException(bindingResult);
         }
 
+        log.info("Callback: {}", gson.toJson(dto));
+
         AppUtil.verifyCallBack(verifyHash, paymentConfig.getFlwVerifyHash(), gson.toJson(dto));
 
         if(dto.isPaymentCallback()) {
