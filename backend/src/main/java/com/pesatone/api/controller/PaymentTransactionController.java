@@ -1,5 +1,7 @@
 package com.pesatone.api.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.pesatone.api.configuration.properties.PaymentConfig;
@@ -32,6 +34,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -42,6 +46,7 @@ public class PaymentTransactionController {
     private final PaymentProcessingService paymentProcessingService;
     private final PayoutService payoutService;
     private final Gson gson;
+    private final ObjectMapper objectMapper;
     private final PaymentConfig paymentConfig;
 
 
@@ -74,7 +79,10 @@ public class PaymentTransactionController {
         log.info("Callback: {}: {}", requestBody, verifyHash);
 
         AppUtil.verifyCallBack(verifyHash, paymentConfig.getFlwVerifyHash(), requestBody);
-        FlwCallBackDto<?> dto =  gson.fromJson(requestBody, new TypeToken<FlwCallBackDto<?>>(){}.getType());
+        FlwCallBackDto<?> dto =  getRequestObject(requestBody);
+        if (dto == null) {
+            return ResponseEntity.badRequest().body(new ApiResponseObject<>("Invalid request", false));
+        }
         if(dto.isPaymentCallback()) {
             FlwCallBackDto<FlwTransactionDetail> request = (FlwCallBackDto<FlwTransactionDetail>) dto;
             PaymentTransaction transaction = paymentTransactionService.getByTransactionReference(request.getData().getTx_ref());
@@ -92,5 +100,14 @@ public class PaymentTransactionController {
     public ResponseEntity<ApiResponseObject<QueryResultPojo<TransactionSearchResponse>>> searchPaymentTransactions(@ParameterObject @Valid TransactionSearchFilter filter) {
         return ResponseEntity.ok(new ApiResponseObject<>("Transactions retrieved successfully",
                 true,paymentTransactionService.searchTransactions(filter)));
+    }
+
+    private FlwCallBackDto<?> getRequestObject(String requestBody){
+        try {
+            return objectMapper.readValue(requestBody, new TypeReference<>() {});
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
