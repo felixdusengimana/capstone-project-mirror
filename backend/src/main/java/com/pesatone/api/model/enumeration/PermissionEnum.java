@@ -12,7 +12,8 @@ public enum PermissionEnum {
     UPDATE_USER_STATUS("Activate or deactivate user"),
     VIEW_PAYOUT("View payout"),
     CREATE_PAYOUT("Create payout"),
-    VIEW_TRANSACTION("View transactions");
+    VIEW_TRANSACTION("View transactions"),
+    VIEW_WALLET("View wallet");
 
     private final String description;
 

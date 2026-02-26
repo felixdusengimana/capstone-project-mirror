@@ -121,7 +121,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
     @Override
     public QueryResultPojo<TransactionSearchResponse> searchTransactions(TransactionSearchFilter filter) {
         QPaymentTransaction qPaymentTransaction = QPaymentTransaction.paymentTransaction;
-        BlazeJPAQuery<AppUser> blazeQuery = new BlazeJPAQuery<>(entityManager, builderFactory);
+        BlazeJPAQuery<PaymentTransaction> blazeQuery = new BlazeJPAQuery<>(entityManager, builderFactory);
 
         blazeQuery.from(qPaymentTransaction)
                 .where(qPaymentTransaction.paymentStatus.eq(PaymentStatusEnum.SUCCESSFUL));
@@ -131,7 +131,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
         }
 
         if (StringUtils.isNotBlank(filter.getDonorName())) {
-            blazeQuery.where(qPaymentTransaction.donorName.contains(filter.getDonorName().toLowerCase()));
+            blazeQuery.where(qPaymentTransaction.donorName.contains(filter.getDonorName()));
         }
 
         if (StringUtils.isNotBlank(filter.getStartDate())) {
@@ -150,7 +150,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
             }
         }
 
-        blazeQuery.orderBy(qPaymentTransaction.paidAt.desc(), qPaymentTransaction.id.desc());
+        blazeQuery.orderBy(qPaymentTransaction.id.desc());
 
         PagedList<TransactionSearchResponse> pagedList = blazeQuery
                 .select(Projections.constructor(
@@ -163,8 +163,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
                         qPaymentTransaction.note,
                         qPaymentTransaction.donorName,
                         qPaymentTransaction.currency
-                ))
-                .fetchPage(filter.getOffset(), filter.getPageNumber());
+                )).fetchPage(filter.getOffset(), filter.getPageSize());
 
         return new QueryResultPojo<>(pagedList, filter.getPageNumber(), filter.getPageSize(), pagedList.getTotalPages());
     }

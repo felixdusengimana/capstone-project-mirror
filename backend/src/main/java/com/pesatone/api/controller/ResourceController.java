@@ -21,7 +21,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("resources")
-@Tag(name="6. Resource Controller")
+@Tag(name="7. Resource Controller")
 public class ResourceController {
     private final CountryRepository countryRepository;
     private final IndustryRepository industryRepository;

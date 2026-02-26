@@ -91,7 +91,7 @@ public class PayoutServiceImpl implements PayoutService {
             blazeQuery.where(qPayout.creator.username.containsIgnoreCase(filter.getCreatorTag()));
         }
 
-        blazeQuery.orderBy(qPayout.createdAt.desc(), qPayout.id.desc());
+        blazeQuery.orderBy(qPayout.id.desc());
 
         PagedList<PayoutSearchResponse> pagedList = blazeQuery
                 .select(Projections.constructor(
@@ -105,7 +105,7 @@ public class PayoutServiceImpl implements PayoutService {
                         qPayout.createdAt,
                         qPayout.processedAt
                 ))
-                .fetchPage(filter.getOffset(), filter.getPageNumber());
+                .fetchPage(filter.getOffset(), filter.getPageSize());
 
         return new QueryResultPojo<>(pagedList, filter.getPageNumber(), filter.getPageSize(), pagedList.getTotalPages());
 

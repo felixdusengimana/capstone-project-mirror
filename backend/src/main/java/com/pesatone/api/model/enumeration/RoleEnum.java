@@ -26,7 +26,8 @@ public enum RoleEnum {
             PermissionEnum.VIEW_PAYOUT,
             PermissionEnum.VIEW_TRANSACTION,
             PermissionEnum.UPDATE_PROFILE,
-            PermissionEnum.VIEW_CREATOR_DASHBOARD),
+            PermissionEnum.VIEW_CREATOR_DASHBOARD,
+            PermissionEnum.VIEW_WALLET),
     FAN("Fan",
             PermissionEnum.VIEW_TRANSACTION,
             PermissionEnum.UPDATE_PROFILE)
