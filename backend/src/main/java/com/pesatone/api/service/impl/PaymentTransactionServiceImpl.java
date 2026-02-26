@@ -173,6 +173,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
         return flutterWaveService.getTransactionDetail(transaction.getTransactionReference())
                 .publishOn(Schedulers.boundedElastic())
                 .map(response -> {
+                    log.info("FLW transaction detail: {}",  response);
                     FlwTransactionDetailResponse detailResponse = gson.fromJson(response, FlwTransactionDetailResponse.class);
                     FlwTransactionDetail transactionDetail = detailResponse.getData();
                     return paymentProcessingService.processPayment(transaction, transactionDetail.getPaymentDto());
