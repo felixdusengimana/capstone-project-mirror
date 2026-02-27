@@ -17,6 +17,7 @@ import { InitiatePayouts } from "@/services/payouts";
 import toast from "react-hot-toast";
 import { useGetWallet } from "@/services/wallet";
 import { z } from "zod";
+import { TransactionData } from "@/types/pay";
 
 export default function WithdrawForm({
   trigger,
@@ -41,7 +42,7 @@ export default function WithdrawForm({
           .number({
             required_error: "Amount is required",
           })
-          .min(1000, "Amount must be greater than 10")
+          .min(100, "Amount must be greater than 100")
           .max(
             wallet?.data.balance ?? 0,
             `Amount must be less than ${wallet?.data.balance.toLocaleString()} ${
@@ -76,11 +77,40 @@ export default function WithdrawForm({
 
   const { mutate, isPending } = useMutation({
     mutationFn: InitiatePayouts,
-    onSuccess() {
-      toast.success("Payout initiate successfully", {
-        id: "payout",
-      });
-      setActive("success");
+    onSuccess: async (data) => {
+      if (data?.data?.transactionReference) {
+        // @ts-ignore
+        FlutterwaveCheckout({
+          public_key: process.env.NEXT_PUBLIC_FLUTTER_WAVE_KEY,
+          tx_ref: data?.data?.transactionReference,
+          amount: data?.data.amount,
+          currency: data?.data.currency,
+          payment_options: "card, banktransfer, ussd",
+          meta: {
+            source: "docs-inline-test",
+          },
+          customer: {
+            email: me?.data?.email,
+            name: me?.data.name,
+          },
+          customizations: {
+            title: `Withdraw from ${me?.data.name}`,
+            description: me?.data.bio,
+            logo: "/app-logo.svg",
+          },
+          callback: function (success_data: TransactionData) {
+            if (success_data.status === "successful") {
+              setActive("success");
+            } else {
+              toast.error("Payout failed");
+            }
+          },
+          // success_data
+          onclose: function () {},
+        });
+      } else {
+        toast.error("Error initiating this payment");
+      }
     },
     onError(error) {
       toast.error(error.message, {

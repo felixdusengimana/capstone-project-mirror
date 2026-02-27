@@ -5,7 +5,7 @@ import Button from "@/components/atoms/Button";
 import Icon, { IconNames } from "@/components/atoms/Icon";
 import Input from "@/components/atoms/Input";
 import TextArea from "@/components/atoms/TextArea";
-import { useGetAllCountries } from "@/services/resources";
+import {} from "@/services/resources";
 import { useGetCreator } from "@/services/users";
 import { Tip, tip, TransactionData } from "@/types/pay";
 import { supportedSocials } from "@/utils/socials";
