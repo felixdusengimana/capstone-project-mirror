@@ -1,7 +1,8 @@
 "use client";
 import { IconNames } from "@/components/atoms/Icon";
+import AdminNavbar from "@/components/organisms/AdminNavbar";
 import Sidebar from "@/components/organisms/Sidebar";
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 
 export default function DashBoardLayout({ children }: { children: ReactNode }) {
   const links = [
@@ -28,11 +29,14 @@ export default function DashBoardLayout({ children }: { children: ReactNode }) {
   ] as { label: string; icon: IconNames; href: string }[];
 
   return (
-    <div className="zoom h-screen flex bg-white relative">
-      <div className={`bg-white sticky top-0 h-screen`}>
+    <div className="h-screen flex flex-col md:flex-row bg-white relative">
+      <div className={`bg-white sticky top-0 hidden md:block`}>
         <Sidebar links={links} />
       </div>
-      <div className="flex-grow bg-[#F0F2F7] overflow-auto pt-[112px]">
+      <div className="md:hidden">
+        <AdminNavbar links={links} />
+      </div>
+      <div className="flex-grow bg-[#F0F2F7] overflow-auto pt-4 px-3 md:px-0 md:pt-[112px]">
         {children}
       </div>
     </div>

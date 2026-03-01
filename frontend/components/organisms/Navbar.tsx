@@ -2,7 +2,6 @@ import Button from "../atoms/Button";
 import Link from "next/link";
 import Logo from "../molecules/Logo";
 import { useAuth } from "@/hooks/useAuth";
-import { getCookie } from "@/utils/cookie";
 
 export default function Navbar() {
   const { isLoggedIn } = useAuth();

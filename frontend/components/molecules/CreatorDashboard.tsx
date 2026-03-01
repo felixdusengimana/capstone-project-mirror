@@ -13,7 +13,7 @@ export default function CreatorDashboard() {
       <div className="w-full bg-white p-8 rounded-lg">
         <CardIcon icon="coins" className="bg-gray-50" />
         <h3 className="font-medium text-sm text-gray-400 mt-6">Money Earned</h3>
-        <h1 className="text-gray-800 font-medium text-4xl mt-4 flex items-center gap-2">
+        <h1 className="text-gray-800 font-medium text-xl md:text-4xl mt-4 flex flex-wrap items-center gap-2">
           {fetchingDashboard ? (
             <span className="animate-pulse bg-gray-200 h-6 w-6 block"></span>
           ) : (
@@ -34,14 +34,14 @@ export default function CreatorDashboard() {
       {/* Supporters */}
       <div className="w-full bg-white p-8 rounded-lg">
         <CardIcon icon="coins" className="bg-gray-50" />
-        <h3 className="font-medium text-sm text-gray-400 mt-6">Total Tips</h3>
-        <div className="mt-4">
+        <h1 className="font-medium text-sm text-gray-400 mt-6">Total Tips</h1>
+        <div className="mt-4 text-gray-800 font-medium text-xl md:text-4xl">
           {fetchingDashboard ? (
             <span className="animate-pulse bg-gray-200 h-10 w-20 block"></span>
           ) : (
-            <h1 className="text-gray-800 font-medium text-4xl ">
+            <span>
               {dashboard?.data.totalTransactions?.toLocaleString() ?? 0}
-            </h1>
+            </span>
           )}
         </div>
       </div>
@@ -52,7 +52,7 @@ export default function CreatorDashboard() {
         <h3 className="font-medium text-sm text-gray-400 mt-6">
           Single Biggest supporter
         </h3>
-        <h1 className="text-gray-800 font-medium text-4xl mt-4 flex items-center gap-2">
+        <h1 className="text-gray-800 font-medium text-xl md:text-4xl mt-4 flex flex-wrap items-center gap-2">
           {fetchingDashboard ? (
             <span className="animate-pulse bg-gray-200 h-6 w-6 block"></span>
           ) : (
