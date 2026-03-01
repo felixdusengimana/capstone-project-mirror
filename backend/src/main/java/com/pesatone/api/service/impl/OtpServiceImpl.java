@@ -103,6 +103,10 @@ public class OtpServiceImpl implements OtpService {
     private void sendOtpNotification(AppUser user, OneTimePassword otp) {
         switch (otp.getType()) {
             case PHONE_VERIFICATION: {
+                notificationService.sendEmail(user.getEmail(), "Verify your Phone",
+                        "<b>Hello " + StringUtils.defaultIfBlank(user.getName(), " ") + ",</b> <br/>" +
+                                "Use this one time password: <b>" + otp.getOtp() + "</b> to verify your phone number. <br/><br/>"+
+                                "Your one time password would expire in <b>" + otpExpiry/60 + "</b> minutes. <br/>");
                 break;
             }
             case EMAIL_VERIFICATION: {
@@ -110,7 +114,7 @@ public class OtpServiceImpl implements OtpService {
                         "<b>Hello " + StringUtils.defaultIfBlank(user.getName(), " ") + ",</b> <br/>" +
                                 "Welcome onboard. <br/>" +
                                 "Pesatone is here to give your fans an easy way of appreciating your talent and craft. <br/><br/>" +
-                                "Use this one time password: <b>" + otp.getOtp() + "</b> to verify your account. <br/><br/>"+
+                                "Use this one time password: <b>" + otp.getOtp() + "</b> to verify your email. <br/><br/>"+
                                 "Your one time password would expire in <b>" + otpExpiry/60 + "</b> minutes. <br/>");
                 break;
             }
