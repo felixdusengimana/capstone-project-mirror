@@ -66,8 +66,8 @@ export default function Input({ value, ...props }: InputProps) {
       <div>
         <div
           className={`w-full flex items-center px-4 border rounded-xl  ${
-            error ? "border-red-400 bg-red-50" : "border-[#E5E9F0] bg-slate-50 "
-          } ${props?.disabled ? "bg-gray-400" : ""}`}
+            error ? "border-red-400 bg-red-50" : "border-[#E5E9F0]  "
+          } ${props.disabled ? "bg-gray-300" : "bg-slate-50"}`}
         >
           {left && <>{left}</>}
           <input
@@ -81,7 +81,7 @@ export default function Input({ value, ...props }: InputProps) {
             }
             value={localValue}
             onChange={handleChange}
-            className={`outline-none w-full py-[13px] bg-inherit text-black`}
+            className={`outline-none w-full py-[13px] bg-inherit text-black disabled:bg-gray-300`}
             id={props.id ?? id}
           />
           {right ||

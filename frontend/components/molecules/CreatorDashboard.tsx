@@ -34,13 +34,13 @@ export default function CreatorDashboard() {
       {/* Supporters */}
       <div className="w-full bg-white p-8 rounded-lg">
         <CardIcon icon="coins" className="bg-gray-50" />
-        <h3 className="font-medium text-sm text-gray-400 mt-6">Supporters</h3>
+        <h3 className="font-medium text-sm text-gray-400 mt-6">Total Tips</h3>
         <div className="mt-4">
           {fetchingDashboard ? (
             <span className="animate-pulse bg-gray-200 h-10 w-20 block"></span>
           ) : (
             <h1 className="text-gray-800 font-medium text-4xl ">
-              {dashboard?.data.totalSupporters?.toLocaleString() ?? 0}
+              {dashboard?.data.totalTransactions?.toLocaleString() ?? 0}
             </h1>
           )}
         </div>

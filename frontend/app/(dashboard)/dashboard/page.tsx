@@ -5,6 +5,7 @@ import Icon from "@/components/atoms/Icon";
 import Input from "@/components/atoms/Input";
 import CreatorDashboard from "@/components/molecules/CreatorDashboard";
 import DashboardProfile from "@/components/molecules/DashboardProfile";
+import Pagination from "@/components/molecules/Pagination";
 import Profile from "@/components/molecules/Profile";
 import SupporterDialog from "@/components/molecules/SupporterDialog";
 import { useGetTransactions } from "@/services/transactions";
@@ -62,43 +63,56 @@ export default function CreatorDashboardPage() {
           userTransactions?.data?.results.length <= 0 ? (
           <div className="text-gray-700 px-6">No information found</div>
         ) : (
-          userTransactions?.data?.results?.map((transaction, i) => (
-            <div
-              className={`w-full px-6 p-4 ${
-                i !== 4 ? "border-b border-gray-100" : ""
-              }`}
-              key={i}
-            >
-              <SupporterDialog
-                transaction={transaction}
-                referenceId={transaction.transactionReference}
-                trigger={
-                  <div
-                    key={i}
-                    className={`w-full flex justify-between items-center`}
-                  >
-                    <Profile
-                      user={{
-                        name: transaction.donorName,
-                        photo: "",
-                        date:
-                          new Date(transaction.paidAt).toLocaleDateString() +
-                          " " +
-                          new Date(transaction.paidAt).toLocaleTimeString(),
-                      }}
-                    />
+          <>
+            {userTransactions?.data?.results?.map((transaction, i) => (
+              <div
+                className={`w-full px-6 p-4 ${
+                  i !== 4 ? "border-b border-gray-100" : ""
+                }`}
+                key={i}
+              >
+                <SupporterDialog
+                  transaction={transaction}
+                  referenceId={transaction.transactionReference}
+                  trigger={
+                    <div
+                      key={i}
+                      className={`w-full flex justify-between items-center`}
+                    >
+                      <Profile
+                        user={{
+                          name: transaction.donorName,
+                          photo: "",
+                          date:
+                            new Date(transaction.paidAt).toLocaleDateString() +
+                            " " +
+                            new Date(transaction.paidAt).toLocaleTimeString(),
+                        }}
+                      />
 
-                    <h3 className="text-gray-800 font-medium text-sm">
-                      <span className="text-[#838AA2] font-normal">
-                        {transaction.currency}
-                      </span>{" "}
-                      {transaction.amount.toLocaleString()}
-                    </h3>
-                  </div>
-                }
-              />
+                      <h3 className="text-gray-800 font-medium text-sm">
+                        <span className="text-[#838AA2] font-normal">
+                          {transaction.currency}
+                        </span>{" "}
+                        {transaction.amount.toLocaleString()}
+                      </h3>
+                    </div>
+                  }
+                />
+              </div>
+            ))}
+            <div>
+              {(userTransactions?.data?.totalPages ?? 0) > 1 && (
+                <Pagination
+                  currentPage={userTransactions?.data.pageNumber ?? 0}
+                  total={userTransactions?.data?.totalPages ?? 0}
+                  onPageChange={(page) =>
+                    setFilters({ ...filters, pageNumber: page })
+                  }
+                />
+              )}
             </div>
-          ))
+          </>
         )}
       </div>
     </div>

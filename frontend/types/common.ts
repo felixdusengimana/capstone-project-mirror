@@ -6,8 +6,8 @@ export interface IResponse<T> {
 
 export interface ISorted<T> {
   results: T[];
-  limit: number;
-  offset: number;
-  total: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
   empty: boolean;
 }

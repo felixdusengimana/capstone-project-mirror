@@ -1,5 +1,6 @@
 "use client";
 import Pill from "@/components/atoms/Pill";
+import Pagination from "@/components/molecules/Pagination";
 import { useGetAllPayouts } from "@/services/payouts";
 import { useGetMe } from "@/services/users";
 import { useGetWallet } from "@/services/wallet";
@@ -20,7 +21,8 @@ export default function PayoutsPage() {
   });
   const { data: wallet, isLoading: walletLoading } = useGetWallet();
 
-  const { data: payouts } = useGetAllPayouts(filters);
+  const { data: payouts, isPending: isLoadingPayouts } =
+    useGetAllPayouts(filters);
 
   return (
     <>
@@ -55,32 +57,46 @@ export default function PayoutsPage() {
             <p className="text-gray-400 text-sm font-normal pl-2">Amount</p>
             <p className="text-gray-400 text-sm font-normal pl-2">Status</p>
           </div>
-          {payouts?.data.results && payouts?.data.results.length <= 0 && (
+          {isLoadingPayouts ? (
+            <div>Loading...</div>
+          ) : payouts?.data.results && payouts?.data.results.length <= 0 ? (
             <div className="mt-2">No payouts data found</div>
+          ) : (
+            <>
+              {payouts?.data.results?.map((item, index) => (
+                <div className="grid grid-cols-3 py-[11px]" key={index}>
+                  <p className="text-gray-600 font-normal text-sm pl-2">
+                    {new Date(item.createdAt).toLocaleDateString() +
+                      " " +
+                      new Date(item.createdAt).toLocaleTimeString()}
+                  </p>
+                  <p className="text-gray-600 font-normal text-sm pl-2">
+                    {item.amount}
+                  </p>
+                  <Pill
+                    variant={
+                      item.paymentStatus === EStatus.SUCCESSFUL
+                        ? "success"
+                        : "warning"
+                    }
+                    className="py-1 capitalize"
+                    bordered
+                  >
+                    {item.paymentStatus}
+                  </Pill>
+                </div>
+              ))}
+              {(payouts?.data?.totalPages ?? 0) > 1 && (
+                <Pagination
+                  currentPage={payouts?.data.pageNumber ?? 100}
+                  total={payouts?.data?.totalPages ?? 1000}
+                  onPageChange={(page) =>
+                    setFilters({ ...filters, pageNumber: page })
+                  }
+                />
+              )}
+            </>
           )}
-          {payouts?.data.results?.map((item, index) => (
-            <div className="grid grid-cols-3 py-[11px]" key={index}>
-              <p className="text-gray-600 font-normal text-sm pl-2">
-                {new Date(item.createdAt).toLocaleDateString() +
-                  " " +
-                  new Date(item.createdAt).toLocaleTimeString()}
-              </p>
-              <p className="text-gray-600 font-normal text-sm pl-2">
-                {item.amount}
-              </p>
-              <Pill
-                variant={
-                  item.paymentStatus === EStatus.SUCCESSFUL
-                    ? "success"
-                    : "warning"
-                }
-                className="py-1 capitalize"
-                bordered
-              >
-                {item.paymentStatus}
-              </Pill>
-            </div>
-          ))}
         </div>
       </div>
     </>
