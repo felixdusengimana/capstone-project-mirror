@@ -16,11 +16,13 @@ export default function ShareProfile({
   profile?: IUser;
 }) {
   const [linkCopied, setLinkCopied] = useState(false);
-  const creatorLink =
-    window.location.hostname +
-    (window.location.port ? `:${window.location.port}` : "") +
-    "/" +
-    profile?.username;
+  const url = window.location.href;
+  const urlObj = new URL(url);
+
+  const baseUrl = `${urlObj.protocol}//${urlObj.hostname}${
+    urlObj.port ? `:${urlObj.port}` : ""
+  }`;
+  const creatorLink = baseUrl + "/" + profile?.username;
 
   const qrCodeRef = useRef(null);
   const downloadQRCode = () => {
