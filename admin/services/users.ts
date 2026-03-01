@@ -53,10 +53,11 @@ export function useGetCreators({
   });
 }
 
-export function useGetCreator(id: string) {
+export function useGetCreator(id: string, enabled = true) {
   return useQuery<IResponse<IUser>>({
     queryKey: ["creator", id],
     queryFn: async () => axiosInstance.get(`/users/creators/${id}`),
+    enabled,
   });
 }
 

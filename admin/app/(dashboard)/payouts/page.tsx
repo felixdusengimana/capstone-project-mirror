@@ -78,7 +78,11 @@ export default function PayoutsDashboard() {
     columnHelper.accessor("createdAt", {
       id: "createdAt",
       cell: (info) => (
-        <span className="font-normal text-sm">{info.getValue()}</span>
+        <span className="font-normal text-sm">
+          {new Date(info.getValue()).toLocaleDateString() +
+            " " +
+            new Date(info.getValue()).toLocaleTimeString()}
+        </span>
       ),
       header: () => (
         <span className="text-gray-500 font-medium text-xs">Date</span>

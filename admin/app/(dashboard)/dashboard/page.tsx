@@ -23,16 +23,18 @@ import { useState } from "react";
 
 export default function AdminDashboard() {
   const searchParams = useSearchParams();
+  const status = searchParams.get("status");
+
   const [filters, setFilters] = useState<Partial<ICreatorFilter>>({
     pageNumber: 1,
     pageSize: 10,
     name: "",
   });
+
   const { data: creators, isLoading, isRefetching } = useGetCreators(filters);
 
   const isLoadingCreators = isRefetching || isLoading;
 
-  const status = searchParams.get("status");
   const { data: user } = useGetMe();
   const { data: countries, isPending } = useGetAllCountries({
     enabled: Boolean(user?.data.id),
@@ -101,48 +103,50 @@ export default function AdminDashboard() {
       footer: (info) => info.column.id,
     }),
 
-    columnHelper.accessor("bio", {
-      id: "attachment",
-      cell: (info) => (
-        <a className="flex gap-1 text-[#00B7FE] hover:underline">
-          <Icon name="attachment" />
-          <span className="font-normal text-sm text-gray-500">
-            {info.getValue()}
-          </span>
-        </a>
-      ),
-      header: () => (
-        <span className="text-gray-500 font-medium text-xs">Attachement</span>
-      ),
-      footer: (info) => info.column.id,
-    }),
+    // columnHelper.accessor("bio", {
+    //   id: "attachment",
+    //   cell: (info) => (
+    //     <a className="flex gap-1 text-[#00B7FE] hover:underline">
+    //       <Icon name="attachment" />
+    //       <span className="font-normal text-sm text-gray-500">
+    //         {info.getValue()}
+    //       </span>
+    //     </a>
+    //   ),
+    //   header: () => (
+    //     <span className="text-gray-500 font-medium text-xs">Attachement</span>
+    //   ),
+    //   footer: (info) => info.column.id,
+    // }),
 
     columnHelper.accessor("id", {
       id: "id",
       cell: (info) => (
         <div className="flex items-center gap-2">
-          <ChangeCreatorStatus
-            trigger={
-              <button className="bg-[#34D399] px-4 py-2 font-medium text-sm text-white rounded-[4px]">
-                Approve
-              </button>
-            }
-            newStatus={EApprovalStatus.APPROVED}
-            userId={info.getValue()}
-          />
+          {!info.row.original.verified && (
+            <ChangeCreatorStatus
+              trigger={
+                <button className="bg-[#34D399] px-4 py-2 font-medium text-sm text-white rounded-[4px]">
+                  Approve
+                </button>
+              }
+              newStatus={EApprovalStatus.APPROVED}
+              userId={info.getValue()}
+            />
+          )}
           <ChangeCreatorStatus
             trigger={
               <button className="bg-white px-4 py-2 font-medium text-sm text-gray-500 rounded-[4px] border border-[#E5E9F0]">
-                Reject
+                {info.row.original.verified ? "Revoke Approval" : "Reject"}
               </button>
             }
             newStatus={EApprovalStatus.REJECTED}
             userId={info.getValue()}
           />
-
+          {/* 
           <button className="bg-white px-4 py-2 font-medium text-sm text-white rounded-lg border border-[#E5E9F0]">
             <Icon name="more-horizontal" />
-          </button>
+          </button> */}
         </div>
       ),
       header: () => (
@@ -230,7 +234,7 @@ export default function AdminDashboard() {
                 setFilters({ ...filters, pageNumber: page });
               },
               perPage: filters?.pageSize ?? 0,
-              total: creators?.data?.totalPages ?? 1000,
+              total: creators?.data?.totalPages ?? 0,
             }}
           />
         </div>

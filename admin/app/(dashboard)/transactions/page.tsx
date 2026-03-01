@@ -6,7 +6,7 @@ import DateRagePicker from "@/components/molecules/DateRagePicker";
 import SearchInput from "@/components/molecules/SearchInput";
 import Tab from "@/components/molecules/Tab";
 import { useGetTransactions } from "@/services/transactions";
-import { ITransaction } from "@/types/transaction";
+import { ITransaction, ITransactionFilter } from "@/types/transaction";
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -18,14 +18,14 @@ import { useState } from "react";
 
 export default function TransactionsDashboard() {
   const searchParams = useSearchParams();
-  const { data, isPending } = useGetTransactions({
-    pageSize: 10,
+
+  const [filters, setFilters] = useState<Partial<ITransactionFilter>>({
     pageNumber: 1,
-    startDate: "2024-04-26",
-    endDate: "2024-04-26",
+    pageSize: 10,
   });
 
-  const [filters, setFilters] = useState({} as Record<string, string>);
+  const { data, isPending } = useGetTransactions(filters);
+
   const status = searchParams.get("status");
 
   const columnHelper = createColumnHelper<ITransaction>();
@@ -130,8 +130,6 @@ export default function TransactionsDashboard() {
     getCoreRowModel: getCoreRowModel(),
   });
 
-  console.log("Hey");
-
   return (
     <div className="w-full bg-gray-200">
       <div className="w-full max-w-[1124px] mx-auto py-10">
@@ -147,7 +145,13 @@ export default function TransactionsDashboard() {
               <p className="font-normal text-base text-gray-700 flex justify-between">
                 Search
               </p>
-              <SearchInput className="bg-gray-50 border border-gray-200 rounded-md w-[257px] py-2 px-4" />
+              <SearchInput
+                placeholder="Search donor name"
+                onSearch={(e) =>
+                  setFilters({ ...filters, pageNumber: 1, donorName: e })
+                }
+                className="bg-gray-50 border border-gray-200 rounded-md w-[257px] py-2 px-4"
+              />
             </div>
           </div>
           <Tab
@@ -177,10 +181,11 @@ export default function TransactionsDashboard() {
             loading={isPending}
             table={table}
             pagination={{
-              currentPage: 2,
-              onPageChange: () => {},
+              currentPage: data?.data.pageNumber ?? 0,
+              onPageChange: (page) =>
+                setFilters({ ...filters, pageSize: page }),
               perPage: 10,
-              total: 1000,
+              total: data?.data.totalPages ?? 0,
             }}
           />
         </div>

@@ -18,7 +18,7 @@ interface CreatorDialogProps {
 }
 export default function CreatorDialog({ trigger, userId }: CreatorDialogProps) {
   const [open, setOpen] = useState(false);
-  const { data: creator, isPending } = useGetCreator(userId!);
+  const { data: creator, isPending } = useGetCreator(userId!, open);
   const handleOpen = () => {
     setOpen(!open);
   };
