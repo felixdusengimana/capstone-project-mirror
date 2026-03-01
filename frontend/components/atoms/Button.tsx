@@ -52,6 +52,7 @@ export default function Button(props: ButtonProps) {
   return (
     <button
       {...rest}
+      disabled={isDisabled}
       className={`flex items-center justify-center gap-1 lg:text-xl md:text-lg text-base font-normal rounded-full ${
         outline ? "border border-gray-200" : variantClasses[variant]
       } ${sizeClasses[size]} ${borderClasses} ${props.className} ${

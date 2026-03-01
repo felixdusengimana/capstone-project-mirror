@@ -65,9 +65,6 @@ dependencies:
   react-webcam:
     specifier: ^7.2.0
     version: 7.2.0(react-dom@18.3.1)(react@18.3.1)
-  use-debounce:
-    specifier: ^10.0.1
-    version: 10.0.1(react@18.3.1)
   zod:
     specifier: ^3.22.4
     version: 3.23.8
@@ -3765,15 +3762,6 @@ packages:
       '@types/react': 18.3.3
       react: 18.3.1
       tslib: 2.6.3
-    dev: false
-
-  /use-debounce@10.0.1(react@18.3.1):
-    resolution: {integrity: sha512-0uUXjOfm44e6z4LZ/woZvkM8FwV1wiuoB6xnrrOmeAEjRDDzTLQNRFtYHvqUsJdrz1X37j0rVGIVp144GLHGKg==}
-    engines: {node: '>= 16.0.0'}
-    peerDependencies:
-      react: '>=16.8.0'
-    dependencies:
-      react: 18.3.1
     dev: false
 
   /use-sidecar@1.1.2(@types/react@18.3.3)(react@18.3.1):

@@ -20,7 +20,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { useDebouncedCallback } from "use-debounce";
+import WithdrawOptions from "@/components/organisms/WithdrawOptions";
+import { EChannel } from "@/types";
 
 export default function UserSettings() {
   const { data: usr, isLoading } = useGetMe();
@@ -30,7 +31,8 @@ export default function UserSettings() {
     reset,
     setValue,
     watch,
-    formState: { dirtyFields, errors },
+    handleSubmit,
+    formState: { errors, isDirty },
   } = useForm<IUpdateUser>({
     resolver: zodResolver(updateUser),
     defaultValues: {
@@ -51,17 +53,12 @@ export default function UserSettings() {
     mutationFn: UpdateUser,
     onSuccess: (data) => {
       reset(data?.data);
-      setIsDirty(false);
       queryClient.invalidateQueries({
         queryKey: ["me"],
       });
       toast.success("Profile updated successfully", {
         id: "updatingProfile",
       });
-      // if phone number is updated, show the verify phone modal
-      if (dirtyFields.phoneNumber && Boolean(data.data?.phoneNumber)) {
-        setOpenPhoneModal(true);
-      }
     },
     onError: (error) => {
       toast.error(error?.message ?? "Error updating Profile", {
@@ -89,8 +86,6 @@ export default function UserSettings() {
 
   const isUserLoading = isLoading || isUpdating || isUpdatingPic;
 
-  const [isDirty, setIsDirty] = useState(false);
-
   useEffect(() => {
     if (!isLoading) {
       reset(usr?.data);
@@ -98,48 +93,27 @@ export default function UserSettings() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading]);
 
-  const debouncedUpdateProfile = useDebouncedCallback(async () => {
-    const dirty = Object.keys(dirtyFields).reduce(
-      // @ts-ignore
-      (acc, key) => ({ ...acc, [key]: watch(key) }),
-      {}
-    );
-
-    if (Object.keys(dirty).length <= 0) {
-      return;
-    }
-    toast.loading("updating profile information", {
-      id: "updatingProfile",
-    });
-
-    updateProfile(dirty);
-  }, 1500);
-
-  const values = Object.values(watch()).join("-");
-
-  useEffect(() => {
-    if (isDirty && Object.keys(errors).length === 0) {
-      debouncedUpdateProfile();
-    }
-
-    return () => {
-      debouncedUpdateProfile.cancel();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [values, isDirty]);
-
   const handleChange = (name: keyof IUpdateUser, value: string) => {
     setValue(name, value, {
       shouldDirty: true,
       shouldValidate: true,
     });
-    setIsDirty(true);
+  };
+
+  const onSubmit = (data: IUpdateUser) => {
+    toast.loading("updating profile information", {
+      id: "updatingProfile",
+    });
+    updateProfile(data);
   };
 
   return (
     <div className="min-h-full w-full dashboard-padding text-black pb-10">
       <h1 className="text-4xl font-sans font-bold text-[#1A1A1A]">Settings</h1>
-      <div className="max-w-[900px] bg-white px-[67px] py-[55px] w-full rounded-lg mt-8 flex gap-28 justify-between items-start">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="max-w-[900px] bg-white px-[67px] py-[55px] w-full rounded-lg mt-8 flex gap-28 justify-between items-start"
+      >
         <ImageCropProvider>
           <ImageCrop
             defaultImage={usr?.data?.profileImageUrl ?? ""}
@@ -178,16 +152,26 @@ export default function UserSettings() {
             onChange={(e) => handleChange("phoneNumber", e.target.value)}
             error={errors.phoneNumber?.message}
           />
-          {(!usr?.data.phoneNumberVerified && usr?.data.phoneNumber) ||
-          (dirtyFields.phoneNumber && isSuccess) ? (
+          {!usr?.data.phoneNumberVerified && usr?.data.phoneNumber ? (
             <p className="-mt-4">
               <VerifyPhoneModal initialOpen={openPhoneModal} />
             </p>
           ) : null}
-        </div>
-      </div>
 
-      <div className="max-w-[900px] bg-white px-[67px] py-[55px] w-full rounded-lg mt-8 flex gap-[107px] justify-between items-start">
+          <Button
+            isLoading={isUpdating}
+            disabled={isUpdatingPic || !isDirty}
+            className="w-fit"
+          >
+            Save
+          </Button>
+        </div>
+      </form>
+
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="max-w-[900px] bg-white px-[67px] py-[55px] w-full rounded-lg mt-8 flex gap-[107px] justify-between items-start"
+      >
         <p className="flex-grow font-medium text-lg text-gray-600">
           Social Links
         </p>
@@ -229,7 +213,6 @@ export default function UserSettings() {
                         shouldDirty: true,
                         shouldValidate: true,
                       });
-                      setIsDirty(true);
                     }}
                     left={
                       <div className="mr-2">
@@ -251,7 +234,6 @@ export default function UserSettings() {
                               shouldDirty: true,
                               shouldValidate: true,
                             });
-                            setIsDirty(true);
                           }}
                           type="button"
                         >
@@ -281,9 +263,106 @@ export default function UserSettings() {
           >
             <Icon name="add" /> <p>Add new link</p>
           </Button>
-        </div>
-      </div>
 
+          <Button
+            isLoading={isUpdating}
+            disabled={isUpdatingPic || !isDirty}
+            className="w-fit mt-5"
+          >
+            Save
+          </Button>
+        </div>
+      </form>
+      <form className="max-w-[900px] bg-white px-[67px] py-[55px] w-full rounded-lg mt-8 ">
+        <h1 className="font-medium text-gray-600 text-lg">Withdraw Options</h1>
+
+        <div className="mt-5">
+          <label
+            htmlFor=""
+            className="text-[#64748A] text-sm font-normal block mb-2"
+          >
+            1. Mobile Money
+          </label>
+
+          {!usr?.data.phoneNumber ? (
+            <WithdrawOptions
+              initialData={{ phoneNumber: "0784483142" }}
+              trigger={
+                <Button type="button">
+                  <Icon name="add" />
+                  <span className="text-sm">Add Mobile Number</span>
+                </Button>
+              }
+              type={EChannel.MOBILE_MONEY}
+            />
+          ) : (
+            <Input
+              disabled
+              value={"0784483142"}
+              right={
+                <WithdrawOptions
+                  trigger={<button type="button">Edit</button>}
+                  type={EChannel.MOBILE_MONEY}
+                />
+              }
+            />
+          )}
+        </div>
+
+        <div className="mt-5">
+          <div className="flex w-full justify-between">
+            <label
+              htmlFor=""
+              className="text-[#64748A] text-sm font-normal block mb-2"
+            >
+              2. Bank Account
+            </label>
+
+            {usr?.data.phoneNumber && (
+              <WithdrawOptions
+                trigger={<button type="button">Edit</button>}
+                type={EChannel.BANK_ACCOUNT}
+              />
+            )}
+          </div>
+
+          {!usr?.data.phoneNumber ? (
+            <WithdrawOptions
+              trigger={
+                <Button type="button">
+                  <Icon name="add" />
+                  <span className="text-sm">Add Bank Account</span>
+                </Button>
+              }
+              type={EChannel.BANK_ACCOUNT}
+            />
+          ) : (
+            <div>
+              <label
+                htmlFor=""
+                className="text-[#64748A] text-sm font-normal block mb-2"
+              >
+                Bank Name: <span className="font-bold">I&M Bank</span>
+              </label>
+
+              <label
+                htmlFor=""
+                className="text-[#64748A] text-sm font-normal block mb-2"
+              >
+                Account Number: <span className="font-bold">2098373</span>
+              </label>
+
+              <label
+                htmlFor=""
+                className="text-[#64748A] text-sm font-normal block mb-2"
+              >
+                Account Name:{" "}
+                <span className="font-bold">Felix Dusengimana</span>
+              </label>
+            </div>
+          )}
+        </div>
+      </form>
       <div className="max-w-[900px] mb-10 bg-white px-[67px] py-[55px] w-full rounded-lg mt-8 flex gap-[107px] justify-between items-start">
         <div className="max-w-[413px]">
           <h1 className="font-medium text-gray-600 text-lg">Delete account</h1>
