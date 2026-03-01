@@ -30,7 +30,7 @@ export default function Sidebar({
 
   const logout = () => {
     removeCookie("token");
-    window.location.href = "/login";
+    window.location.href = "/";
   };
 
   const user = usr?.data;

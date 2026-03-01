@@ -18,7 +18,7 @@ export default function Navbar() {
           </Link>
         ) : (
           <>
-            <Link href={"/login"}>
+            <Link href={"/"}>
               <Button variant="secondary" className="hidden md:block">
                 Login
               </Button>

@@ -13,7 +13,7 @@ export function middleware(request: NextRequest) {
   }
 
   if (!tokenCookie?.value && authorizedRoutes.includes(pathname)) {
-    return NextResponse.redirect(new URL(`/login`, request.url));
+    return NextResponse.redirect(new URL(`/`, request.url));
   }
 
   return NextResponse.next();
