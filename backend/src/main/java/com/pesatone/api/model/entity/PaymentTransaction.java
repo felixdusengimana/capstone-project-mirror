@@ -48,6 +48,8 @@ public class PaymentTransaction {
 
     private String donorName;
 
+    private String donorEmail;
+
     private String note;
 
     private Date paidAt;

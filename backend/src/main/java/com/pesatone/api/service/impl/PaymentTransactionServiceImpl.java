@@ -71,6 +71,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
         transaction.setPaymentStatus(PaymentStatusEnum.PENDING);
         transaction.setTransactionReference(AppUtil.getTransactionReference("PT"));
         transaction.setDonorName(dto.getName());
+        transaction.setDonorEmail(dto.getEmail());
         transaction.setNote(dto.getNote());
         AppUser creator = appUserRepository.findActiveByUserNameAndRole(dto.getCreatorUserName(), RoleEnum.CREATOR)
                 .orElseThrow(() -> new PesatoneNotFoundException(String.format("Creator with tag %s not found", dto.getCreatorUserName())));
@@ -112,7 +113,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
                 .map(PaymentTransaction::getAmount)
                 .max(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
         long totalSupporters = transactions.stream()
-                .map(PaymentTransaction::getDonorName)
+                .map(PaymentTransaction::getDonorEmail)
                 .distinct()
                 .count();
 

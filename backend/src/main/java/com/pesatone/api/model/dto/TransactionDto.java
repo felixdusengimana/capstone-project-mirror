@@ -48,6 +48,10 @@ public class TransactionDto {
             description = "A name your favorite can call you")
     private String name;
 
+    @Schema(name = "email",
+            description = "Email of supporter")
+    private String email;
+
     @Schema(name = "note",
             description = "Message to your favorite creator",
             example = "Say something nicem")
