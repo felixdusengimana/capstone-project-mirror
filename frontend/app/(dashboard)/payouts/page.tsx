@@ -6,7 +6,6 @@ import { useGetWallet } from "@/services/wallet";
 import { EStatus } from "@/types";
 import { IPayoutsFilters } from "@/types/payouts";
 import dynamic from "next/dynamic";
-import Script from "next/script";
 import { useState } from "react";
 const WithdrawForm = dynamic(
   () => import("@/components/molecules/WithdrawForm"),
@@ -26,8 +25,6 @@ export default function PayoutsPage() {
 
   return (
     <>
-      <Script src="https://checkout.flutterwave.com/v3.js"></Script>
-
       <div className="min-h-full w-full dashboard-padding text-black pb-10">
         <h1 className="text-4xl font-sans font-bold text-[#1A1A1A]">Payouts</h1>
 

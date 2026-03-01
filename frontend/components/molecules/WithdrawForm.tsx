@@ -17,7 +17,6 @@ import { InitiatePayouts } from "@/services/payouts";
 import toast from "react-hot-toast";
 import { useGetWallet } from "@/services/wallet";
 import { z } from "zod";
-import { TransactionData } from "@/types/pay";
 
 export default function WithdrawForm({
   trigger,
@@ -79,37 +78,15 @@ export default function WithdrawForm({
     mutationFn: InitiatePayouts,
     onSuccess: async (data) => {
       if (data?.data?.transactionReference) {
-        // @ts-ignore
-        FlutterwaveCheckout({
-          public_key: process.env.NEXT_PUBLIC_FLUTTER_WAVE_KEY,
-          tx_ref: data?.data?.transactionReference,
-          amount: data?.data.amount,
-          currency: data?.data.currency,
-          payment_options: "card, banktransfer, ussd",
-          meta: {
-            source: "docs-inline-test",
-          },
-          customer: {
-            email: me?.data?.email,
-            name: me?.data.name,
-          },
-          customizations: {
-            title: `Withdraw from ${me?.data.name}`,
-            description: me?.data.bio,
-            logo: "/app-logo.svg",
-          },
-          callback: function (success_data: TransactionData) {
-            if (success_data.status === "successful") {
-              setActive("success");
-            } else {
-              toast.error("Payout failed");
-            }
-          },
-          // success_data
-          onclose: function () {},
-        });
+        toast.success(
+          "Your payout has been initiated. Your money would be in your account soon.",
+          {
+            id: "payout",
+          }
+        );
+        setOpen(false);
       } else {
-        toast.error("Error initiating this payment");
+        toast.error("Error initiating this payment", { id: "payout" });
       }
     },
     onError(error) {
@@ -253,6 +230,7 @@ export default function WithdrawForm({
               <OTPInput
                 onChange={(value) => {
                   if (value.length === 6) {
+                    toast.loading("Initiating payout", { id: "payout" });
                     mutate({ ...watch(), otp: value });
                   }
                 }}
