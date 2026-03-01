@@ -21,7 +21,9 @@ export default function Profile({
 }: ProfileProps) {
   return (
     <div className={`flex gap-2 items-start ${className}`} {...rest}>
-      <Avatar src={user.photo} alt={user.name} />
+      <div className="w-10">
+        <Avatar src={user.photo} alt={user.name} />
+      </div>
       <div className="font-medium flex items-start flex-col">
         {isUserLoading ? (
           <span className="animate-pulse bg-gray-200 h-4 w-40 block"></span>

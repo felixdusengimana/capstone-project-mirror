@@ -2,13 +2,11 @@
 import Button from "@/components/atoms/Button";
 
 import Input from "@/components/atoms/Input";
-import ThirdPartyLogin from "@/components/molecules/ThirdPartyLogin";
 import { Login } from "@/services/auth";
 import { IRegisterInputs, registerSchema } from "@/types/auth";
 import { setCookie } from "@/utils/cookie";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
@@ -26,7 +24,7 @@ export default function LoginPage() {
         return toast.error("Login failed!", { id: "login" });
       }
       setCookie("token", token, expiresIn);
-      router.push("/resolve");
+      router.push("/dashboard");
     },
     onError(error) {
       toast.error(`${error.message ?? "Login failed!"}`, {

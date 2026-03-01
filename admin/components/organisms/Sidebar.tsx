@@ -33,7 +33,7 @@ export default function Sidebar({
     window.location.href = "/login";
   };
 
-  const user = usr && !isUserLoading ? usr.data : null;
+  const user = usr?.data;
 
   return (
     <div
@@ -43,9 +43,9 @@ export default function Sidebar({
       <div>
         <Profile
           user={{
-            name: user?.name || "",
+            name: user?.name ?? "---",
             photo: user?.profileImageUrl || "",
-            username: user?.username,
+            username: user?.username ?? user?.email,
           }}
           verified
           isUserLoading={isUserLoading}
