@@ -1,0 +1,87 @@
+"use client";
+import { usePathname } from "next/navigation";
+import { ComponentProps } from "react";
+import Profile from "../molecules/Profile";
+import Icon, { IconNames } from "../atoms/Icon";
+import Link from "next/link";
+import Image from "next/image";
+import Button from "../atoms/Button";
+import dynamic from "next/dynamic";
+import { removeCookie } from "@/utils/cookie";
+import { useGetMe } from "@/services/users";
+const VerifyAccount = dynamic(
+  () => import("@/components/molecules/VerifyAccount"),
+  { ssr: false }
+);
+
+interface SidebarProps extends ComponentProps<"div"> {
+  links: { label: string; icon: IconNames; href: string }[];
+  isAdmin?: boolean;
+}
+
+export default function Sidebar({
+  className,
+  links = [],
+  isAdmin,
+  ...props
+}: SidebarProps) {
+  const pathname = usePathname();
+  const { data: usr, isLoading: isUserLoading } = useGetMe();
+
+  const logout = () => {
+    removeCookie("token");
+    window.location.href = "/login";
+  };
+
+  const user = usr && !isUserLoading ? usr.data : null;
+
+  return (
+    <div
+      {...props}
+      className={`w-[393px] pt-[64px] pl-[72px] pr-[71px] border-r border-gray-300 overflow-x-hidden h-full flex flex-col justify-between pb-6 ${className}`}
+    >
+      <div>
+        <Profile
+          user={{
+            name: user?.name || "",
+            photo: user?.profileImageUrl || "",
+            username: user?.username,
+          }}
+          verified
+          isUserLoading={isUserLoading}
+        />
+
+        <div className="mt-20">
+          {links.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`flex items-center gap-2 text-base py-2.5 px-4 rounded-lg ${
+                pathname === link.href
+                  ? "bg-[#F5F7FF] text-gray-600 font-medium"
+                  : "text-[#64748A] font-normal"
+              }`}
+            >
+              <Icon
+                name={link.icon}
+                fill={pathname === link.href ? "#4B5563" : "#6B7280"}
+                stroke={pathname === link.href ? "#4B5563" : "#6B7280"}
+              />
+              <p>{link.label}</p>
+            </Link>
+          ))}
+        </div>
+      </div>
+      <div>
+        <Button
+          onClick={logout}
+          outline
+          className="text-gray-900 flex gap-1 items-center"
+        >
+          <Icon name="logout" />
+          <p>Logout</p>
+        </Button>
+      </div>
+    </div>
+  );
+}
