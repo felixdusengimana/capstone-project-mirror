@@ -3,12 +3,20 @@ import Button from "@/components/atoms/Button";
 import Icon, { IconNames } from "@/components/atoms/Icon";
 import Input from "@/components/atoms/Input";
 import TextArea from "@/components/atoms/TextArea";
-import VerifyPhoneModal from "@/components/molecules/VerifyPhoneModal";
 import dynamic from "next/dynamic";
 const DeleteAccount = dynamic(
   () => import("@/components/organisms/DeleteAccount"),
   { ssr: false }
 );
+const VerifyPhoneModal = dynamic(
+  () => import("@/components/molecules/VerifyPhoneModal"),
+  { ssr: false }
+);
+const WithdrawOptions = dynamic(
+  () => import("@/components/organisms/WithdrawOptions"),
+  { ssr: false }
+);
+
 import ImageCrop from "@/components/organisms/ImageCrop";
 import ImageCropProvider from "@/providers/ImageCropProvider";
 import { UpdateUser, UploadProfileImage, useGetMe } from "@/services/users";
@@ -20,7 +28,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import WithdrawOptions from "@/components/organisms/WithdrawOptions";
 import { EChannel } from "@/types";
 
 export default function UserSettings() {
@@ -45,11 +52,7 @@ export default function UserSettings() {
     },
   });
 
-  const {
-    mutate: updateProfile,
-    isPending: isUpdating,
-    isSuccess,
-  } = useMutation({
+  const { mutate: updateProfile, isPending: isUpdating } = useMutation({
     mutationFn: UpdateUser,
     onSuccess: (data) => {
       reset(data?.data);
@@ -112,7 +115,7 @@ export default function UserSettings() {
       <h1 className="text-4xl font-sans font-bold text-[#1A1A1A]">Settings</h1>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="max-w-[900px] bg-white px-[67px] py-[55px] w-full rounded-lg mt-8 flex gap-28 justify-between items-start"
+        className="max-w-[900px] bg-white px-[67px] py-[55px] w-full rounded-lg mt-8 flex flex-wrap gap-28 justify-between items-start"
       >
         <ImageCropProvider>
           <ImageCrop
@@ -170,7 +173,7 @@ export default function UserSettings() {
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="max-w-[900px] bg-white px-[67px] py-[55px] w-full rounded-lg mt-8 flex gap-[107px] justify-between items-start"
+        className="max-w-[900px] bg-white px-[67px] py-[55px] w-full rounded-lg mt-8 flex flex-wrap gap-y-2 gap-x-[107px] justify-between items-start"
       >
         <p className="flex-grow font-medium text-lg text-gray-600">
           Social Links
@@ -187,7 +190,7 @@ export default function UserSettings() {
               return (
                 <div key={index} className="flex items-center">
                   <Input
-                    label="Social Media Link"
+                    label={`Social Media Link ${index + 1}`}
                     className="flex-grow"
                     value={link.link}
                     onChange={(e) => {
@@ -363,7 +366,7 @@ export default function UserSettings() {
           )}
         </div>
       </form>
-      <div className="max-w-[900px] mb-10 bg-white px-[67px] py-[55px] w-full rounded-lg mt-8 flex gap-[107px] justify-between items-start">
+      <div className="max-w-[900px] mb-10 bg-white px-[67px] py-[55px] w-full rounded-lg mt-8 flex flex-wrap gap-y-5 gap-x-[107px] justify-between items-start">
         <div className="max-w-[413px]">
           <h1 className="font-medium text-gray-600 text-lg">Delete account</h1>
           <p className="font-normal text-gray-400 text-base">

@@ -8,7 +8,7 @@ export default function CreatorDashboard() {
     useGetCreatorDashboard({ enabled: true });
 
   return (
-    <div className="w-full grid grid-cols-3 gap-10 items-center">
+    <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 items-center">
       {/* Money Earned */}
       <div className="w-full bg-white p-8 rounded-lg">
         <CardIcon icon="coins" className="bg-gray-50" />
