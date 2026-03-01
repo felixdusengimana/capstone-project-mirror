@@ -202,7 +202,7 @@ export default function AdminDashboard() {
             tabs={[
               {
                 label: (
-                  <Link href={"/ad?status=all"} className="flex gap-2">
+                  <Link href={"?status=all"} className="flex gap-2">
                     All clients{" "}
                     <p className="border border-[#E5E9F0] text-[#6B7280] px-2 py-0.5 rounded-full">
                       200
@@ -212,11 +212,11 @@ export default function AdminDashboard() {
                 active: status === "all" || !status,
               },
               {
-                label: <Link href="/ad?status=approved">Approved</Link>,
+                label: <Link href="?status=approved">Approved</Link>,
                 active: status === "approved",
               },
               {
-                label: <Link href="/ad?status=rejected">Rejected</Link>,
+                label: <Link href="?status=rejected">Rejected</Link>,
                 active: status === "rejected",
               },
             ]}
