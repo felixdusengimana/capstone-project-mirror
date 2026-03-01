@@ -106,7 +106,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
                 .select(qPaymentTransaction).fetch();
 
         BigDecimal totalAmountReceived = transactions.stream()
-                .map(PaymentTransaction::getAmount)
+                .map(x-> x.getAmount().subtract(x.getTransactionFee()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         Integer totalTransactions = transactions.size();
         BigDecimal biggestSupport = transactions.stream()
