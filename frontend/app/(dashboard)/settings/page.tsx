@@ -5,7 +5,11 @@ import Icon, { IconNames } from "@/components/atoms/Icon";
 import Input from "@/components/atoms/Input";
 import TextArea from "@/components/atoms/TextArea";
 import VerifyPhoneModal from "@/components/molecules/VerifyPhoneModal";
-import DeleteAccount from "@/components/organisms/DeleteAccount";
+import dynamic from "next/dynamic";
+const DeleteAccount = dynamic(
+  () => import("@/components/organisms/DeleteAccount"),
+  { ssr: false }
+);
 import ImageCrop from "@/components/organisms/ImageCrop";
 import ImageCropProvider from "@/providers/ImageCropProvider";
 import { UpdateUser, UploadProfileImage, useGetMe } from "@/services/users";
