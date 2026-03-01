@@ -20,8 +20,10 @@ import { z } from "zod";
 
 export default function WithdrawForm({
   trigger,
+  error,
 }: {
   trigger?: React.ReactNode;
+  error?: string;
 }) {
   const { data: me, isLoading } = useGetMe();
   const [active, setActive] = useState<"form" | "otp" | "success">("form");
@@ -116,7 +118,16 @@ export default function WithdrawForm({
         </div>
       </DialogTrigger>
       <Dialog preventCloseOnClickOutside className="p-10 bg-[#F0F2F7]">
-        {active === "form" ? (
+        {Boolean(error) ? (
+          <>
+            <div className="bg-red-100 text-red-500 p-4 rounded-lg">
+              {error}
+            </div>
+            <Button className="w-full mt-4" onClick={() => setOpen(false)}>
+              Close
+            </Button>
+          </>
+        ) : active === "form" ? (
           <>
             <div className="w-full py-6 pb-16 bg-white rounded-lg border-gray-200">
               <div className="px-8 border-b border-gray-100 pb-6 mb-6">

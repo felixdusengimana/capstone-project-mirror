@@ -45,7 +45,13 @@ export default function PayoutsPage() {
               </h3>
             )}
           </div>
-          <WithdrawForm />
+          <WithdrawForm
+            error={
+              !creator?.data.phoneNumber
+                ? "You must complete withdraw information in setting"
+                : ""
+            }
+          />
         </div>
 
         <div className="bg-white px-[67px] py-[55px] w-full rounded-lg mt-8">
