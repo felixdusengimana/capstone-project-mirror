@@ -9,7 +9,6 @@ export interface IPayouts {
   paymentStatus: EStatus;
   transactionReference: string;
   createdAt: string;
-  processedAt: string;
 }
 
 export interface IPayoutsFilters {
@@ -38,4 +37,5 @@ export const payout = z.object({
 
 export type IInitiatePayout = z.infer<typeof payout> & {
   otp: string;
+  phoneNumber: string;
 };

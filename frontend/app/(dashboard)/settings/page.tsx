@@ -1,5 +1,4 @@
 "use client";
-import Avatar from "@/components/atoms/Avatar";
 import Button from "@/components/atoms/Button";
 import Icon, { IconNames } from "@/components/atoms/Icon";
 import Input from "@/components/atoms/Input";

@@ -15,13 +15,12 @@ const WithdrawForm = dynamic(
 export default function PayoutsPage() {
   const { data: creator } = useGetMe();
   const [filters, setFilters] = useState<Partial<IPayoutsFilters>>({
-    creatorTag: `@${creator?.data?.username ?? ""}`,
     pageNumber: 1,
     pageSize: 10,
   });
   const { data: wallet, isLoading: walletLoading } = useGetWallet();
 
-  const { data: payouts } = useGetAllPayouts(filters, !creator?.data?.username);
+  const { data: payouts } = useGetAllPayouts(filters);
 
   return (
     <>
@@ -62,7 +61,9 @@ export default function PayoutsPage() {
           {payouts?.data.results?.map((item, index) => (
             <div className="grid grid-cols-3 py-[11px]" key={index}>
               <p className="text-gray-600 font-normal text-sm pl-2">
-                {item.processedAt}
+                {new Date(item.createdAt).toLocaleDateString() +
+                  " " +
+                  new Date(item.createdAt).toLocaleTimeString()}
               </p>
               <p className="text-gray-600 font-normal text-sm pl-2">
                 {item.amount}

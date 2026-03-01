@@ -56,6 +56,9 @@ export default function WithdrawForm({
           required_error: "Currency is required",
           invalid_type_error: "Pleas select Currency",
         }),
+        phoneNumber: z
+          .string()
+          .min(10, "Phone should be at least 10 characters"),
       })
     ),
     defaultValues: {
@@ -180,12 +183,23 @@ export default function WithdrawForm({
                   }
                   placeholder="Select Payment Channel"
                 >
-                  {Object.keys(EChannel).map((d) => (
-                    <option key={d} value={d}>
-                      {d.replaceAll("_", " ")}
-                    </option>
-                  ))}
+                  {/* {Object.keys(EChannel).map((d) => ( */}
+                  <option key={"MOBILE_MONEY"} value={"MOBILE_MONEY"}>
+                    MOBILE MONEY
+                  </option>
+                  {/* ))} */}
                 </Select>
+                {/* 
+                {watch("paymentChannel") === EChannel.MOBILE_MONEY && (
+                  <>
+                    <Input
+                      label="Phone"
+                      value={watch("phoneNumber")}
+                      onChange={(e) => setValue("phoneNumber", e.target.value)}
+                      error={errors.phoneNumber?.message}
+                    />
+                  </>
+                )} */}
 
                 <div className="flex flex-col gap-4">
                   <Button
