@@ -29,7 +29,7 @@ export default function DashBoardLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="zoom h-screen flex bg-white relative">
-      <div className={`bg-white`}>
+      <div className={`bg-white sticky top-0 h-screen`}>
         <Sidebar links={links} />
       </div>
       <div className="flex-grow bg-[#F0F2F7] overflow-auto pt-[112px]">

@@ -47,6 +47,7 @@ export default function Sidebar({
             photo: user?.profileImageUrl || "",
             username: user?.username,
           }}
+          verified={user?.verified}
           isUserLoading={isUserLoading}
         />
 
