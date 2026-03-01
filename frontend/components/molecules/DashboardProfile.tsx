@@ -12,6 +12,7 @@ import { IconNames } from "../atoms/Icon";
 
 export default function DashboardProfile() {
   const { data: profile, isPending: isFetchingUser } = useGetMe();
+
   return (
     <div className="w-full flex flex-col gap-10 bg-white mt-8 px-6 py-7 rounded-lg">
       <div className="flex justify-between ">

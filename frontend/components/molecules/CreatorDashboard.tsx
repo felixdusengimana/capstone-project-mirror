@@ -63,9 +63,7 @@ export default function CreatorDashboard() {
           {fetchingDashboard ? (
             <span className="animate-pulse bg-gray-200 h-10 w-20 block"></span>
           ) : (
-            <span>
-              {dashboard?.data.biggestSupporter?.toLocaleString() ?? 0}
-            </span>
+            <span>{dashboard?.data.biggestSupport?.toLocaleString() ?? 0}</span>
           )}
         </h1>
       </div>
