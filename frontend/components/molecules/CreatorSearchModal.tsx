@@ -39,7 +39,7 @@ export default function CreatorSearchModal({
   ...props
 }: SearchTriggerProps) {
   const [query, setQuery] = useState("");
-  const { data, isLoading } = useGetCreators({ name: query });
+  const { data, isLoading } = useGetCreators({ name: query, pageSize: 5 });
   const creators = data?.data.results || [];
 
   return (

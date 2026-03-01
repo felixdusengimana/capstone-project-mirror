@@ -171,10 +171,9 @@ export default function SupportCreator() {
 
             <h3 className="mt-8">Success !</h3>
             <p className="max-w-[307px] text-center mt-4">
-              Thank you for supporting{" "}
-              <span className="font-bold">{data?.data?.name}</span>
-              <br />
-              Your support have been sent
+              Another one! Thanks for supporting{" "}
+              <span className="font-bold">{data?.data?.name}</span>. You smart,
+              you loyal, you grateful.
             </p>
           </div>
 

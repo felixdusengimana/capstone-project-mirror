@@ -482,14 +482,15 @@ function TikTok({ ...props }) {
   );
 }
 
-function Verified({ ...props }) {
+function Verified({ width = 15, height = 15, ...props }: IconComponentProps) {
   return (
     <svg
-      width="20"
-      height="20"
+      width={width}
+      height={height}
       viewBox="0 0 20 20"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      {...props}
     >
       <path
         fillRule="evenodd"
