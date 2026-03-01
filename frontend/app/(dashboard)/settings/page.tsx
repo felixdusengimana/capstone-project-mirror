@@ -115,7 +115,7 @@ export default function UserSettings() {
       <h1 className="text-4xl font-sans font-bold text-[#1A1A1A]">Settings</h1>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="max-w-[900px] bg-white px-[67px] py-[55px] w-full rounded-lg mt-8 flex flex-wrap gap-28 justify-between items-start"
+        className="max-w-[900px] bg-white px-10 lg:px-[67px] py-[55px] w-full rounded-lg mt-8 flex flex-wrap gap-28 justify-between items-start"
       >
         <ImageCropProvider>
           <ImageCrop
@@ -173,13 +173,13 @@ export default function UserSettings() {
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="max-w-[900px] bg-white px-[67px] py-[55px] w-full rounded-lg mt-8 flex flex-wrap gap-y-2 gap-x-[107px] justify-between items-start"
+        className="max-w-[900px] bg-white px-10 lg:px-[67px] py-[55px] w-full rounded-lg mt-8 flex flex-wrap gap-y-2 gap-x-[107px] justify-between items-start"
       >
         <p className="flex-grow font-medium text-lg text-gray-600">
           Social Links
         </p>
-        <div>
-          <div className="flex flex-col gap-4 min-w-[486px]">
+        <div className="flex-grow">
+          <div className="flex flex-col gap-4  max-w-full min-w-full lg:min-w-[486px]">
             {watch("socialLinks")?.map((link, index) => {
               const domain = extractDomainFromURL(link.link!);
               const socialMedia =
@@ -276,7 +276,7 @@ export default function UserSettings() {
           </Button>
         </div>
       </form>
-      <form className="max-w-[900px] bg-white px-[67px] py-[55px] w-full rounded-lg mt-8 ">
+      <form className="max-w-[900px] bg-white px-10 lg:px-[67px] py-[55px] w-full rounded-lg mt-8 ">
         <h1 className="font-medium text-gray-600 text-lg">Withdraw Options</h1>
 
         <div className="mt-5">
@@ -366,7 +366,7 @@ export default function UserSettings() {
           )}
         </div>
       </form>
-      <div className="max-w-[900px] mb-10 bg-white px-[67px] py-[55px] w-full rounded-lg mt-8 flex flex-wrap gap-y-5 gap-x-[107px] justify-between items-start">
+      <div className="max-w-[900px] mb-10 bg-white px-10 lg:px-[67px] py-[55px] w-full rounded-lg mt-8 flex flex-wrap gap-y-5 gap-x-[107px] justify-between items-start">
         <div className="max-w-[413px]">
           <h1 className="font-medium text-gray-600 text-lg">Delete account</h1>
           <p className="font-normal text-gray-400 text-base">
