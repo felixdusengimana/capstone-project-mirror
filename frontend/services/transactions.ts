@@ -21,9 +21,13 @@ export function useGetTransactions({
   });
 }
 
-export function useGetTransactionByReference(reference: string) {
+export function useGetTransactionByReference(
+  reference: string,
+  enabled = true
+) {
   return useQuery<IResponse<ITransaction>>({
     queryKey: ["transaction", reference],
     queryFn: async () => axiosInstance.get(`/transactions/${reference}/status`),
+    enabled,
   });
 }

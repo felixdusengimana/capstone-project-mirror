@@ -70,6 +70,7 @@ export default function CreatorDashboardPage() {
               key={i}
             >
               <SupporterDialog
+                transaction={transaction}
                 referenceId={transaction.transactionReference}
                 trigger={
                   <div

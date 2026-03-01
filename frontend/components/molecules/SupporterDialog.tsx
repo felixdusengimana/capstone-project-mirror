@@ -8,21 +8,24 @@ import Profile from "./Profile";
 import CardIcon from "./CardIcon";
 import { useState } from "react";
 import { useGetTransactionByReference } from "@/services/transactions";
+import { ITransaction } from "@/types/transaction";
 
 interface SupporterDialogProps {
   trigger?: React.ReactNode;
   referenceId: string;
+  transaction: ITransaction;
 }
 export default function SupporterDialog({
   trigger,
   referenceId,
+  transaction,
 }: SupporterDialogProps) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => {
     setOpen(!open);
   };
 
-  const { data: transaction } = useGetTransactionByReference(referenceId);
+  // const { data: transaction } = useGetTransactionByReference(referenceId, open);
 
   return (
     <SidebarDialogRoot open={open} onOpenChange={handleOpen}>
@@ -37,14 +40,14 @@ export default function SupporterDialog({
           <div className="mt-20">
             <Profile
               user={{
-                name: transaction?.data?.donorName ?? "",
+                name: transaction?.donorName ?? "",
                 photo: "",
-                date: transaction?.data?.donorEmail ?? "",
+                date: transaction?.donorEmail ?? "",
               }}
             />
 
             <p className="text-[#475569] mt-4 mx-w-[382px] p-4">
-              {transaction?.data?.note}
+              {transaction?.note}
             </p>
 
             <div className="h-0.5 w-[273px] mx-auto bg-gray-200 my-16"></div>
@@ -56,22 +59,21 @@ export default function SupporterDialog({
               <div className="flex text-base font-normal text-gray-600 justify-between">
                 <p className="text-gray-400">Amount</p>
                 <p>
-                  {transaction?.data?.currency}{" "}
-                  {transaction?.data?.amount?.toLocaleString()}
+                  {transaction?.currency}{" "}
+                  {transaction?.amount?.toLocaleString()}
                 </p>
               </div>
 
               <div className="flex text-base font-normal text-gray-600 justify-between">
                 <p className="text-gray-400">Payment fee</p>
                 <p>
-                  {transaction?.data?.currency}{" "}
-                  {transaction?.data?.transactionFee}
+                  {transaction?.currency} {transaction?.transactionFee}
                 </p>
               </div>
 
               <div className="flex text-base font-normal text-gray-600 justify-between">
                 <p className="text-gray-400">Transaction ID</p>
-                <p>{transaction?.data?.transactionReference}</p>
+                <p>{transaction?.transactionReference}</p>
               </div>
             </div>
           </div>
