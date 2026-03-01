@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.server.MethodNotAllowedException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.io.IOException;
 import java.util.Date;
@@ -102,7 +103,7 @@ public class ErrorControllerAdvice {
 
     @ExceptionHandler({PesatoneAuthenticationException.class, BadCredentialsException.class})
     public ResponseEntity<Object> handleAuthenticationException(Exception e) {
-        log.info("AUTHORIZATION_EXCEPTION", e);
+        log.info("AUTHORIZATION_EXCEPTION {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponseObject<>("Sorry, your credentials are invalid or the account is not active",false));
     }
 
@@ -116,6 +117,12 @@ public class ErrorControllerAdvice {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponseObject<>(e.getMessage(),false));
     }
 
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Object> handle(NoResourceFoundException e) {
+        log.error("No resource exception {}",e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponseObject<>("Page not found",false));
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Object> handle(RuntimeException e) {
         log.error("RUNTIME_EXCEPTION",e);
@@ -124,7 +131,7 @@ public class ErrorControllerAdvice {
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<Object> handle(MethodNotAllowedException e) {
-        log.error(e.getMessage(),e);
+        log.error("Method not allowed {}",e.getMessage());
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(new ApiResponseObject<>("Http method not supported",false));
     }
 

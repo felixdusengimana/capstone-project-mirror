@@ -48,6 +48,9 @@ public class ApplicationSecurityConfig {
                                 .anyRequest()
                                 .authenticated()
                 )
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .permitAll())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
