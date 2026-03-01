@@ -12,5 +12,8 @@ public record TransactionSearchResponse(Long id,
                                         Date paidAt,
                                         String note,
                                         String donorName,
-                                        CurrencyEnum currency) {
+                                        CurrencyEnum currency,
+                                        String creatorUserName,
+                                        String creatorName,
+                                        String creatorProfileImageUrl) {
 }

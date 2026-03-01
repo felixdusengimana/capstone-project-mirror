@@ -9,8 +9,13 @@ import com.pesatone.api.exception.PesatoneException;
 import com.pesatone.api.exception.PesatoneNotFoundException;
 import com.pesatone.api.model.dto.PayoutDto;
 import com.pesatone.api.model.dto.PayoutRequestDto;
-import com.pesatone.api.model.dto.flw.*;
-import com.pesatone.api.model.entity.*;
+import com.pesatone.api.model.dto.flw.FlwPayoutDetail;
+import com.pesatone.api.model.dto.flw.FlwPayoutDetailResponseList;
+import com.pesatone.api.model.dto.flw.FlwPayoutRequestDto;
+import com.pesatone.api.model.entity.AppUser;
+import com.pesatone.api.model.entity.Payout;
+import com.pesatone.api.model.entity.QPayout;
+import com.pesatone.api.model.entity.Wallet;
 import com.pesatone.api.model.enumeration.*;
 import com.pesatone.api.model.search.filter.PayoutSearchFilter;
 import com.pesatone.api.model.search.response.PayoutSearchResponse;
@@ -78,6 +83,7 @@ public class PayoutServiceImpl implements PayoutService {
         QPayout qPayout = QPayout.payout;
         BlazeJPAQuery<Payout> blazeQuery = new BlazeJPAQuery<>(entityManager, builderFactory);
         blazeQuery.from(qPayout);
+
         if (requestPrincipal.isCreator()) {
             blazeQuery.where(qPayout.creator.id.eq(requestPrincipal.getLoggedInUser().getId()));
         }
@@ -103,7 +109,10 @@ public class PayoutServiceImpl implements PayoutService {
                         qPayout.paymentStatus,
                         qPayout.transactionReference,
                         qPayout.createdAt,
-                        qPayout.processedAt
+                        qPayout.processedAt,
+                        qPayout.creator.username,
+                        qPayout.creator.name,
+                        qPayout.creator.profileImageUrl
                 ))
                 .fetchPage(filter.getOffset(), filter.getPageSize());
 

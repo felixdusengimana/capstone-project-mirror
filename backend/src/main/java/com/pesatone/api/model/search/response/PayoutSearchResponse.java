@@ -14,5 +14,8 @@ public record PayoutSearchResponse(Long id,
                                    PaymentStatusEnum paymentStatus,
                                    String transactionReference,
                                    Date createdAt,
-                                   Date processedAt) {
+                                   Date processedAt,
+                                   String creatorUserName,
+                                   String creatorName,
+                                   String creatorProfileImageUrl) {
 }

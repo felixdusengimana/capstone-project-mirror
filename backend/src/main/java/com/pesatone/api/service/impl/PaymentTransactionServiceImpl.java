@@ -16,8 +16,8 @@ import com.pesatone.api.model.enumeration.PaymentProviderEnum;
 import com.pesatone.api.model.enumeration.PaymentStatusEnum;
 import com.pesatone.api.model.enumeration.RoleEnum;
 import com.pesatone.api.model.pojo.DashboardPojo;
-import com.pesatone.api.model.search.response.QueryResultPojo;
 import com.pesatone.api.model.search.filter.TransactionSearchFilter;
+import com.pesatone.api.model.search.response.QueryResultPojo;
 import com.pesatone.api.model.search.response.TransactionSearchResponse;
 import com.pesatone.api.repository.AppUserRepository;
 import com.pesatone.api.repository.PaymentTransactionRepository;
@@ -26,6 +26,7 @@ import com.pesatone.api.service.PaymentTransactionService;
 import com.pesatone.api.service.payment.FlutterWaveService;
 import com.pesatone.api.util.AppUtil;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.StringPath;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -162,7 +163,10 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
                         qPaymentTransaction.paidAt,
                         qPaymentTransaction.note,
                         qPaymentTransaction.donorName,
-                        qPaymentTransaction.currency
+                        qPaymentTransaction.currency,
+                        qPaymentTransaction.creator.username,
+                        qPaymentTransaction.creator.name,
+                        qPaymentTransaction.creator.profileImageUrl
                 )).fetchPage(filter.getOffset(), filter.getPageSize());
 
         return new QueryResultPojo<>(pagedList, filter.getPageNumber(), filter.getPageSize(), pagedList.getTotalPages());
@@ -172,7 +176,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
         return flutterWaveService.getTransactionDetail(transaction.getTransactionReference())
                 .publishOn(Schedulers.boundedElastic())
                 .map(response -> {
-                    log.info("FLW transaction detail: {}",  response);
+                    log.info("FLW transaction detail: {}", response);
                     FlwTransactionDetailResponse detailResponse = gson.fromJson(response, FlwTransactionDetailResponse.class);
                     FlwTransactionDetail transactionDetail = detailResponse.getData();
                     return paymentProcessingService.processPayment(transaction, transactionDetail.getPaymentDto());
