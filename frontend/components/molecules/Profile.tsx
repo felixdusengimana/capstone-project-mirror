@@ -26,7 +26,10 @@ export default function Profile({
         {isUserLoading ? (
           <span className="animate-pulse bg-gray-200 h-4 w-40 block"></span>
         ) : (
-          <h3 className="text-base text-gray-800">{user.name}</h3>
+          <div className="flex gap-0.5 items-center">
+            <h3 className="text-base text-gray-800">{user.name}</h3>
+            {verified && <Icon name="verified" />}
+          </div>
         )}
 
         {isUserLoading ? (
@@ -39,7 +42,6 @@ export default function Profile({
 
         {user.date && <p className="text-sm text-gray-500">{user.date}</p>}
       </div>
-      {verified && <Icon name="verified" />}
     </div>
   );
 }
