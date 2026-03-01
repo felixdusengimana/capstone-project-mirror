@@ -1214,7 +1214,7 @@ function ChevronLeft({
       <path
         d="M12.8417 13.825L9.02499 10L12.8417 6.175L11.6667 5L6.66666 10L11.6667 15L12.8417 13.825Z"
         fill={fill}
-        fill-opacity="0.37"
+        fillOpacity="0.37"
       />
     </svg>
   );

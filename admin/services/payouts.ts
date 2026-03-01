@@ -6,11 +6,13 @@ import { ObjectToParams } from "@/utils/params";
 
 export function useGetAllPayouts(
   data: Partial<IPayoutsFilters>,
-  enabled = true
+  enabled = true,
+  pageSize = 10,
+  pageNumber = 1
 ) {
-  const params = ObjectToParams({ ...data });
+  const params = ObjectToParams({ ...data, pageNumber, pageSize });
   return useQuery<IResponse<ISorted<IPayouts>>>({
-    queryKey: ["payouts", Object.values(data).join(",")],
+    queryKey: ["payouts", Object.values(data).join(","), pageNumber, pageSize],
     queryFn: async () => axiosInstance.get(`/payouts?${params}`),
     enabled,
   });

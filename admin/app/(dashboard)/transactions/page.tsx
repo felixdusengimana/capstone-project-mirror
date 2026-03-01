@@ -47,25 +47,18 @@ export default function TransactionsDashboard() {
       footer: (info) => info.column.id,
     }),
 
-    columnHelper.accessor("amount", {
+    columnHelper.accessor("creatorName", {
       id: "creator",
       cell: (info) => (
-        <CreatorDialog
-          userId="1"
-          trigger={
-            <div className="flex gap-2 items-center">
-              <Avatar src="/profiles/profile1.png" />
-              <div className="flex flex-col justify-start items-start">
-                <span className="font-medium text-sm block">
-                  {info.getValue()}
-                </span>
-                <span className="font-normal text-gray-400 text-xs block">
-                  ---
-                </span>
-              </div>
-            </div>
-          }
-        />
+        <div className="flex gap-2 items-center">
+          <Avatar src="/profiles/profile1.png" />
+          <div className="flex flex-col justify-start items-start">
+            <span className="font-medium text-sm block">{info.getValue()}</span>
+            <span className="font-normal text-gray-400 text-xs block">
+              {info.row.original.creatorUserName}
+            </span>
+          </div>
+        </div>
       ),
       header: () => (
         <span className="text-gray-500 font-medium text-xs">Creator</span>
@@ -110,7 +103,7 @@ export default function TransactionsDashboard() {
     //   footer: (info) => info.column.id,
     // }),
 
-    columnHelper.accessor("transactionFee", {
+    columnHelper.accessor("transactionReference", {
       id: "id",
       cell: (info) => (
         <span className="font-normal text-sm">{info.getValue()}</span>

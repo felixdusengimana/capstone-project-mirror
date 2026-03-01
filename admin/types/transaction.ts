@@ -10,6 +10,8 @@ export interface ITransaction {
   donorName: string;
   donorEmail?: string;
   currency: ECurrency;
+  creatorName: string;
+  creatorUserName: string;
 }
 
 export interface ITransactionFilter {

@@ -2,7 +2,6 @@
 import Avatar from "@/components/atoms/Avatar";
 import Pill from "@/components/atoms/Pill";
 import Select from "@/components/atoms/Select";
-import CreatorDialog from "@/components/molecules/CreatorDialog";
 import { CustomTable } from "@/components/molecules/CustomTable";
 import DateRagePicker from "@/components/molecules/DateRagePicker";
 import SearchInput from "@/components/molecules/SearchInput";
@@ -36,25 +35,18 @@ export default function PayoutsDashboard() {
   const columnHelper = createColumnHelper<IPayouts>();
 
   const [columns] = useState(() => [
-    columnHelper.accessor("amount", {
-      id: "name",
+    columnHelper.accessor("creatorName", {
+      id: "creatorName",
       cell: (info) => (
-        <CreatorDialog
-          userId="1"
-          trigger={
-            <div className="flex gap-2 items-center">
-              <Avatar src="/profiles/profile1.png" />
-              <div className="flex flex-col justify-start items-start">
-                <span className="font-medium text-sm block">
-                  {info.getValue()}
-                </span>
-                <span className="font-normal text-gray-400 text-xs block">
-                  ---
-                </span>
-              </div>
-            </div>
-          }
-        />
+        <div className="flex gap-2 items-center">
+          <Avatar src="/profiles/profile1.png" />
+          <div className="flex flex-col justify-start items-start">
+            <span className="font-medium text-sm block">{info.getValue()}</span>
+            <span className="font-normal text-gray-400 text-xs block">
+              {info.row.original.creatorUserName}
+            </span>
+          </div>
+        </div>
       ),
       header: () => (
         <span className="text-gray-500 font-medium text-xs">Creator</span>
@@ -202,10 +194,10 @@ export default function PayoutsDashboard() {
             table={table}
             loading={isPending}
             pagination={{
-              currentPage: 2,
+              currentPage: data?.data?.pageNumber ?? 0,
               onPageChange: () => {},
               perPage: 10,
-              total: 1000,
+              total: data?.data?.totalPages ?? 0,
             }}
           />
         </div>

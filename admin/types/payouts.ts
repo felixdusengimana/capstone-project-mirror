@@ -10,6 +10,8 @@ export interface IPayouts {
   transactionReference: string;
   createdAt: string;
   processedAt: string;
+  creatorName: string;
+  creatorUserName: string;
 }
 
 export interface IPayoutsFilters {
