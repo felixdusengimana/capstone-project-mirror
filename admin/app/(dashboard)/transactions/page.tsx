@@ -156,9 +156,9 @@ export default function TransactionsDashboard() {
                 label: (
                   <Link href={"?status=all"} className="flex gap-2">
                     All clients{" "}
-                    <p className="border border-[#E5E9F0] text-[#6B7280] px-2 py-0.5 rounded-full">
+                    {/* <p className="border border-[#E5E9F0] text-[#6B7280] px-2 py-0.5 rounded-full">
                       200
-                    </p>
+                    </p> */}
                   </Link>
                 ),
                 active: status === "all" || !status,
