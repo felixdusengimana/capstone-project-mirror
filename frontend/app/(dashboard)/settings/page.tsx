@@ -8,6 +8,7 @@ const DeleteAccount = dynamic(
   () => import("@/components/organisms/DeleteAccount"),
   { ssr: false }
 );
+
 const VerifyPhoneModal = dynamic(
   () => import("@/components/molecules/VerifyPhoneModal"),
   { ssr: false }
@@ -28,7 +29,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { EChannel } from "@/types";
 
 export default function UserSettings() {
   const { data: usr, isLoading } = useGetMe();
@@ -164,7 +164,8 @@ export default function UserSettings() {
           <Button
             isLoading={isUpdating}
             disabled={isUpdatingPic || !isDirty}
-            className="w-fit"
+            size="sm"
+            className="w-fit ml-auto"
           >
             Save
           </Button>
@@ -270,102 +271,14 @@ export default function UserSettings() {
           <Button
             isLoading={isUpdating}
             disabled={isUpdatingPic || !isDirty}
-            className="w-fit mt-5"
+            size="sm"
+            className="w-fit mt-5 ml-auto"
           >
             Save
           </Button>
         </div>
       </form>
-      <form className="max-w-[900px] bg-white px-10 lg:px-[67px] py-[55px] w-full rounded-lg mt-8 ">
-        <h1 className="font-medium text-gray-600 text-lg">Withdraw Options</h1>
-
-        <div className="mt-5">
-          <label
-            htmlFor=""
-            className="text-[#64748A] text-sm font-normal block mb-2"
-          >
-            1. Mobile Money
-          </label>
-
-          {!usr?.data.phoneNumber ? (
-            <WithdrawOptions
-              initialData={{ phoneNumber: "0784483142" }}
-              trigger={
-                <Button type="button">
-                  <Icon name="add" />
-                  <span className="text-sm">Add Mobile Number</span>
-                </Button>
-              }
-              type={EChannel.MOBILE_MONEY}
-            />
-          ) : (
-            <Input
-              disabled
-              value={"0784483142"}
-              right={
-                <WithdrawOptions
-                  trigger={<button type="button">Edit</button>}
-                  type={EChannel.MOBILE_MONEY}
-                />
-              }
-            />
-          )}
-        </div>
-
-        <div className="mt-5">
-          <div className="flex w-full justify-between">
-            <label
-              htmlFor=""
-              className="text-[#64748A] text-sm font-normal block mb-2"
-            >
-              2. Bank Account
-            </label>
-
-            {usr?.data.phoneNumber && (
-              <WithdrawOptions
-                trigger={<button type="button">Edit</button>}
-                type={EChannel.BANK_ACCOUNT}
-              />
-            )}
-          </div>
-
-          {!usr?.data.phoneNumber ? (
-            <WithdrawOptions
-              trigger={
-                <Button type="button">
-                  <Icon name="add" />
-                  <span className="text-sm">Add Bank Account</span>
-                </Button>
-              }
-              type={EChannel.BANK_ACCOUNT}
-            />
-          ) : (
-            <div>
-              <label
-                htmlFor=""
-                className="text-[#64748A] text-sm font-normal block mb-2"
-              >
-                Bank Name: <span className="font-bold">I&M Bank</span>
-              </label>
-
-              <label
-                htmlFor=""
-                className="text-[#64748A] text-sm font-normal block mb-2"
-              >
-                Account Number: <span className="font-bold">2098373</span>
-              </label>
-
-              <label
-                htmlFor=""
-                className="text-[#64748A] text-sm font-normal block mb-2"
-              >
-                Account Name:{" "}
-                <span className="font-bold">Felix Dusengimana</span>
-              </label>
-            </div>
-          )}
-        </div>
-      </form>
+      <WithdrawOptions />
       <div className="max-w-[900px] mb-10 bg-white px-10 lg:px-[67px] py-[55px] w-full rounded-lg mt-8 flex flex-wrap gap-y-5 gap-x-[107px] justify-between items-start">
         <div className="max-w-[413px]">
           <h1 className="font-medium text-gray-600 text-lg">Delete account</h1>

@@ -1,141 +1,128 @@
 import { EChannel } from "@/types";
-import React, { useState } from "react";
-import Dialog, { DialogRoot } from "../molecules/Dialog";
-import { DialogTrigger } from "@radix-ui/react-dialog";
 import Button from "../atoms/Button";
-import Input from "../atoms/Input";
-import Select from "../atoms/Select";
-import {
-  IWithdrawAccount,
-  withdrawAccountPhone,
-  withdrawAccountWithBank,
-} from "@/types/wallet";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import Icon from "../atoms/Icon";
+import WithdrawOptionsForm from "./WithdrawOptionsForm";
+import { useGetWithdrawAccounts } from "@/services/withdrawal-accounts";
+import { IWithdrawalAccount } from "@/types/withdrawal-accounts";
 
-interface IWithdrawOptions {
-  trigger: React.ReactNode;
-  type: EChannel;
-  initialData?: Partial<IWithdrawAccount>;
-}
-export default function WithdrawOptions({
-  trigger,
-  type,
-  initialData,
-}: IWithdrawOptions) {
-  const [openModal, setOpenModal] = useState(false);
+export default function WithdrawOptions() {
+  const { data: accounts, isPending: isLoadingAccounts } =
+    useGetWithdrawAccounts({});
+  const phone = accounts?.data.find(
+    (account) => account.accountType === EChannel.MOBILE_MONEY
+  );
 
-  const {
-    reset,
-    setValue,
-    watch,
-    handleSubmit,
-    formState: { errors, isDirty },
-  } = useForm<IWithdrawAccount>({
-    resolver: zodResolver(
-      type === EChannel.MOBILE_MONEY
-        ? withdrawAccountPhone
-        : withdrawAccountWithBank
-    ),
-    defaultValues: {
-      phoneNumber: initialData?.phoneNumber,
-      bankName: initialData?.bankName,
-      accountName: initialData?.accountName,
-      accountNumber: initialData?.accountNumber,
-    },
-  });
-
-  const onSubmit = (data: IWithdrawAccount) => {
-    console.log(data);
-    setOpenModal(false);
-    reset();
-  };
+  const bank = accounts?.data.find(
+    (account) => account.accountType === EChannel.BANK_ACCOUNT
+  );
 
   return (
-    <DialogRoot open={openModal} onOpenChange={setOpenModal}>
-      <DialogTrigger>{trigger}</DialogTrigger>
-      <Dialog className="p-5">
-        <h1 className="font-medium text-gray-600 text-lg">
-          {(initialData?.phoneNumber && type === EChannel.MOBILE_MONEY) ||
-          (initialData?.accountNumber && type === EChannel.BANK_ACCOUNT)
-            ? "Edit"
-            : "Add"}{" "}
-          {type === EChannel.BANK_ACCOUNT ? "Bank Account" : "Mobile Money"}{" "}
-          Information
-        </h1>
+    <form className="max-w-[900px] bg-white px-10 lg:px-[67px] py-[55px] w-full rounded-lg mt-8 ">
+      <h1 className="font-medium text-gray-600 text-lg">Withdraw Options</h1>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
-          {type === EChannel.MOBILE_MONEY ? (
-            <Input
-              error={errors.phoneNumber?.message}
-              label="Mobile Number"
-              onChange={(e) =>
-                setValue("phoneNumber", e.target.value, {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                })
-              }
-              value={watch("phoneNumber")}
+      <div className="mt-5">
+        <div className="flex w-full justify-between">
+          <label
+            htmlFor=""
+            className="text-[#64748A] text-sm font-normal block mb-2"
+          >
+            1. Mobile Money
+          </label>
+
+          {phone && (
+            <WithdrawOptionsForm
+              initialData={{
+                id: phone?.id,
+                accountNumber: phone?.accountNumber,
+              }}
+              trigger={<button type="button">Edit</button>}
+              type={EChannel.MOBILE_MONEY}
             />
-          ) : (
-            <>
-              <Select
-                error={errors.bankName?.message}
-                label="Bank Name"
-                onChange={(e) =>
-                  setValue("bankName", e.target.value, {
-                    shouldDirty: true,
-                    shouldValidate: true,
-                  })
-                }
-                value={watch("bankName")}
-                placeholder=" Select Bank"
-              >
-                <option value="zenith">Zenith Bank</option>
-                <option value="gtb">GT Bank</option>
-                <option value="firstbank">First Bank</option>
-                <option value="access">Access Bank</option>
-              </Select>
-              <Input
-                error={errors.accountNumber?.message}
-                label="Account Number"
-                value={watch("accountNumber")}
-                onChange={(e) =>
-                  setValue("accountNumber", e.target.value, {
-                    shouldDirty: true,
-                    shouldValidate: true,
-                  })
-                }
-              />
-              <Input
-                error={errors.accountName?.message}
-                label="Account Name"
-                value={watch("accountName")}
-                onChange={(e) =>
-                  setValue("accountName", e.target.value, {
-                    shouldDirty: true,
-                    shouldValidate: true,
-                  })
-                }
-              />
-            </>
           )}
+        </div>
 
-          <div className="flex gap-3 mt-3">
-            <Button className="w-fit" disabled={!isDirty}>
-              Save
-            </Button>
-            <Button
-              onClick={() => setOpenModal(false)}
-              type="button"
-              variant="danger"
-              className="w-fit"
+        {!phone ? (
+          <WithdrawOptionsForm
+            trigger={
+              <Button type="button">
+                <Icon name="add" />
+                <span className="text-sm">Add Mobile Number</span>
+              </Button>
+            }
+            type={EChannel.MOBILE_MONEY}
+          />
+        ) : (
+          <label
+            htmlFor=""
+            className="text-[#64748A] text-sm font-normal block mb-2"
+          >
+            Mobile Number:{" "}
+            <span className="font-bold">{phone?.accountNumber}</span>
+          </label>
+        )}
+      </div>
+
+      <div className="mt-5">
+        <div className="flex w-full justify-between">
+          <label
+            htmlFor=""
+            className="text-[#64748A] text-sm font-normal block mb-2"
+          >
+            2. Bank Account
+          </label>
+
+          {bank && (
+            <WithdrawOptionsForm
+              initialData={{
+                id: bank?.id,
+                accountName: bank?.accountName,
+                accountNumber: bank?.accountNumber,
+                bankCode: bank?.bank?.code,
+                accountType: bank?.accountType,
+              }}
+              trigger={<button type="button">Edit</button>}
+              type={EChannel.BANK_ACCOUNT}
+            />
+          )}
+        </div>
+
+        {!bank ? (
+          <WithdrawOptionsForm
+            trigger={
+              <Button type="button">
+                <Icon name="add" />
+                <span className="text-sm">Add Bank Account</span>
+              </Button>
+            }
+            type={EChannel.BANK_ACCOUNT}
+          />
+        ) : (
+          <div>
+            <label
+              htmlFor=""
+              className="text-[#64748A] text-sm font-normal block mb-2"
             >
-              Cancel
-            </Button>
+              Bank Name: <span className="font-bold">{bank.bank?.name}</span>
+            </label>
+
+            <label
+              htmlFor=""
+              className="text-[#64748A] text-sm font-normal block mb-2"
+            >
+              Account Number:{" "}
+              <span className="font-bold">{bank.accountNumber}</span>
+            </label>
+
+            <label
+              htmlFor=""
+              className="text-[#64748A] text-sm font-normal block mb-2"
+            >
+              Account Name:{" "}
+              <span className="font-bold">{bank.accountName}</span>
+            </label>
           </div>
-        </form>
-      </Dialog>
-    </DialogRoot>
+        )}
+      </div>
+    </form>
   );
 }

@@ -4,7 +4,7 @@ import Pagination from "@/components/molecules/Pagination";
 import { useGetAllPayouts } from "@/services/payouts";
 import { useGetMe } from "@/services/users";
 import { useGetWallet } from "@/services/wallet";
-import { EStatus } from "@/types";
+import { ECurrency, EStatus } from "@/types";
 import { IPayoutsFilters } from "@/types/payouts";
 import dynamic from "next/dynamic";
 import { useState } from "react";
@@ -15,11 +15,16 @@ const WithdrawForm = dynamic(
 
 export default function PayoutsPage() {
   const { data: creator } = useGetMe();
+
   const [filters, setFilters] = useState<Partial<IPayoutsFilters>>({
     pageNumber: 1,
-    pageSize: 10,
+    pageSize: 1,
+    currency: ECurrency.RWF,
   });
-  const { data: wallet, isLoading: walletLoading } = useGetWallet();
+
+  const { data: wallet, isPending: walletLoading } = useGetWallet({
+    currency: filters?.currency!,
+  });
 
   const { data: payouts, isPending: isLoadingPayouts } =
     useGetAllPayouts(filters);
@@ -37,15 +42,32 @@ export default function PayoutsPage() {
             {walletLoading ? (
               <div className="animate-pulse h-8 w-24 bg-gray-200 rounded-lg mt-4"></div>
             ) : (
-              <h3 className=" text-gray-800 font-medium text-4xl flex items-center gap-2 mt-4">
-                <span className="font-normal text-base text-gray-400">
-                  {wallet?.data?.currency}
-                </span>{" "}
-                {wallet?.data.balance.toLocaleString()}
-              </h3>
+              <div className="flex items-center gap-2 mt-4">
+                <select
+                  value={filters?.currency}
+                  className="font-normal text-base text-gray-400 bg-white"
+                  onChange={(e) =>
+                    setFilters({
+                      ...filters,
+                      currency: e.target.value as ECurrency,
+                    })
+                  }
+                >
+                  {Object.values(ECurrency).map((currency) => (
+                    <option key={currency} value={currency}>
+                      {currency}
+                    </option>
+                  ))}
+                </select>
+                <h3 className=" text-gray-800 font-medium text-4xl ">
+                  {wallet?.data.balance.toLocaleString()}
+                </h3>
+              </div>
             )}
           </div>
           <WithdrawForm
+            wallet={wallet?.data!}
+            walletLoading={walletLoading}
             error={
               !creator?.data.phoneNumber
                 ? "You must complete withdraw information in setting"
@@ -77,7 +99,7 @@ export default function PayoutsPage() {
                       new Date(item.createdAt).toLocaleTimeString()}
                   </p>
                   <p className="text-gray-600 font-normal text-sm pl-2">
-                    {item.amount}
+                    {item.amount.toLocaleString()} {item.currency}
                   </p>
                   <Pill
                     variant={
@@ -92,16 +114,19 @@ export default function PayoutsPage() {
                   </Pill>
                 </div>
               ))}
-              {(payouts?.data?.totalPages ?? 0) > 1 && (
-                <Pagination
-                  currentPage={payouts?.data.pageNumber ?? 100}
-                  total={payouts?.data?.totalPages ?? 1000}
-                  onPageChange={(page) =>
-                    setFilters({ ...filters, pageNumber: page })
-                  }
-                />
-              )}
             </>
+          )}
+
+          {(payouts?.data?.totalPages ?? 0) > 1 && (
+            <div className="py-8">
+              <Pagination
+                currentPage={payouts?.data.pageNumber ?? 100}
+                total={payouts?.data?.totalPages ?? 1000}
+                onPageChange={(page) =>
+                  setFilters({ ...filters, pageNumber: page })
+                }
+              />
+            </div>
           )}
         </div>
       </div>

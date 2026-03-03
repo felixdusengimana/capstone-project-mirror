@@ -5,6 +5,7 @@ import Icon from "@/components/atoms/Icon";
 import Input from "@/components/atoms/Input";
 import CreatorDashboard from "@/components/molecules/CreatorDashboard";
 import DashboardProfile from "@/components/molecules/DashboardProfile";
+import DateRagePicker from "@/components/molecules/DateRagePicker";
 import Pagination from "@/components/molecules/Pagination";
 import Profile from "@/components/molecules/Profile";
 import SupporterDialog from "@/components/molecules/SupporterDialog";
@@ -49,13 +50,14 @@ export default function CreatorDashboardPage() {
             }
             placeholder="Search"
           />
-          <Button
+          {/* <Button
             outline
             className="text-[#475569] font-medium flex gap-1 items-center"
           >
             Last 30 days
             <Icon name="arrow-down" />
-          </Button>
+          </Button> */}
+          <DateRagePicker />
         </div>
         {isPending ? (
           <div className="text-gray-700 px-6">Loading</div>
@@ -103,13 +105,15 @@ export default function CreatorDashboardPage() {
             ))}
             <div>
               {(userTransactions?.data?.totalPages ?? 0) > 1 && (
-                <Pagination
-                  currentPage={userTransactions?.data.pageNumber ?? 0}
-                  total={userTransactions?.data?.totalPages ?? 0}
-                  onPageChange={(page) =>
-                    setFilters({ ...filters, pageNumber: page })
-                  }
-                />
+                <div className="py-8">
+                  <Pagination
+                    currentPage={userTransactions?.data.pageNumber ?? 0}
+                    total={userTransactions?.data?.totalPages ?? 0}
+                    onPageChange={(page) =>
+                      setFilters({ ...filters, pageNumber: page })
+                    }
+                  />
+                </div>
               )}
             </div>
           </>

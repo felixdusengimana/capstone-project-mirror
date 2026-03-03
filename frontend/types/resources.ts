@@ -11,3 +11,9 @@ export interface ICountry {
   countryCode: string;
   currency: string;
 }
+
+export interface IBank {
+  id: number;
+  name: string;
+  code: string;
+}

@@ -5,35 +5,59 @@ import Icon from "../atoms/Icon";
 import Input from "../atoms/Input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { IInitiatePayout, payout } from "@/types/payouts";
-import { useState } from "react";
+import { IInitiatePayout } from "@/types/payouts";
+import { useEffect, useState } from "react";
 import { EChannel, ECurrency } from "@/types";
 import Select from "../atoms/Select";
 import { EOtpTypes, GenerateOTP, useGetMe } from "@/services/users";
 import { convertEmail } from "@/utils/convertEmail";
 import OTPInput from "./OTPInput";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { InitiatePayouts } from "@/services/payouts";
 import toast from "react-hot-toast";
-import { useGetWallet } from "@/services/wallet";
 import { z } from "zod";
+import { IWallet } from "@/types/wallet";
+import useIsNativeCurrency from "@/hooks/useIsNativeCurrency";
+import { useGetWithdrawAccounts } from "@/services/withdrawal-accounts";
 
 export default function WithdrawForm({
   trigger,
+  wallet,
+  walletLoading,
   error,
 }: {
   trigger?: React.ReactNode;
+  wallet: IWallet;
   error?: string;
+  walletLoading?: boolean;
 }) {
-  const { data: me, isLoading } = useGetMe();
+  const { data: me, isPending: loadingUser } = useGetMe();
   const [active, setActive] = useState<"form" | "otp" | "success">("form");
   const [open, setOpen] = useState(false);
+  const isNativeCurrency = useIsNativeCurrency({ currency: wallet?.currency });
+  const queryClient = useQueryClient();
+  const { data: accounts, isPending: loadingAccounts } = useGetWithdrawAccounts(
+    { enabled: open }
+  );
+  const bankAccount = accounts?.data?.find(
+    (account) => account.accountType == EChannel.BANK_ACCOUNT
+  );
+  const mobileMoneyAccount = accounts?.data?.find(
+    (account) => account.accountType == EChannel.MOBILE_MONEY
+  );
 
-  const { data: wallet, isLoading: walletLoading } = useGetWallet();
+  const isLoading = loadingUser || walletLoading || loadingAccounts;
+
+  const currencyMinWithdraw = {
+    [ECurrency.RWF]: 1000,
+    [ECurrency.USD]: 10,
+    [ECurrency.GBP]: 10,
+  };
 
   const {
     handleSubmit,
     setValue,
+    reset,
     watch,
     formState: { errors },
   } = useForm<IInitiatePayout>({
@@ -43,11 +67,16 @@ export default function WithdrawForm({
           .number({
             required_error: "Amount is required",
           })
-          .min(100, "Amount must be greater than 100")
+          .min(
+            currencyMinWithdraw[wallet?.currency],
+            `Amount must be greater than ${
+              currencyMinWithdraw[wallet?.currency]
+            }${wallet?.currency}`
+          )
           .max(
-            wallet?.data.balance ?? 0,
-            `Amount must be less than ${wallet?.data.balance.toLocaleString()} ${
-              wallet?.data.currency
+            wallet?.balance ?? 0,
+            `Amount must be less than ${wallet?.balance.toLocaleString()} ${
+              wallet?.currency
             }`
           ),
         paymentChannel: z.nativeEnum(EChannel, {
@@ -58,14 +87,8 @@ export default function WithdrawForm({
           required_error: "Currency is required",
           invalid_type_error: "Pleas select Currency",
         }),
-        phoneNumber: z
-          .string()
-          .min(10, "Phone should be at least 10 characters"),
       })
     ),
-    defaultValues: {
-      currency: ECurrency.RWF,
-    },
   });
 
   // set otp if user didn't verify email
@@ -81,18 +104,18 @@ export default function WithdrawForm({
 
   const { mutate, isPending } = useMutation({
     mutationFn: InitiatePayouts,
-    onSuccess: async (data) => {
-      if (data?.data?.transactionReference) {
-        toast.success(
-          "Your payout has been initiated. Your money would be in your account soon.",
-          {
-            id: "payout",
-          }
-        );
-        setOpen(false);
-      } else {
-        toast.error("Error initiating this payment", { id: "payout" });
-      }
+    onSuccess: () => {
+      toast.success(
+        "Your payout has been initiated. Your money would be in your account soon.",
+        {
+          id: "payout",
+        }
+      );
+      setOpen(false);
+      queryClient.invalidateQueries({
+        queryKey: ["payouts"],
+      });
+      reset();
     },
     onError(error) {
       toast.error(error.message, {
@@ -104,6 +127,13 @@ export default function WithdrawForm({
   const onSubmit = (data: IInitiatePayout) => {
     sendFirstOtp();
   };
+
+  useEffect(() => {
+    reset({
+      currency: wallet?.currency,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wallet]);
 
   return (
     <DialogRoot onOpenChange={setOpen} open={open}>
@@ -139,9 +169,9 @@ export default function WithdrawForm({
                 ) : (
                   <h3 className=" text-gray-800 font-medium text-4xl flex items-center gap-2 mt-4">
                     <span className="font-normal text-base text-gray-400">
-                      {wallet?.data?.currency}
+                      {wallet?.currency}
                     </span>{" "}
-                    {wallet?.data.balance.toLocaleString()}
+                    {wallet?.balance.toLocaleString()}
                   </h3>
                 )}
               </div>
@@ -164,22 +194,10 @@ export default function WithdrawForm({
                   error={errors.amount?.message || errors.currency?.message}
                   autoFocus
                   type="number"
-                  right={
-                    <select
-                      value={watch("currency")}
-                      onChange={(e) => {
-                        setValue("currency", e.target.value as ECurrency, {
-                          shouldValidate: true,
-                        });
-                      }}
-                      className="bg-[#F7F9FB] text-[#475569]"
-                    >
-                      {Object.keys(ECurrency).map((d) => (
-                        <option key={d} value={d}>
-                          {d}
-                        </option>
-                      ))}
-                    </select>
+                  left={
+                    <p className="text-gray-800 font-medium text-lg pr-1">
+                      {wallet?.currency}
+                    </p>
                   }
                 />
 
@@ -194,23 +212,45 @@ export default function WithdrawForm({
                   }
                   placeholder="Select Payment Channel"
                 >
-                  {/* {Object.keys(EChannel).map((d) => ( */}
-                  <option key={"MOBILE_MONEY"} value={"MOBILE_MONEY"}>
-                    MOBILE MONEY
-                  </option>
-                  {/* ))} */}
+                  {Object.keys(EChannel)
+                    .filter(
+                      (d) =>
+                        (d === EChannel.MOBILE_MONEY && isNativeCurrency) ||
+                        d !== EChannel.MOBILE_MONEY
+                    )
+                    .map((d) => (
+                      <option key={d} value={d}>
+                        {d.split("_").join(" ")}
+                      </option>
+                    ))}
                 </Select>
-                {/* 
-                {watch("paymentChannel") === EChannel.MOBILE_MONEY && (
+
+                {watch("paymentChannel") && (
                   <>
-                    <Input
-                      label="Phone"
-                      value={watch("phoneNumber")}
-                      onChange={(e) => setValue("phoneNumber", e.target.value)}
-                      error={errors.phoneNumber?.message}
-                    />
+                    {watch("paymentChannel") === EChannel.MOBILE_MONEY &&
+                    mobileMoneyAccount ? (
+                      <Input
+                        label="Mobile Money Number"
+                        disabled
+                        value={mobileMoneyAccount.accountNumber}
+                      />
+                    ) : null}
+
+                    {watch("paymentChannel") === EChannel.BANK_ACCOUNT &&
+                    bankAccount ? (
+                      <Input
+                        label="Bank Account Number"
+                        disabled
+                        value={
+                          bankAccount.accountNumber +
+                          "(" +
+                          bankAccount.bank?.name +
+                          ")"
+                        }
+                      />
+                    ) : null}
                   </>
-                )} */}
+                )}
 
                 <div className="flex flex-col gap-4">
                   <Button

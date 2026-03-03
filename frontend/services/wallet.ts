@@ -4,11 +4,10 @@ import axiosInstance from "./axiosInstance";
 import { ECurrency } from "@/types";
 import { IWallet } from "@/types/wallet";
 
-export function useGetWallet(
-  { currency }: { currency: ECurrency } = { currency: ECurrency.RWF }
-) {
+export function useGetWallet({ currency }: { currency: ECurrency }) {
   return useQuery<IResponse<IWallet>>({
-    queryKey: ["payouts", "balance"],
+    queryKey: ["wallet", "balance", currency],
     queryFn: async () => axiosInstance.get(`wallets/${currency}`),
+    enabled: !!currency,
   });
 }

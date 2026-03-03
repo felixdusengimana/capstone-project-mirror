@@ -57,7 +57,8 @@ export default function ResolveScreen() {
     <div className="h-screen w-full bg-white">
       <div className="flex justify-center items-center h-full">
         <div className="flex flex-col items-center">
-          <h1 className="text-4xl font-bold text-gray-800">Loading...</h1>
+          {/* spinner */}
+          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
         </div>
       </div>
     </div>

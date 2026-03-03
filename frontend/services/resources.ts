@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "./axiosInstance";
 import { IResponse } from "@/types/common";
-import { ICountry, IIndustry } from "@/types/resources";
+import { IBank, ICountry, IIndustry } from "@/types/resources";
 
 export function useGetAllIndustries({ enabled = true }: { enabled?: boolean }) {
   return useQuery<IResponse<IIndustry[]>>({
@@ -15,6 +15,14 @@ export function useGetAllCountries({ enabled = true }: { enabled?: boolean }) {
   return useQuery<IResponse<ICountry[]>>({
     queryKey: ["countries"],
     queryFn: async () => axiosInstance.get("/resources/countries"),
+    enabled: enabled,
+  });
+}
+
+export function useGetAllBanks({ enabled = true }: { enabled?: boolean }) {
+  return useQuery<IResponse<IBank[]>>({
+    queryKey: ["banks"],
+    queryFn: async () => axiosInstance.get("/resources/banks"),
     enabled: enabled,
   });
 }

@@ -16,7 +16,7 @@ export default function Pagination({
   loading,
 }: PaginationProps) {
   return (
-    <div className="text-black w-full py-8 px-6 flex justify-between items-center">
+    <div className="text-black w-full flex justify-between items-center">
       <button
         onClick={() => {
           if (currentPage > 1) onPageChange(currentPage - 1);
@@ -28,7 +28,7 @@ export default function Pagination({
         Previous
       </button>
       <p className="text-[#0000008A] font-normal text-sm">
-        Page {total.toLocaleString()} of {total.toLocaleString()}
+        Page {currentPage.toLocaleString()} of {total.toLocaleString()}
       </p>
       <button
         onClick={() => {

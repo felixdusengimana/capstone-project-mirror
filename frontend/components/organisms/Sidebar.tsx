@@ -16,13 +16,11 @@ const VerifyAccount = dynamic(
 
 interface SidebarProps extends ComponentProps<"div"> {
   links: { label: string; icon: IconNames; href: string }[];
-  isAdmin?: boolean;
 }
 
 export default function Sidebar({
   className,
   links = [],
-  isAdmin,
   ...props
 }: SidebarProps) {
   const pathname = usePathname();
@@ -73,7 +71,7 @@ export default function Sidebar({
         </div>
       </div>
 
-      {!isAdmin && !usr?.data?.verified ? (
+      {!isUserLoading && !usr?.data?.verified ? (
         <div className="flex flex-col mt-[96px] mb-[76px] gap-[15px] items-center justify-center bg-gray-50 border border-gray-200 px-[39px] py-[31px] rounded-lg">
           <Image alt="" src="/dance.svg" width={204} height={130} />
           <p className="text-center text-[#475569] text-sm font-normal">
