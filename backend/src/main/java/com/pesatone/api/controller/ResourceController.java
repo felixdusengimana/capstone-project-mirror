@@ -4,7 +4,9 @@ import com.pesatone.api.model.dto.ApiResponseObject;
 import com.pesatone.api.model.dto.ValidationDto;
 import com.pesatone.api.model.entity.Country;
 import com.pesatone.api.model.entity.Industry;
+import com.pesatone.api.model.pojo.BankPojo;
 import com.pesatone.api.repository.AppUserRepository;
+import com.pesatone.api.repository.BankRepository;
 import com.pesatone.api.repository.CountryRepository;
 import com.pesatone.api.repository.IndustryRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,6 +28,7 @@ public class ResourceController {
     private final CountryRepository countryRepository;
     private final IndustryRepository industryRepository;
     private final AppUserRepository userRepository;
+    private final BankRepository bankRepository;
 
     @Operation(summary = "Get countries", description = "Get list of supported countries")
     @GetMapping("/countries")
@@ -39,6 +42,13 @@ public class ResourceController {
     public ResponseEntity<ApiResponseObject<List<Industry>>> getIndustries() {
         return ResponseEntity.ok(new ApiResponseObject<>("Industries retrieved", true,
                 industryRepository.findAll(Sort.by(Sort.Direction.ASC, "name"))));
+    }
+
+    @Operation(summary = "Get Banks", description = "Get list of Banks")
+    @GetMapping("/banks")
+    public ResponseEntity<ApiResponseObject<List<BankPojo>>> getBanks() {
+        return ResponseEntity.ok(new ApiResponseObject<>("Bank retrieved successfully", true,
+                bankRepository.findAllSorted(Sort.by(Sort.Direction.ASC, "name"))));
     }
 
     @Operation(summary = "Validate resource", description = "Check if a resource exists")

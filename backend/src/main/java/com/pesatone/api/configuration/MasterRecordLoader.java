@@ -2,11 +2,13 @@ package com.pesatone.api.configuration;
 
 import com.google.gson.Gson;
 import com.pesatone.api.model.dto.SignUpDto;
+import com.pesatone.api.model.entity.Bank;
 import com.pesatone.api.model.entity.Country;
 import com.pesatone.api.model.entity.Industry;
 import com.pesatone.api.model.enumeration.RoleEnum;
 import com.pesatone.api.model.enumeration.StatusEnum;
 import com.pesatone.api.repository.AppUserRepository;
+import com.pesatone.api.repository.BankRepository;
 import com.pesatone.api.repository.CountryRepository;
 import com.pesatone.api.repository.IndustryRepository;
 import com.pesatone.api.service.UserService;
@@ -35,6 +37,7 @@ public class MasterRecordLoader {
     private final IndustryRepository industryRepository;
     private final CountryRepository countryRepository;
     private final AppUserRepository userRepository;
+    private final BankRepository bankRepository;
     private final Gson gson;
     private final UserService userService;
 
@@ -48,6 +51,7 @@ public class MasterRecordLoader {
     public void loadRecords(){
         loadIndustries();
         loadCountries();
+        loadBanks();
         createDefaultAdminUser();
     }
 
@@ -82,6 +86,24 @@ public class MasterRecordLoader {
             countryRepository.saveAll(countries);
         }catch (Exception ex){
             log.error("Error loading countries {}", ex.getMessage());
+        }
+    }
+
+    private void loadBanks(){
+        log.info("**** loading banks ****");
+        try (InputStreamReader reader = new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/master_records/bank.json")))) {
+            Bank[] dtoList = gson.fromJson(gson.newJsonReader(reader), Bank[].class);
+            List<Bank> banks = new ArrayList<>();
+            for (Bank bankDto : dtoList) {
+                if (bankRepository.countByCode(bankDto.getCode()) == 0) {
+                    bankDto.setCountry(countryRepository.findActiveByIsoCode("RWA").orElse(null));
+                    bankDto.setStatus(StatusEnum.ACTIVE);
+                    banks.add(bankDto);
+                }
+            }
+            bankRepository.saveAll(banks);
+        }catch (Exception ex){
+            log.error("Error loading banks {}", ex.getMessage());
         }
     }
 

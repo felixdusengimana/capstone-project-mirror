@@ -14,7 +14,10 @@ public enum PermissionEnum {
     CREATE_PAYOUT("Create payout"),
     VIEW_TRANSACTION("View transactions"),
     VIEW_WALLET("View wallet"),
-    DELETE_ACCOUNT("Delete account");
+    DELETE_ACCOUNT("Delete account"),
+    CREATE_WITHDRAWAL_ACCOUNT("Create withdrawal account"),
+    UPDATE_WITHDRAWAL_ACCOUNT("Update withdrawal account"),
+    VIEW_WITHDRAWAL_ACCOUNT("View withdrawal account");
 
     private final String description;
 
