@@ -41,7 +41,7 @@ export default function WithdrawOptions() {
           )}
         </div>
 
-        {!phone ? (
+        {!phone && !isLoadingAccounts ? (
           <WithdrawOptionsForm
             trigger={
               <Button type="button">
@@ -86,7 +86,7 @@ export default function WithdrawOptions() {
           )}
         </div>
 
-        {!bank ? (
+        {!bank && !isLoadingAccounts ? (
           <WithdrawOptionsForm
             trigger={
               <Button type="button">
@@ -102,7 +102,7 @@ export default function WithdrawOptions() {
               htmlFor=""
               className="text-[#64748A] text-sm font-normal block mb-2"
             >
-              Bank Name: <span className="font-bold">{bank.bank?.name}</span>
+              Bank Name: <span className="font-bold">{bank?.bank?.name}</span>
             </label>
 
             <label
@@ -110,7 +110,7 @@ export default function WithdrawOptions() {
               className="text-[#64748A] text-sm font-normal block mb-2"
             >
               Account Number:{" "}
-              <span className="font-bold">{bank.accountNumber}</span>
+              <span className="font-bold">{bank?.accountNumber}</span>
             </label>
 
             <label
@@ -118,7 +118,7 @@ export default function WithdrawOptions() {
               className="text-[#64748A] text-sm font-normal block mb-2"
             >
               Account Name:{" "}
-              <span className="font-bold">{bank.accountName}</span>
+              <span className="font-bold">{bank?.accountName}</span>
             </label>
           </div>
         )}
