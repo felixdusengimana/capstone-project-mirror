@@ -5,7 +5,7 @@ import Icon from "@/components/atoms/Icon";
 import Input from "@/components/atoms/Input";
 import CreatorDashboard from "@/components/molecules/CreatorDashboard";
 import DashboardProfile from "@/components/molecules/DashboardProfile";
-import DateRagePicker from "@/components/molecules/DateRagePicker";
+import DateRange from "@/components/molecules/DateRange";
 import Pagination from "@/components/molecules/Pagination";
 import Profile from "@/components/molecules/Profile";
 import SupporterDialog from "@/components/molecules/SupporterDialog";
@@ -14,11 +14,20 @@ import { ITransactionFilter } from "@/types/transaction";
 import { useState } from "react";
 
 export default function CreatorDashboardPage() {
+  const today = new Date();
+  const sevenDaysAgo = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDay() - 7
+  );
   const [filters, setFilters] = useState<Partial<ITransactionFilter>>({
     pageNumber: 1,
     pageSize: 10,
     donorName: "",
+    startDate: sevenDaysAgo.toLocaleDateString(),
+    endDate: today.toLocaleDateString(),
   });
+
   const { data: userTransactions, isPending } = useGetTransactions(filters);
   return (
     <div className="min-h-full w-full dashboard-padding text-black pb-32 ">
@@ -50,14 +59,17 @@ export default function CreatorDashboardPage() {
             }
             placeholder="Search"
           />
-          {/* <Button
-            outline
-            className="text-[#475569] font-medium flex gap-1 items-center"
-          >
-            Last 30 days
-            <Icon name="arrow-down" />
-          </Button> */}
-          <DateRagePicker />
+          <div className="">
+            <DateRange
+              initialValue={{
+                startDate: new Date(sevenDaysAgo).toISOString().split("T")[0],
+                endDate: new Date(today).toISOString().split("T")[0],
+              }}
+              onChange={(startDate, endDate) => {
+                setFilters({ ...filters, startDate, endDate });
+              }}
+            />
+          </div>
         </div>
         {isPending ? (
           <div className="text-gray-700 px-6">Loading</div>
