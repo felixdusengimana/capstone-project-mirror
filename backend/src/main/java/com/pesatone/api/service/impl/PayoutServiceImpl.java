@@ -12,19 +12,15 @@ import com.pesatone.api.model.dto.PayoutRequestDto;
 import com.pesatone.api.model.dto.flw.FlwPayoutDetail;
 import com.pesatone.api.model.dto.flw.FlwPayoutDetailResponseList;
 import com.pesatone.api.model.dto.flw.FlwPayoutRequestDto;
-import com.pesatone.api.model.entity.AppUser;
-import com.pesatone.api.model.entity.Payout;
-import com.pesatone.api.model.entity.QPayout;
-import com.pesatone.api.model.entity.Wallet;
+import com.pesatone.api.model.entity.*;
 import com.pesatone.api.model.enumeration.*;
+import com.pesatone.api.model.pojo.WithdrawalAccountPojo;
 import com.pesatone.api.model.search.filter.PayoutSearchFilter;
 import com.pesatone.api.model.search.response.PayoutSearchResponse;
 import com.pesatone.api.model.search.response.QueryResultPojo;
 import com.pesatone.api.repository.PayoutRepository;
-import com.pesatone.api.service.OtpService;
-import com.pesatone.api.service.PaymentProcessingService;
-import com.pesatone.api.service.PayoutService;
-import com.pesatone.api.service.WalletService;
+import com.pesatone.api.repository.WithdrawalAccountRepository;
+import com.pesatone.api.service.*;
 import com.pesatone.api.service.payment.FlutterWaveService;
 import com.pesatone.api.util.AppUtil;
 import com.querydsl.core.types.Projections;
@@ -39,6 +35,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Slf4j
@@ -54,6 +51,8 @@ public class PayoutServiceImpl implements PayoutService {
     private final FlutterWaveService flutterWaveService;
     private final Gson gson;
     private final PaymentProcessingService paymentProcessingService;
+    private final WithdrawalAccountService withdrawalAccountService;
+    private final WithdrawalAccountRepository withdrawalAccountRepository;
 
     @Override
     public Payout getByReference(String reference) {
@@ -64,7 +63,6 @@ public class PayoutServiceImpl implements PayoutService {
     @Transactional
     @Override
     public Payout initiatePayout(AppUser creator, PayoutRequestDto dto) {
-        //TODO where do we settle if method is BANKACCOUNT?
         Wallet wallet = walletService.getOrCreateWallet(creator, dto.getCurrency());
         validatePayoutRequest(creator, wallet, dto);
         Payout payout = new Payout();
@@ -153,7 +151,9 @@ public class PayoutServiceImpl implements PayoutService {
     @Override
     public Mono<Payout> initiateMomoPayout(Payout transaction) {
         try {
-            FlwPayoutRequestDto dto = new FlwPayoutRequestDto(transaction);
+            WithdrawalAccount account = withdrawalAccountRepository.findByCreatorAndAccountType(transaction.getCreator(), PayoutChannelEnum.MOBILE_MONEY)
+                    .orElseThrow(() -> new PesatoneNotFoundException("No mobile money account found for the user"));
+            FlwPayoutRequestDto dto = new FlwPayoutRequestDto(transaction, account);
             initiateMomoTransfer(dto);
             transaction.setPayoutProcessingStatus(PayoutProcessingStatusEnum.PROCESSING);
             payoutRepository.save(transaction);
@@ -163,18 +163,32 @@ public class PayoutServiceImpl implements PayoutService {
         return Mono.just(transaction);
     }
 
-    private void validatePayoutRequest(AppUser user, Wallet wallet, PayoutRequestDto dto) {
-        if (BooleanUtils.isNotTrue(user.getVerified())) {
+    private void validatePayoutRequest(AppUser creator, Wallet wallet, PayoutRequestDto dto) {
+        if (BooleanUtils.isNotTrue(creator.getVerified())) {
             throw new PesatoneException("Your account must be verified before you can proceed with withdrawals");
         }
+        List<WithdrawalAccountPojo> withdrawalAccounts = withdrawalAccountService.getAccounts();
+        if (withdrawalAccounts.isEmpty()) {
+            throw new PesatoneException("You must set up your withdrawal account in settings tab before you can proceed");
+        }
+
+        if (dto.getPaymentChannel().equals(PayoutChannelEnum.BANK_ACCOUNT) && withdrawalAccounts.stream().noneMatch(a -> a.getAccountType().equals(PayoutChannelEnum.BANK_ACCOUNT))) {
+            throw new PesatoneException("No bank account information found. " +
+                    "You must set up your withdrawal account in settings tab before you can proceed");
+        }
+
+        if (dto.getPaymentChannel().equals(PayoutChannelEnum.MOBILE_MONEY) && withdrawalAccounts.stream().noneMatch(a -> a.getAccountType().equals(PayoutChannelEnum.MOBILE_MONEY))) {
+            throw new PesatoneException("No mobile money information found. " +
+                    "You must set up your withdrawal account in settings tab before you can proceed");
+        }
+
         if (dto.getAmount().compareTo(wallet.getBalance()) > 0) {
             throw new PesatoneException("Insufficient balance");
         }
         if (payoutRepository.countPendingPayouts(wallet) > 0) {
             throw new PesatoneException("You already have pending payouts for this currency.");
         }
-        // check if user has set-up and verified payout mode
-        boolean validOtp = otpService.verifyOtp(user, OtpTypeEnum.PAYOUT, dto.getOtp());
+        boolean validOtp = otpService.verifyOtp(creator, OtpTypeEnum.PAYOUT, dto.getOtp());
         if (BooleanUtils.isFalse(validOtp)) {
             throw new PesatoneException("Cannot verify OTP. Please try again later");
         }

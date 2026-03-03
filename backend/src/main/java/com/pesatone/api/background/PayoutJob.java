@@ -22,7 +22,7 @@ public class PayoutJob {
    private final PayoutService payoutService;
    private final
 
-    @Scheduled(fixedDelayString = "PT20M", initialDelayString = "PT1M")
+    @Scheduled(fixedDelayString = "PT1M", initialDelayString = "PT10S")
     void processMobileMoneyPayout() {
         log.info("*** Payout processing Job running at {} ***", new Date());
         try {

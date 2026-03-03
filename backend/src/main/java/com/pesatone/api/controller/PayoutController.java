@@ -52,7 +52,7 @@ public class PayoutController {
     @PreAuthorize("hasAnyAuthority(T(com.pesatone.api.model.enumeration.PermissionEnum).VIEW_PAYOUT)")
     public Mono<ResponseEntity<ApiResponseObject<PayoutPojo>>> getPayout(@PathVariable String transactionReference) {
         Payout payout = payoutService.getByReference(transactionReference);
-        if(principal.isCreator() && payout.getCreator().getId().equals(principal.getLoggedInUser().getId())){
+        if(principal.isCreator() && !payout.getCreator().getId().equals(principal.getLoggedInUser().getId())){
             throw new PesatoneNotFoundException("Payout not found");
         }
         return payoutService.checkMomoPayoutStatus(payout)

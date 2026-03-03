@@ -3,8 +3,10 @@ package com.pesatone.api.model.dto.flw;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pesatone.api.model.entity.Payout;
+import com.pesatone.api.model.entity.WithdrawalAccount;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -30,11 +32,11 @@ public class FlwPayoutRequestDto {
 
     private String reference;
 
-    public FlwPayoutRequestDto(Payout payout){
+    public FlwPayoutRequestDto(Payout payout, WithdrawalAccount withdrawalAccount){
         setAmount(payout.getAmount());
         setReference(payout.getTransactionReference());
-        setBeneficiaryName(payout.getCreator().getName());
+        setBeneficiaryName(StringUtils.defaultIfBlank(withdrawalAccount.getAccountName(),payout.getCreator().getName()));
         setNarration("Payout on "+ new Date());
-        setAccountNumber(payout.getCreator().getPhoneNumber());
+        setAccountNumber(withdrawalAccount.getAccountNumber());
     }
 }
