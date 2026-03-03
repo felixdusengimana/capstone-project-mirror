@@ -223,6 +223,7 @@ public class UserServiceImpl implements UserService {
                         newLink.setStatus(StatusEnum.ACTIVE);
                         return newLink;
                     });
+            link.setLink(linkDto.getLink());
             links.add(link);
         }
         socialLinkRepository.saveAll(links);
