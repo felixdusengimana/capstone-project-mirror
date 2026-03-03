@@ -11,6 +11,7 @@ import com.pesatone.api.service.NotificationService;
 import com.pesatone.api.service.OtpService;
 import com.pesatone.api.util.AppUtil;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ public class OtpServiceImpl implements OtpService {
     @Transactional
     public void sendOtp(AppUser recipient, OtpTypeEnum type) {
         invalidateOtp(recipient, type);
+        validateOtpCreation(recipient,type);
         OneTimePassword otp = createOtp(recipient, type);
         sendOtpNotification(recipient, otp);
     }
@@ -71,6 +73,16 @@ public class OtpServiceImpl implements OtpService {
     private void invalidateOtp(AppUser recipient, OtpTypeEnum type) {
         List<OneTimePassword> validOtps = otpRepository.findUnexpiredByAppUserAndType(recipient, type);
         expireOtps(validOtps);
+    }
+
+    private void validateOtpCreation(AppUser user,OtpTypeEnum type) {
+        if(type.equals(OtpTypeEnum.EMAIL_VERIFICATION) && BooleanUtils.isTrue(user.getEmailVerified())){
+            throw new PesatoneException("Email verification is already completed.");
+        }
+
+        if(type.equals(OtpTypeEnum.PHONE_VERIFICATION) && BooleanUtils.isTrue(user.getPhoneNumberVerified())){
+            throw new PesatoneException("Phone number verification is already completed.");
+        }
     }
 
     private OneTimePassword createOtp(AppUser recipient, OtpTypeEnum type) {
