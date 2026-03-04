@@ -48,7 +48,7 @@ export default function WithdrawForm({
 
   const error = !bankAccount?.accountNumber
     ? "Please add a bank account information"
-    : mobileMoneyAccount?.accountNumber
+    : !mobileMoneyAccount?.accountNumber
     ? "Please add a mobile money account information"
     : null;
 
