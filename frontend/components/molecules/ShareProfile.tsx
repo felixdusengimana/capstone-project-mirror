@@ -45,8 +45,10 @@ export default function ShareProfile({
       <DialogTrigger>
         <div>
           {trigger ?? (
-            <Button className="flex gap-0.5 items-center">
-              <p className="font-medium text-sm text-white">Share profile</p>
+            <Button className="flex gap-0.5 px-2 py-0 items-center">
+              <p className="font-medium text-xs md:text-sm text-white">
+                Share profile
+              </p>
             </Button>
           )}
         </div>

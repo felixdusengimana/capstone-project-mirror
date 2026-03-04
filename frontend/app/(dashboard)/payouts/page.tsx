@@ -34,7 +34,7 @@ export default function PayoutsPage() {
       <div className="min-h-full w-full dashboard-padding text-black pb-10">
         <h1 className="text-4xl font-sans font-bold text-[#1A1A1A]">Payouts</h1>
 
-        <div className="w-full flex justify-between gap-10 items-center bg-white mt-8 px-6 py-7 rounded-lg">
+        <div className="w-full flex justify-between flex-wrap gap-10 items-center bg-white mt-8 px-6 py-7 rounded-lg">
           <div>
             <p className="text-gray-400 text-sm font-medium">
               Outstanding balance

@@ -55,9 +55,9 @@ export default function Button(props: ButtonProps) {
       disabled={isDisabled}
       className={`flex items-center justify-center gap-1 lg:text-xl md:text-lg text-base font-normal rounded-full ${
         outline ? "border border-gray-200" : variantClasses[variant]
-      } ${sizeClasses[size]} ${borderClasses} ${props.className} ${
+      } ${sizeClasses[size]} ${borderClasses} ${
         isDisabled ? "opacity-65 cursor-not-allowed" : ""
-      }`}
+      } ${props.className}`}
     >
       {isLoading && (
         <div className="w-3 h-3 rounded-full border border-t-0 border-gray-200 animate-spin"></div>
