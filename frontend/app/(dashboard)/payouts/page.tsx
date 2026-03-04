@@ -65,15 +65,7 @@ export default function PayoutsPage() {
               </div>
             )}
           </div>
-          <WithdrawForm
-            wallet={wallet?.data!}
-            walletLoading={walletLoading}
-            error={
-              !creator?.data.phoneNumber
-                ? "You must complete withdraw information in setting"
-                : ""
-            }
-          />
+          <WithdrawForm wallet={wallet?.data!} walletLoading={walletLoading} />
         </div>
 
         <div className="bg-white px-[67px] py-[55px] w-full rounded-lg mt-8">

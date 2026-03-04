@@ -24,11 +24,11 @@ export default function WithdrawForm({
   trigger,
   wallet,
   walletLoading,
-  error,
+  errorMessage,
 }: {
   trigger?: React.ReactNode;
   wallet: IWallet;
-  error?: string;
+  errorMessage?: string;
   walletLoading?: boolean;
 }) {
   const { data: me, isPending: loadingUser } = useGetMe();
@@ -45,6 +45,12 @@ export default function WithdrawForm({
   const mobileMoneyAccount = accounts?.data?.find(
     (account) => account.accountType == EChannel.MOBILE_MONEY
   );
+
+  const error = !bankAccount?.accountNumber
+    ? "Please add a bank account information"
+    : mobileMoneyAccount?.accountNumber
+    ? "Please add a mobile money account information"
+    : null;
 
   const isLoading = loadingUser || walletLoading || loadingAccounts;
 
