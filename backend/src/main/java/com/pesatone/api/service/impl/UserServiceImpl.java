@@ -111,7 +111,7 @@ public class UserServiceImpl implements UserService {
         log.info("Profile update before save Name: {}",user.getName());
         log.info("Profile update before save Bio: {}",user.getBio());
         log.info("Profile update before save Phone: {}",user.getPhoneNumber());
-        userRepository.save(user);
+        entityManager.merge(user);
         log.info("Profile updated successfully");
         return user;
     }
