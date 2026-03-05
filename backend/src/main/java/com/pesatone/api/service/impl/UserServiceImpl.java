@@ -80,6 +80,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public AppUser updateUserDetails(AppUser user, UserDetailDto dto) {
+        user = userRepository.findActiveById(user.getId()).orElse(user);
         if(!Boolean.TRUE.equals(user.getEmailVerified())){
             throw new IllegalArgumentException("Please verify your email to proceed");
         }
@@ -108,11 +109,7 @@ public class UserServiceImpl implements UserService {
         if (dto.getSocialLinks() != null && !dto.getSocialLinks().isEmpty()) {
             setSocialLinks(user, dto.getSocialLinks());
         }
-        log.info("Profile update before save Name: {}",user.getName());
-        log.info("Profile update before save Bio: {}",user.getBio());
-        log.info("Profile update before save Phone: {}",user.getPhoneNumber());
-        entityManager.merge(user);
-        log.info("Profile updated successfully");
+        userRepository.save(user);
         return user;
     }
 

@@ -24,7 +24,9 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     @Query("select u from AppUser  u where u.username = lower(?1)")
     Optional<AppUser> findByUserName(String username);
 
-    @Query("select u from AppUser  u where u.id = ?1 " +
+    @Query("select u from AppUser u left join fetch u.country " +
+            "left join fetch u.industry " +
+            "where u.id = ?1 " +
             "and u.status = 'ACTIVE'")
     Optional<AppUser> findActiveById(Long id);
 
