@@ -87,11 +87,11 @@ export default function WithdrawForm({
           ),
         paymentChannel: z.nativeEnum(EChannel, {
           required_error: "Payment channel is required",
-          invalid_type_error: "Pleas select payment channel",
+          invalid_type_error: "Please select payment channel",
         }),
         currency: z.nativeEnum(ECurrency, {
           required_error: "Currency is required",
-          invalid_type_error: "Pleas select Currency",
+          invalid_type_error: "Please select Currency",
         }),
       })
     ),
