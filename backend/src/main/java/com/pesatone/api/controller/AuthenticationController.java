@@ -71,7 +71,7 @@ public class AuthenticationController {
     @Operation(summary = "Initiate Password Reset", description = "Initiate Password Reset")
     @PostMapping("/password-reset/initiate")
     public ResponseEntity<ApiResponseObject<Object>> initiatePasswordReset(@RequestBody @Valid InitiateResetPasswordDto dto) {
-        userRepository.findByEmail(dto.getEmail())
+        userRepository.findActiveByEmail(dto.getEmail())
                 .ifPresent(userService::initiatePasswordReset);
         return ResponseEntity.ok(new ApiResponseObject<>("Password reset initiated successfully", true, null));
     }

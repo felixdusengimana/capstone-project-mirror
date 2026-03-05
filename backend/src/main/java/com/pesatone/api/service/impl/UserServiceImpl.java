@@ -109,6 +109,7 @@ public class UserServiceImpl implements UserService {
         if (dto.getSocialLinks() != null && !dto.getSocialLinks().isEmpty()) {
             setSocialLinks(user, dto.getSocialLinks());
         }
+        log.info("User id: {}", user.getId());
         userRepository.save(user);
         return user;
     }
