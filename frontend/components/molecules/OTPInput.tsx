@@ -39,44 +39,44 @@ export default function OTPInput({
   const seconds = countDown % 60;
 
   return (
-    <div className="w-full">
+    <div className="w-full max-w-[600px]">
       <div className="grid grid-cols-6 w-full gap-6">
         <OTP.Root onChange={onChange}>
           <OTP.Input
             disabled={isPending}
             className={`border ${
               error ? "border-red-400" : "border-gray-200"
-            } bg-gray-50 py-5 rounded-xl w-full text-center text-black`}
+            } bg-gray-50 py-3 rounded-xl w-full text-center text-black`}
           />
           <OTP.Input
             disabled={isPending}
             className={`border ${
               error ? "border-red-400" : "border-gray-200"
-            } bg-gray-50 py-5 rounded-xl w-full text-center text-black`}
+            } bg-gray-50 py-3 rounded-xl w-full text-center text-black`}
           />
           <OTP.Input
             disabled={isPending}
             className={`border ${
               error ? "border-red-400" : "border-gray-200"
-            } bg-gray-50 py-5 rounded-xl w-full text-center text-black`}
+            } bg-gray-50 py-3 rounded-xl w-full text-center text-black`}
           />
           <OTP.Input
             disabled={isPending}
             className={`border ${
               error ? "border-red-400" : "border-gray-200"
-            } bg-gray-50 py-5 rounded-xl w-full text-center text-black`}
+            } bg-gray-50 py-3 rounded-xl w-full text-center text-black`}
           />
           <OTP.Input
             disabled={isPending}
             className={`border ${
               error ? "border-red-400" : "border-gray-200"
-            } bg-gray-50 py-5 rounded-xl w-full text-center text-black`}
+            } bg-gray-50 py-3 rounded-xl w-full text-center text-black`}
           />
           <OTP.Input
             disabled={isPending}
             className={`border ${
               error ? "border-red-400" : "border-gray-200"
-            } bg-gray-50 py-5 rounded-xl w-full text-center text-black`}
+            } bg-gray-50 py-3 rounded-xl w-full text-center text-black`}
           />
         </OTP.Root>
       </div>
