@@ -30,7 +30,7 @@ export function GetUser(id: string) {
 }
 
 export function UpdateUser(data: Partial<ICreateUser>) {
-  return axiosInstance.put(`/users/profile`, data);
+  return axiosInstance.post(`/users/profile`, data);
 }
 
 export function UploadProfileImage(data: FormData) {

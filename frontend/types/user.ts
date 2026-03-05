@@ -15,6 +15,7 @@ export interface IUser {
   industryName: string;
   socialLinks: ISocialLink[];
   verified: boolean;
+  verificationImageUrl: string;
 }
 
 export interface IApprovalData {

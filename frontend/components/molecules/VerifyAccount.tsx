@@ -41,6 +41,8 @@ export default function VerifyAccount({
       toast.success("Verification picture uploaded successfully", {
         id: "updatingProfile",
       });
+
+      router.push(`${pathName}?verify=done`);
     },
     onError: () => {
       toast.error("Error updating Profile picture", {
@@ -62,7 +64,10 @@ export default function VerifyAccount({
       </DialogTrigger>
       <Dialog className="p-10 bg-[#d6d8dd] overflow-hidden">
         {verifyStep === "1" ? (
-          <CustomWebcam updateProfilePic={(data) => updateProfilePic(data)} />
+          <CustomWebcam
+            isUpdatingPic={isUpdatingPic}
+            updateProfilePic={(data) => updateProfilePic(data)}
+          />
         ) : verifyStep === "done" ? (
           <div className="relative">
             <svg
@@ -221,17 +226,19 @@ export default function VerifyAccount({
             </Button>
           </>
         )}
-        <Button
-          className="w-full bg-gray-200 text-[#4B5563] mt-4"
-          style={{
-            color: "#4B5563",
-          }}
-          onClick={() => {
-            setOpen(false);
-          }}
-        >
-          Cancel
-        </Button>
+        <Link href="/dashboard">
+          <Button
+            className="w-full bg-gray-200 text-[#4B5563] mt-4"
+            style={{
+              color: "#4B5563",
+            }}
+            onClick={() => {
+              setOpen(false);
+            }}
+          >
+            Cancel
+          </Button>
+        </Link>
       </Dialog>
     </DialogRoot>
   );

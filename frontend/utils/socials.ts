@@ -23,10 +23,10 @@ export const supportedSocials = [
   //   name: "linkedin",
   //   emoji: "🔗",
   // },
-  {
-    name: "youtube",
-    emoji: "🎥",
-  },
+  // {
+  //   name: "youtube",
+  //   emoji: "🎥",
+  // },
   {
     name: "tiktok",
     emoji: "🎵",

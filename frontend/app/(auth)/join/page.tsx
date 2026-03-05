@@ -455,7 +455,7 @@ export default function Join() {
                         });
                       }}
                       left={
-                        <div className="flex gap-1">
+                        <div className="flex flex-grow">
                           <select
                             className="bg-transparent"
                             value={link.platform}
@@ -482,7 +482,7 @@ export default function Join() {
                               </option>
                             ))}
                           </select>
-                          <div>
+                          <div className="w-max block">
                             {/* formatted selected social link */}
                             {isOtherPlatform ? (
                               <label

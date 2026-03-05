@@ -10,16 +10,42 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IRegisterInputs, registerSchema } from "@/types/auth";
 import { useMutation } from "@tanstack/react-query";
-import { Register } from "@/services/auth";
+import { Login, Register } from "@/services/auth";
 import toast from "react-hot-toast";
+import { setCookie } from "@/utils/cookie";
 
 export default function RegisterPage() {
   const router = useRouter();
 
+  const {
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<IRegisterInputs>({
+    resolver: zodResolver(registerSchema),
+  });
+
+  const { mutate: login, isPending: isLoggingIn } = useMutation({
+    onSuccess(data: { data: { token: string; expiresIn: number } }) {
+      toast.success("Registration successful!", { id: "register" });
+      const token = data?.data?.token;
+      const expiresIn = data.data?.expiresIn;
+      if (!token || !expiresIn) {
+        router.push("/login");
+      }
+      setCookie("token", token, expiresIn);
+      router.push("/resolve");
+    },
+    onError() {
+      router.push("/login");
+    },
+    mutationFn: Login,
+  });
+
   const { mutate, isPending } = useMutation({
     onSuccess() {
-      toast.success("Registration successful!", { id: "register" });
-      router.push("/login");
+      login({ ...watch() });
     },
     onError(error) {
       toast.error(`${error.message ?? "Registration failed!"}`, {
@@ -27,14 +53,6 @@ export default function RegisterPage() {
       });
     },
     mutationFn: Register,
-  });
-
-  const {
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm<IRegisterInputs>({
-    resolver: zodResolver(registerSchema),
   });
 
   const onSubmit = (data: IRegisterInputs) => {
@@ -100,7 +118,7 @@ export default function RegisterPage() {
         >
           Back
         </Button>
-        <Button isLoading={isPending} className="px-[72px]">
+        <Button isLoading={isPending || isLoggingIn} className="px-[72px]">
           {isPending ? "Singing up..." : "Sign up"}
         </Button>
       </div>

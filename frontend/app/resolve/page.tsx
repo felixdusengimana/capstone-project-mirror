@@ -30,13 +30,13 @@ export default function ResolveScreen() {
         if (!info.emailVerified) {
           mutate();
         } else {
-          const step = !info?.bio
+          const step = !Boolean(info?.bio)
             ? 2
-            : !info.username
+            : !Boolean(info?.username)
             ? 3
-            : !info.countryName
+            : !Boolean(info?.countryName)
             ? 4
-            : info.socialLinks?.length <= 0
+            : !Boolean(info?.socialLinks?.length)
             ? 5
             : -1;
 

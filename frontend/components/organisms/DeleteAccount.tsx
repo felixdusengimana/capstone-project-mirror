@@ -43,7 +43,7 @@ const DeleteAccount = ({ trigger, pesaTag }: IDeleteAccountProps) => {
         {trigger ?? <Button variant="danger-reverse">Delete my account</Button>}
       </DialogTrigger>
       <Dialog className="p-4">
-        <div className="flex flex-col gap-5">
+        <form className="flex flex-col gap-5">
           <p className="text-gray-800 font-bold text-2xl">Delete Account</p>
           <p className="text-gray-800">
             Are you sure you want to delete your account?
@@ -59,7 +59,11 @@ const DeleteAccount = ({ trigger, pesaTag }: IDeleteAccountProps) => {
             error={error}
           />
           <div className="flex gap-4">
-            <Button disabled={isPending} onClick={() => setOpenModal(false)}>
+            <Button
+              type="button"
+              disabled={isPending}
+              onClick={() => setOpenModal(false)}
+            >
               Cancel
             </Button>
             <Button
@@ -77,7 +81,7 @@ const DeleteAccount = ({ trigger, pesaTag }: IDeleteAccountProps) => {
               Yes, Delete
             </Button>
           </div>
-        </div>
+        </form>
       </Dialog>
     </DialogRoot>
   );

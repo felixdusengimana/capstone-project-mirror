@@ -2,7 +2,6 @@
 import { useCallback, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import Button from "../atoms/Button";
-import { usePathname, useRouter } from "next/navigation";
 
 interface ICustomWebcamProps {
   isUpdatingPic?: boolean;
@@ -13,30 +12,38 @@ export default function CustomWebcam({
   updateProfilePic,
   isUpdatingPic,
 }: ICustomWebcamProps) {
-  const router = useRouter();
-  const pathName = usePathname();
   const webcamRef = useRef(null);
   const [imgSrc, setImgSrc] = useState(null);
+  const [file, setFile] = useState<File | null>(null);
 
-  const retake = () => {
-    setImgSrc(null);
-  };
+  function base64ToBlob(base64: string, mimeType: string) {
+    const byteCharacters = atob(base64);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type: mimeType });
+  }
+
+  function blobToFile(blob: Blob, fileName: string) {
+    return new File([blob], fileName, { type: blob.type });
+  }
 
   const capture = useCallback(() => {
     // @ts-ignore
     const imageSrc = webcamRef.current.getScreenshot();
     setImgSrc(imageSrc);
 
-    const data = new FormData();
+    // Extract the base64 string and MIME type
+    const base64String = imageSrc.split(",")[1];
+    const mimeType = "image/jpeg";
 
-    // convert imageSrc to binary
-    const block = imageSrc.split(";");
-    const contentType = block[0].split(":")[1];
-    const realData = block[1].split(",")[1];
-    const blob = new Blob([atob(realData)], { type: contentType });
-    data.append("image", blob);
+    // Convert base64 to Blob
+    const blob = base64ToBlob(base64String, mimeType);
+    const file = blobToFile(blob, "image.png");
 
-    updateProfilePic?.(data);
+    setFile(file);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [webcamRef]);
@@ -54,12 +61,14 @@ export default function CustomWebcam({
         </div>
       </div>
       <Button
-        disabled={isUpdatingPic}
+        isLoading={isUpdatingPic}
         className="w-full mt-8"
         onClick={
-          imgSrc
+          imgSrc && file
             ? () => {
-                router.push(`${pathName}?verify=done`);
+                const data = new FormData();
+                data.append("image", file);
+                updateProfilePic?.(data);
               }
             : capture
         }
