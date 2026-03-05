@@ -4,7 +4,15 @@ import Webcam from "react-webcam";
 import Button from "../atoms/Button";
 import { usePathname, useRouter } from "next/navigation";
 
-export default function CustomWebcam() {
+interface ICustomWebcamProps {
+  isUpdatingPic?: boolean;
+  updateProfilePic?: (data: FormData) => void;
+}
+
+export default function CustomWebcam({
+  updateProfilePic,
+  isUpdatingPic,
+}: ICustomWebcamProps) {
   const router = useRouter();
   const pathName = usePathname();
   const webcamRef = useRef(null);
@@ -18,6 +26,19 @@ export default function CustomWebcam() {
     // @ts-ignore
     const imageSrc = webcamRef.current.getScreenshot();
     setImgSrc(imageSrc);
+
+    const data = new FormData();
+
+    // convert imageSrc to binary
+    const block = imageSrc.split(";");
+    const contentType = block[0].split(":")[1];
+    const realData = block[1].split(",")[1];
+    const blob = new Blob([atob(realData)], { type: contentType });
+    data.append("image", blob);
+
+    updateProfilePic?.(data);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [webcamRef]);
 
   // code
@@ -33,6 +54,7 @@ export default function CustomWebcam() {
         </div>
       </div>
       <Button
+        disabled={isUpdatingPic}
         className="w-full mt-8"
         onClick={
           imgSrc

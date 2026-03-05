@@ -38,7 +38,7 @@ export const step0 = z.object({
 
 export const step1 = z.object({
   image: z.string({
-    required_error: "Image is required",
+    required_error: "Profile Picture is required",
   }),
   name: z
     .string({
@@ -79,24 +79,15 @@ export const step4 = z.object({
         platform: z.string({
           required_error: "Platform is required",
         }),
-        link: z
-          .string({
-            required_error: "URL is required",
-          })
-          .url("Invalid url"),
+        link: z.string({
+          required_error: "Username is required",
+        }),
       })
     )
     .min(1, "You need to add at least 1 link"),
 });
 
-export const validateLinks = step4.refine(
-  (val) =>
-    val.socialLinks?.filter((d) => Boolean(d.platform?.trim())).length >= 1,
-  {
-    message: "You need to add at least 1 link",
-    path: ["socialLinks"],
-  }
-);
+export const validateLinks = step4;
 
 export interface ISocialLink {
   platform: string;

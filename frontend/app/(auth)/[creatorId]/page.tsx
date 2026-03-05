@@ -241,8 +241,10 @@ export default function SupportCreator() {
                     >
                       <Icon
                         name={
-                          supportedSocials.includes(
-                            link.platform.toLocaleLowerCase()
+                          supportedSocials.find(
+                            (s) =>
+                              link.platform.toLocaleLowerCase() ===
+                              s.name.toLocaleLowerCase()
                           )
                             ? (link.platform.toLocaleLowerCase() as IconNames)
                             : "web"

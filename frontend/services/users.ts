@@ -41,6 +41,14 @@ export function UploadProfileImage(data: FormData) {
   });
 }
 
+export function UploadVerificationImage(data: FormData) {
+  return axiosInstance.post(`/users/profile/verifications/image`, data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+}
+
 export function useGetCreators({
   name,
   pageNumber = 1,

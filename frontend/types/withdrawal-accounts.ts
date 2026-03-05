@@ -8,6 +8,7 @@ export const withdrawAccountPhone = z.object({
       required_error: "Phone number is required",
     })
     .min(10, "Phone number must be at least 10 characters")
+    .max(10, "Phone number must be at most 10 characters")
     .regex(/^[0-9]*$/, "Invalid phone number"),
 });
 

@@ -140,6 +140,7 @@ export default function WithdrawOptionsForm({
             <Input
               error={errors.accountNumber?.message}
               label="Mobile Number"
+              type="text"
               onChange={(e) =>
                 setValue("accountNumber", e.target.value, {
                   shouldDirty: true,
@@ -173,6 +174,7 @@ export default function WithdrawOptionsForm({
                 error={errors.accountNumber?.message}
                 label="Account Number"
                 value={watch("accountNumber")}
+                type="text"
                 onChange={(e) =>
                   setValue("accountNumber", e.target.value, {
                     shouldDirty: true,
@@ -184,6 +186,7 @@ export default function WithdrawOptionsForm({
                 error={errors.accountName?.message}
                 label="Account Name"
                 value={watch("accountName")}
+                type="text"
                 onChange={(e) =>
                   setValue("accountName", e.target.value, {
                     shouldDirty: true,

@@ -16,3 +16,18 @@ export function extractDomainFromURL(url: string) {
   const hostnameSegments = hostname.split(".");
   return hostnameSegments.slice(-2).join(".");
 }
+
+export function removeProtocol(url: string) {
+  return url.replace(/(^\w+:|^)\/\//, "");
+}
+
+export function getURLPathName(url: string) {
+  // Check if the URL is valid
+  if (!isValidURL(url)) {
+    return url;
+  }
+
+  const urlObj = new URL(url);
+  const path = urlObj.pathname;
+  return path.replace(/^\/|\/$/g, "");
+}

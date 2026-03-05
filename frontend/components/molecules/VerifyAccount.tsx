@@ -5,6 +5,10 @@ import CardIcon from "./CardIcon";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import CustomWebcam from "./CustomWebcam";
+import Link from "next/link";
+import { UploadVerificationImage } from "@/services/users";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 export default function VerifyAccount({
   trigger,
@@ -16,6 +20,7 @@ export default function VerifyAccount({
   const pathName = usePathname();
   const verifyStep = searchParams.get("verify");
   const [open, setOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   function handleOpenChange(open: boolean) {
     setOpen(open);
@@ -26,6 +31,23 @@ export default function VerifyAccount({
       setOpen(true);
     }
   }, [verifyStep]);
+
+  const { mutate: updateProfilePic, isPending: isUpdatingPic } = useMutation({
+    mutationFn: UploadVerificationImage,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["me"],
+      });
+      toast.success("Verification picture uploaded successfully", {
+        id: "updatingProfile",
+      });
+    },
+    onError: () => {
+      toast.error("Error updating Profile picture", {
+        id: "updatingProfile",
+      });
+    },
+  });
 
   return (
     <DialogRoot open={open} onOpenChange={handleOpenChange}>
@@ -40,7 +62,7 @@ export default function VerifyAccount({
       </DialogTrigger>
       <Dialog className="p-10 bg-[#d6d8dd] overflow-hidden">
         {verifyStep === "1" ? (
-          <CustomWebcam />
+          <CustomWebcam updateProfilePic={(data) => updateProfilePic(data)} />
         ) : verifyStep === "done" ? (
           <div className="relative">
             <svg
@@ -122,14 +144,16 @@ export default function VerifyAccount({
               </p>
             </div>
 
-            <Button
-              className="w-full mt-8"
-              onClick={() => {
-                setOpen(false);
-              }}
-            >
-              Back home
-            </Button>
+            <Link href="/dashboard">
+              <Button
+                className="w-full mt-8"
+                onClick={() => {
+                  setOpen(false);
+                }}
+              >
+                Back home
+              </Button>
+            </Link>
           </div>
         ) : (
           <>

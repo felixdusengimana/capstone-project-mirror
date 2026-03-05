@@ -12,7 +12,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import countriesFlags from "@/data/countries.json";
 import { useGetAllCountries, useGetAllIndustries } from "@/services/resources";
 import { useEffect, useState } from "react";
-import { extractDomainFromURL } from "@/utils/URL";
 import { supportedSocials } from "@/utils/socials";
 import { ICountry } from "@/types/resources";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -39,6 +38,7 @@ import { convertEmail } from "@/utils/convertEmail";
 import { getCookie, setCookie } from "@/utils/cookie";
 import ImageCrop from "@/components/organisms/ImageCrop";
 import ImageCropProvider from "@/providers/ImageCropProvider";
+import { getURLPathName, removeProtocol } from "@/utils/URL";
 
 export default function Join() {
   const STEPS = 5;
@@ -168,9 +168,18 @@ export default function Join() {
       await updateProfilePic(data);
     }
 
-    const socialLinks = data.socialLinks?.filter((link) =>
-      Boolean(link.link?.trim())
-    );
+    const socialLinks = data.socialLinks
+      ?.filter(
+        (link) => Boolean(link.link?.trim()) && Boolean(link.platform?.trim())
+      )
+      .map((link) => ({
+        platform: link.platform.toLocaleUpperCase(),
+        link:
+          link.platform === "others"
+            ? `https://${link.link}`
+            : `https://${link.platform.toLowerCase()}.com/${link.link}`,
+      }));
+
     mutate({
       ...data,
       ...(socialLinks && { socialLinks }),
@@ -260,6 +269,7 @@ export default function Join() {
             <div className="flex flex-col lg:flex-row justify-between gap-10 items-center mt-10">
               <ImageCropProvider>
                 <ImageCrop
+                  error={errors.image?.message}
                   defaultImage={user?.data.profileImageUrl ?? ""}
                   callbackOnDone={(avatar) => {
                     if (avatar) {
@@ -403,53 +413,93 @@ export default function Join() {
             </p>
             <div className="flex flex-col gap-2 mt-10">
               {watch("socialLinks")?.map((link, index) => {
-                const domain = extractDomainFromURL(link.link);
-                const socialMedia =
-                  Boolean(domain) && String(domain).split(".")[0];
-                const isIcon = Boolean(socialMedia)
-                  ? supportedSocials.includes(String(socialMedia))
-                  : false;
+                const isOtherPlatform = link.platform === "others";
+                const isPlatformSelectedNotOther =
+                  Boolean(link.platform) && !isOtherPlatform;
+
                 return (
                   <div key={index} className="flex items-center">
                     <Input
                       error={
                         errors?.socialLinks?.message ||
+                        errors?.socialLinks?.[index]?.platform?.message ||
                         errors?.socialLinks?.[index]?.link?.message
+                      }
+                      placeholder={
+                        isOtherPlatform
+                          ? "Enter website link"
+                          : isPlatformSelectedNotOther
+                          ? "username"
+                          : "Select platform"
                       }
                       label="Social Media Link"
                       className="flex-grow"
                       value={link.link}
+                      id={`social-link-${index}`}
                       onChange={(e) => {
                         const newLinks = [...watch("socialLinks")];
-                        const inDomain = extractDomainFromURL(e.target.value);
-                        const inSocialMedia =
-                          Boolean(inDomain) && String(inDomain).split(".")[0];
-
-                        const others =
-                          Boolean(inSocialMedia) &&
-                          !supportedSocials.includes(String(inSocialMedia));
+                        // remove protocol from link
+                        const noProtocol = removeProtocol(e.target.value);
+                        const newURL = isOtherPlatform
+                          ? noProtocol
+                          : getURLPathName(e.target.value);
 
                         newLinks[index] = {
-                          link: e.target.value,
-                          platform:
-                            inSocialMedia === "twitter"
-                              ? "X"
-                              : others
-                              ? "OTHERS"
-                              : String(inSocialMedia)?.toLocaleUpperCase(),
+                          ...newLinks[index],
+                          link: newURL,
                         };
+
                         setValue("socialLinks", newLinks, {
                           shouldDirty: true,
                           shouldValidate: true,
                         });
                       }}
                       left={
-                        <div className="mr-2">
-                          <Icon
-                            width={20}
-                            height={20}
-                            name={isIcon ? (socialMedia as IconNames) : "alt"}
-                          />
+                        <div className="flex gap-1">
+                          <select
+                            className="bg-transparent"
+                            value={link.platform}
+                            onChange={(e) => {
+                              const newLinks = [...watch("socialLinks")];
+                              newLinks[index] = {
+                                ...newLinks[index],
+                                platform: e.target.value,
+                              };
+                              setValue("socialLinks", newLinks, {
+                                shouldDirty: true,
+                                shouldValidate: true,
+                              });
+                            }}
+                          >
+                            <option value="">Select platform</option>
+                            {supportedSocials.map((social) => (
+                              <option
+                                key={social.name}
+                                className="capitalize"
+                                value={social.name}
+                              >
+                                {social.emoji} {social.name}
+                              </option>
+                            ))}
+                          </select>
+                          <div>
+                            {/* formatted selected social link */}
+                            {isOtherPlatform ? (
+                              <label
+                                htmlFor={`social-link-${index}`}
+                                className="text-gray-500"
+                              >
+                                https://
+                              </label>
+                            ) : isPlatformSelectedNotOther ? (
+                              <label
+                                htmlFor={`social-link-${index}`}
+                                className="text-gray-500"
+                              >
+                                https://{link.platform.toLowerCase()}.com/
+                              </label>
+                            ) : null}
+                          </div>
                         </div>
                       }
                       right={

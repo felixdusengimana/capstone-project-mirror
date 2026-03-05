@@ -5,12 +5,16 @@ import { useMutation } from "@tanstack/react-query";
 import { DeleteProfileAccount } from "@/services/users";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import Input from "../atoms/Input";
 
 interface IDeleteAccountProps {
   trigger?: ReactNode;
+  pesaTag?: string;
 }
-const DeleteAccount = ({ trigger }: IDeleteAccountProps) => {
+const DeleteAccount = ({ trigger, pesaTag }: IDeleteAccountProps) => {
   const [openModal, setOpenModal] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pesaTagValue, setPesaTagValue] = useState<string>("");
   const router = useRouter();
 
   const { isPending, mutate } = useMutation({
@@ -44,6 +48,16 @@ const DeleteAccount = ({ trigger }: IDeleteAccountProps) => {
           <p className="text-gray-800">
             Are you sure you want to delete your account?
           </p>
+          <Input
+            placeholder="Enter your PesaTag to confirm"
+            label="PesaTag"
+            value={pesaTagValue}
+            onChange={(e) => {
+              setPesaTagValue(e.target.value);
+              setError(null);
+            }}
+            error={error}
+          />
           <div className="flex gap-4">
             <Button disabled={isPending} onClick={() => setOpenModal(false)}>
               Cancel
@@ -51,7 +65,14 @@ const DeleteAccount = ({ trigger }: IDeleteAccountProps) => {
             <Button
               isLoading={isPending}
               variant="danger"
-              onClick={() => mutate()}
+              onClick={() => {
+                if (pesaTagValue !== pesaTag) {
+                  setError("PesaTag does not match");
+                  return;
+                }
+                setError("");
+                mutate();
+              }}
             >
               Yes, Delete
             </Button>
