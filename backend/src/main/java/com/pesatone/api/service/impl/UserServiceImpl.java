@@ -84,10 +84,18 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Please verify your email to proceed");
         }
         log.info("Profile update request: {}",gson.toJson(dto));
-        if (StringUtils.isNotBlank(dto.getUsername())) user.setUsername(dto.getUsername().toLowerCase());
-        if (StringUtils.isNotBlank(dto.getName())) user.setName(dto.getName());
-        if (StringUtils.isNotBlank(dto.getPhoneNumber())) user.setPhoneNumber(dto.getPhoneNumber());
-        if (StringUtils.isNotBlank(dto.getBio())) user.setBio(dto.getBio());
+        if (StringUtils.isNotBlank(dto.getUsername())){
+            user.setUsername(dto.getUsername().toLowerCase());
+        }
+        if (StringUtils.isNotBlank(dto.getName())) {
+            user.setName(dto.getName());
+        }
+        if (StringUtils.isNotBlank(dto.getPhoneNumber())){
+            user.setPhoneNumber(dto.getPhoneNumber());
+        }
+        if (StringUtils.isNotBlank(dto.getBio())) {
+            user.setBio(dto.getBio());
+        }
 
         if (StringUtils.isNotBlank(dto.getCountryIsoCode())) {
             countryRepository.findActiveByIsoCode(dto.getCountryIsoCode())
@@ -100,7 +108,7 @@ public class UserServiceImpl implements UserService {
         if (dto.getSocialLinks() != null && !dto.getSocialLinks().isEmpty()) {
             setSocialLinks(user, dto.getSocialLinks());
         }
-
+        log.info("Profile update before save: {}",gson.toJson(user));
         userRepository.save(user);
         log.info("Profile updated successfully");
         return user;
