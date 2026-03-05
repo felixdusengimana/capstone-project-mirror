@@ -108,7 +108,9 @@ public class UserServiceImpl implements UserService {
         if (dto.getSocialLinks() != null && !dto.getSocialLinks().isEmpty()) {
             setSocialLinks(user, dto.getSocialLinks());
         }
-        log.info("Profile update before save: {}",gson.toJson(user));
+        log.info("Profile update before save Name: {}",user.getName());
+        log.info("Profile update before save Bio: {}",user.getBio());
+        log.info("Profile update before save Phone: {}",user.getPhoneNumber());
         userRepository.save(user);
         log.info("Profile updated successfully");
         return user;
