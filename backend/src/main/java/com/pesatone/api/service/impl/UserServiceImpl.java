@@ -4,6 +4,7 @@ import com.blazebit.persistence.*;
 import com.blazebit.persistence.querydsl.BlazeJPAQuery;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.google.gson.Gson;
 import com.pesatone.api.exception.PesatoneException;
 import com.pesatone.api.exception.PesatoneNotFoundException;
 import com.pesatone.api.model.dto.SignUpDto;
@@ -30,6 +31,7 @@ import com.pesatone.api.service.UserService;
 import com.querydsl.core.types.Projections;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,6 +47,7 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
     private final AppUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -56,6 +59,7 @@ public class UserServiceImpl implements UserService {
     private final CriteriaBuilderFactory builderFactory;
     private final EntityManager entityManager;
     private final NotificationService notificationService;
+    private final Gson gson;
 
     @Value("${application.passwordResetUrl}")
     private String passwordResetUrl;
@@ -79,6 +83,7 @@ public class UserServiceImpl implements UserService {
         if(!Boolean.TRUE.equals(user.getEmailVerified())){
             throw new IllegalArgumentException("Please verify your email to proceed");
         }
+        log.info("Profile update request: {}",gson.toJson(dto));
         if (StringUtils.isNotBlank(dto.getUsername())) user.setUsername(dto.getUsername().toLowerCase());
         if (StringUtils.isNotBlank(dto.getName())) user.setName(dto.getName());
         if (StringUtils.isNotBlank(dto.getPhoneNumber())) user.setPhoneNumber(dto.getPhoneNumber());
@@ -97,6 +102,7 @@ public class UserServiceImpl implements UserService {
         }
 
         userRepository.save(user);
+        log.info("Profile updated successfully");
         return user;
     }
 
