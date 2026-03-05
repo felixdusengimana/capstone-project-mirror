@@ -47,7 +47,14 @@ export default function UserSettings() {
       email: usr?.data?.email,
       name: usr?.data?.name,
       phoneNumber: usr?.data?.phoneNumber,
-      socialLinks: [],
+      socialLinks:
+        usr?.data?.socialLinks?.map((d) => ({
+          link:
+            d?.platform?.toLocaleLowerCase() !== "others"
+              ? getURLPathName(d.link)
+              : removeProtocol(d.link),
+          platform: d.platform.toLowerCase(),
+        })) ?? [],
       profileImageUrl: usr?.data?.profileImageUrl,
     },
   });
@@ -55,7 +62,19 @@ export default function UserSettings() {
   const { mutate: updateProfile, isPending: isUpdating } = useMutation({
     mutationFn: UpdateUser,
     onSuccess: (data) => {
-      reset(data?.data);
+      reset({
+        ...data?.data,
+        socialLinks:
+          data?.data?.socialLinks?.map(
+            (d: { platform: string; link: string }) => ({
+              link:
+                d?.platform?.toLocaleLowerCase() !== "others"
+                  ? getURLPathName(d.link)
+                  : removeProtocol(d.link),
+              platform: d.platform.toLowerCase(),
+            })
+          ) ?? [],
+      });
       queryClient.invalidateQueries({
         queryKey: ["me"],
       });
@@ -91,7 +110,17 @@ export default function UserSettings() {
 
   useEffect(() => {
     if (!isLoading) {
-      reset(usr?.data);
+      reset({
+        ...usr?.data,
+        socialLinks:
+          usr?.data?.socialLinks?.map((d) => ({
+            link:
+              d?.platform?.toLocaleLowerCase() !== "others"
+                ? getURLPathName(d.link)
+                : removeProtocol(d.link),
+            platform: d.platform.toLowerCase(),
+          })) ?? [],
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading]);
@@ -108,20 +137,22 @@ export default function UserSettings() {
       id: "updatingProfile",
     });
 
-    // const socialLinks = data.socialLinks
-    //   ?.filter(
-    //     (link) => Boolean(link.link?.trim()) && Boolean(link.platform?.trim())
-    //   )
-    //   .map((link) => ({
-    //     platform: link.platform.toLocaleUpperCase(),
-    //     link:
-    //       link.platform === "others"
-    //         ? `https://${link.link}`
-    //         : `https://${link.platform.toLowerCase()}.com/${link.link}`,
-    //   }));
+    const socialLinks = data.socialLinks
+      ?.filter(
+        (link) => Boolean(link.link?.trim()) && Boolean(link.platform?.trim())
+      )
+      .map((link) => ({
+        platform: link.platform.toLocaleUpperCase(),
+        link:
+          link.platform === "others"
+            ? `https://${link.link}`
+            : `https://${link.platform.toLowerCase()}.com/${link.link}`,
+      }));
 
-    updateProfile({ ...data });
+    updateProfile({ ...data, socialLinks });
   };
+
+  console.log({ d: watch("socialLinks") });
 
   return (
     <div className="min-h-full w-full dashboard-padding text-black pb-10">
@@ -266,7 +297,7 @@ export default function UserSettings() {
                             </option>
                           ))}
                         </select>
-                        <div>
+                        <div className="w-max">
                           {/* formatted selected social link */}
                           {isOtherPlatform ? (
                             <label

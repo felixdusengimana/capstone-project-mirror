@@ -214,14 +214,21 @@ export default function Join() {
       countryIsoCode: user?.data?.countryName,
       industryCode: user?.data?.industryName,
       socialLinks:
-        user?.data?.socialLinks && user?.data?.socialLinks.length > 0
-          ? user?.data?.socialLinks
+        user?.data?.socialLinks && user?.data?.socialLinks?.length > 0
+          ? user?.data?.socialLinks?.map((link) => ({
+              platform: link.platform.toLocaleLowerCase(),
+              link:
+                link?.platform?.toLocaleLowerCase() !== "others"
+                  ? getURLPathName(link.link)
+                  : removeProtocol(link.link),
+            }))
           : [{ platform: "", link: "" }],
       image: user?.data?.profileImageUrl,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.data, isGettingUser, step]);
 
+  console.log({ d: watch() });
   const handleOTP = (otp: string) => {
     setValue("otp", otp);
     if (otp.length === OTP_LENGTH && Boolean(otp)) {
