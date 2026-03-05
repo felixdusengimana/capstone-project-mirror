@@ -88,7 +88,7 @@ public class UserController {
     }
 
     @Operation(summary = "Update profile", description = "Update logged in user profile")
-    @PutMapping("profile")
+    @PostMapping("profile")
     @PreAuthorize("hasAnyAuthority(T(com.pesatone.api.model.enumeration.PermissionEnum).UPDATE_PROFILE)")
     public ResponseEntity<ApiResponseObject<UserPojo>> updateUserProfile(@RequestBody @Valid UserDetailDto dto) {
         AppUser user = principal.getLoggedInUser();
