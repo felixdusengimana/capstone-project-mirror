@@ -114,6 +114,7 @@ export default function UserSettings() {
     <div className="min-h-full w-full dashboard-padding text-black pb-10">
       <h1 className="text-4xl font-sans font-bold text-[#1A1A1A]">Settings</h1>
       <form
+        id="profile-settings"
         onSubmit={handleSubmit(onSubmit)}
         className="max-w-[900px] bg-white px-10 lg:px-[67px] py-[55px] w-full rounded-lg mt-8 flex flex-wrap gap-28 justify-between items-start"
       >
@@ -173,6 +174,7 @@ export default function UserSettings() {
       </form>
 
       <form
+        id="social-links"
         onSubmit={handleSubmit(onSubmit)}
         className="max-w-[900px] bg-white px-10 lg:px-[67px] py-[55px] w-full rounded-lg mt-8 flex flex-wrap gap-y-2 gap-x-[107px] justify-between items-start"
       >
@@ -278,8 +280,13 @@ export default function UserSettings() {
           </Button>
         </div>
       </form>
-      <WithdrawOptions />
-      <div className="max-w-[900px] mb-10 bg-white px-10 lg:px-[67px] py-[55px] w-full rounded-lg mt-8 flex flex-wrap gap-y-5 gap-x-[107px] justify-between items-start">
+      <div id="withdrawal-options">
+        <WithdrawOptions />
+      </div>
+      <div
+        id="delete-account"
+        className="max-w-[900px] mb-10 bg-white px-10 lg:px-[67px] py-[55px] w-full rounded-lg mt-8 flex flex-wrap gap-y-5 gap-x-[107px] justify-between items-start"
+      >
         <div className="max-w-[413px]">
           <h1 className="font-medium text-gray-600 text-lg">Delete account</h1>
           <p className="font-normal text-gray-400 text-base">

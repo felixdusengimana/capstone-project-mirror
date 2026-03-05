@@ -24,11 +24,11 @@ export default function CreatorDashboardPage() {
     pageNumber: 1,
     pageSize: 10,
     donorName: "",
-    startDate: sevenDaysAgo.toLocaleDateString(),
-    endDate: today.toLocaleDateString(),
+    startDate: sevenDaysAgo.toLocaleString(),
+    endDate: today.toLocaleString(),
   });
 
-  const { data: userTransactions, isPending } = useGetTransactions(filters);
+  const { data: userTransactions, isLoading } = useGetTransactions(filters);
   return (
     <div className="min-h-full w-full dashboard-padding text-black pb-32 ">
       <h1 className="text-4xl font-sans font-bold text-[#1A1A1A]">Dashboard</h1>
@@ -71,7 +71,7 @@ export default function CreatorDashboardPage() {
             />
           </div>
         </div>
-        {isPending ? (
+        {isLoading ? (
           <div className="text-gray-700 px-6">Loading</div>
         ) : userTransactions?.data?.results &&
           userTransactions?.data?.results.length <= 0 ? (

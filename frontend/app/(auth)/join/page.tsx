@@ -162,7 +162,7 @@ export default function Join() {
     }
 
     toast.loading("Updating profile...", { id: "update-profile" });
-    if (profilePhoto) {
+    if (profilePhoto && step === "2") {
       const data = new FormData();
       data.append("image", profilePhoto);
       await updateProfilePic(data);
@@ -222,7 +222,6 @@ export default function Join() {
 
   if (!renderPage) return null;
 
-  console.log({ d: watch() });
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}

@@ -19,6 +19,7 @@ import { z } from "zod";
 import { IWallet } from "@/types/wallet";
 import useIsNativeCurrency from "@/hooks/useIsNativeCurrency";
 import { useGetWithdrawAccounts } from "@/services/withdrawal-accounts";
+import Link from "next/link";
 
 export default function WithdrawForm({
   trigger,
@@ -46,11 +47,20 @@ export default function WithdrawForm({
     (account) => account.accountType == EChannel.MOBILE_MONEY
   );
 
-  const error = !bankAccount?.accountNumber
-    ? "Please add a bank account information"
-    : !mobileMoneyAccount?.accountNumber
-    ? "Please add a mobile money account information"
-    : null;
+  const error =
+    !bankAccount?.accountNumber && !mobileMoneyAccount?.accountNumber ? (
+      <div>
+        <p>Please add a withdrawal accounts to proceed</p>
+        <Link
+          href="/dashboard/settings#withdrawal-accounts"
+          className="text-black"
+        >
+          Add withdrawal account
+        </Link>
+      </div>
+    ) : (
+      errorMessage
+    );
 
   const isLoading = loadingUser || walletLoading || loadingAccounts;
 
@@ -141,6 +151,12 @@ export default function WithdrawForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wallet]);
 
+  // if no bank information remove bank in option, is is not native of no mobile money remove mobile money
+  const options = [
+    ...(isNativeCurrency && mobileMoneyAccount ? [EChannel.MOBILE_MONEY] : []),
+    ...(bankAccount ? [EChannel.BANK_ACCOUNT] : []),
+  ];
+
   return (
     <DialogRoot onOpenChange={setOpen} open={open}>
       <DialogTrigger>
@@ -154,7 +170,7 @@ export default function WithdrawForm({
         </div>
       </DialogTrigger>
       <Dialog preventCloseOnClickOutside className="p-10 bg-[#F0F2F7]">
-        {Boolean(error) ? (
+        {Boolean(error) && !isLoading ? (
           <>
             <div className="bg-red-100 text-red-500 p-4 rounded-lg">
               {error}
@@ -218,17 +234,11 @@ export default function WithdrawForm({
                   }
                   placeholder="Select Payment Channel"
                 >
-                  {Object.keys(EChannel)
-                    .filter(
-                      (d) =>
-                        (d === EChannel.MOBILE_MONEY && isNativeCurrency) ||
-                        d !== EChannel.MOBILE_MONEY
-                    )
-                    .map((d) => (
-                      <option key={d} value={d}>
-                        {d.split("_").join(" ")}
-                      </option>
-                    ))}
+                  {options.map((d) => (
+                    <option key={d} value={d}>
+                      {d.split("_").join(" ")}
+                    </option>
+                  ))}
                 </Select>
 
                 {watch("paymentChannel") && (

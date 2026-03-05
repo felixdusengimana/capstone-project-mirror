@@ -5,16 +5,19 @@ import ImageCropModalContent from "./ImageCropModalContent";
 import Dialog, { DialogRoot, DialogTrigger } from "../molecules/Dialog";
 import Avatar from "../atoms/Avatar";
 import Icon from "../atoms/Icon";
+import { error } from "console";
 
 interface IImageCropProps {
   defaultImage: string;
   disabled?: boolean;
+  error?: string;
   callbackOnDone?: (avatar: File) => void;
 }
 const ImageCrop = ({
   defaultImage,
   disabled,
   callbackOnDone,
+  error,
 }: IImageCropProps) => {
   const [openModal, setOpenModal] = useState(false);
   const [preview, setPreview] = useState<string>("");
@@ -51,10 +54,15 @@ const ImageCrop = ({
               src={Boolean(preview) ? preview : defaultImage ?? ""}
               size="2xl"
             />
-            <div className="mt-6 text-xlfont-normal rounded-full border border-gray-200 flex gap-1 px-4 py-3">
+            <div
+              className={`mt-6 text-xl font-normal rounded-full border ${
+                error ? "border-red-400" : "border-gray-200"
+              } flex gap-1 px-4 py-3`}
+            >
               <Icon name="camera" />
               <p>Upload Profile</p>
             </div>
+            {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
           </label>
 
           <input
