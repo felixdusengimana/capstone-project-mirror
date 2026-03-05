@@ -4,6 +4,7 @@ import com.pesatone.api.model.dto.SignUpDto;
 import com.pesatone.api.model.dto.UserDetailDto;
 import com.pesatone.api.model.entity.AppUser;
 import com.pesatone.api.model.enumeration.ApprovalStatusEnum;
+import com.pesatone.api.model.enumeration.ImageTypeEnum;
 import com.pesatone.api.model.enumeration.RoleEnum;
 import com.pesatone.api.model.pojo.UserPojo;
 import com.pesatone.api.model.search.filter.CreatorSearchFilter;
@@ -16,7 +17,7 @@ public interface UserService {
 
     AppUser updateUserDetails(AppUser user, UserDetailDto dto);
 
-    String uploadProfileImage(AppUser user, MultipartFile file);
+    String uploadImage(AppUser user, MultipartFile file, ImageTypeEnum type);
 
     void initiatePasswordReset(AppUser user);
 

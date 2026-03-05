@@ -13,6 +13,7 @@ import com.pesatone.api.model.entity.AppUser;
 import com.pesatone.api.model.entity.QAppUser;
 import com.pesatone.api.model.entity.SocialLink;
 import com.pesatone.api.model.enumeration.ApprovalStatusEnum;
+import com.pesatone.api.model.enumeration.ImageTypeEnum;
 import com.pesatone.api.model.enumeration.RoleEnum;
 import com.pesatone.api.model.enumeration.StatusEnum;
 import com.pesatone.api.model.pojo.UserPojo;
@@ -101,14 +102,23 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public String uploadProfileImage(AppUser user, MultipartFile file) {
+    public String uploadImage(AppUser user, MultipartFile file, ImageTypeEnum type) {
         String secureUrl = null;
         try {
+            String folder = "profile_images";
+            if(type.equals(ImageTypeEnum.VERIFICATION_IMAGE)){
+                folder = "verification_images";
+            }
             Map uploadedFile = cloudinary.uploader().upload(file.getBytes(),
                     ObjectUtils.asMap("public_id", file.getName()+"-"+System.currentTimeMillis(),
-                            "folder", "profile_images"));
+                            "folder", folder));
             secureUrl = (String) uploadedFile.get("secure_url");
-            user.setProfileImageUrl(secureUrl);
+
+            if(type.equals(ImageTypeEnum.VERIFICATION_IMAGE)){
+                user.setVerificationImageUrl(secureUrl);
+            } else {
+                user.setProfileImageUrl(secureUrl);
+            }
             userRepository.save(user);
         } catch (IOException e) {
             e.printStackTrace();

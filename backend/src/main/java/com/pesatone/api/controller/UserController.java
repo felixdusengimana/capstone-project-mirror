@@ -6,6 +6,7 @@ import com.pesatone.api.model.dto.ApiResponseObject;
 import com.pesatone.api.model.dto.CreatorApprovalDto;
 import com.pesatone.api.model.dto.UserDetailDto;
 import com.pesatone.api.model.entity.AppUser;
+import com.pesatone.api.model.enumeration.ImageTypeEnum;
 import com.pesatone.api.model.enumeration.RoleEnum;
 import com.pesatone.api.model.pojo.DashboardPojo;
 import com.pesatone.api.model.pojo.UserPojo;
@@ -105,7 +106,20 @@ public class UserController {
             throw new MultipartException("Please upload a valid image file (jpeg, png or jpg)");
         }
         return ResponseEntity.ok(new ApiResponseObject<>("Profile image uploaded successfully", true,
-                userService.uploadProfileImage(user, file)));
+                userService.uploadImage(user, file, ImageTypeEnum.PROFILE_IMAGE)));
+    }
+
+    @Operation(summary = "Upload verification image", description = "Upload verification image")
+    @PostMapping("profile/verifications/image")
+    @PreAuthorize("hasAnyAuthority(T(com.pesatone.api.model.enumeration.PermissionEnum).UPDATE_PROFILE)")
+    public ResponseEntity<ApiResponseObject<String>> uploadVerificationImage(@Valid @RequestParam("image") MultipartFile file) {
+        AppUser user = principal.getLoggedInUser();
+        List<String> validImageFileTypes = List.of("image/png", "image/jpg", "image/jpeg");
+        if (StringUtils.isBlank(file.getContentType()) || !validImageFileTypes.contains(file.getContentType())) {
+            throw new MultipartException("Please upload a valid image file (jpeg, png or jpg)");
+        }
+        return ResponseEntity.ok(new ApiResponseObject<>("Verification image uploaded successfully", true,
+                userService.uploadImage(user, file, ImageTypeEnum.VERIFICATION_IMAGE)));
     }
 
     @Operation(summary = "Approve profile verification", description = "Approve user profile verification")

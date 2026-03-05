@@ -34,6 +34,8 @@ public class AppUser {
 
     private String profileImageUrl;
 
+    private String verificationImageUrl;
+
     @NotNull
     @JsonIgnore
     private String password;
