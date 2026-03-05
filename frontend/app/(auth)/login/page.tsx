@@ -64,12 +64,12 @@ export default function LoginPage() {
         <h1 className="text-gray-700 text-4xl font-mono mb-10">
           Login into your account{" "}
         </h1>
-        <ThirdPartyLogin thirdParty="google" />
+        {/* <ThirdPartyLogin thirdParty="google" />
         <div className="my-6 flex gap-5 justify-center items-center">
           <div className="bg-gray-400 h-[1px] w-[105.5px]" />
           <p className="text-gray-400 leading-6">OR</p>
           <div className="bg-gray-400 h-[1px] w-[105.5px]" />
-        </div>
+        </div> */}
         <Input
           label="Email"
           className="mb-4"
