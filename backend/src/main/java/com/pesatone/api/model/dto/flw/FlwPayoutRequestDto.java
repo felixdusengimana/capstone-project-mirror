@@ -14,29 +14,20 @@ import java.util.Date;
 @Getter
 @Setter
 public class FlwPayoutRequestDto {
-    @JsonProperty("accountBank")
-    @JsonAlias("account_bank")
-    private String accountBank = "MPS";
-
-    @JsonProperty("accountNumber")
-    @JsonAlias("account_number")
-    private String accountNumber;
-
+    private String account_bank = "MPS";
+    private String account_number;
     private BigDecimal amount;
     private String narration;
     private String currency = "RWF";
-
-    @JsonProperty("beneficiaryName")
-    @JsonAlias("beneficiary_name")
-    private String beneficiaryName;
+    private String beneficiary_name;
 
     private String reference;
 
     public FlwPayoutRequestDto(Payout payout, WithdrawalAccount withdrawalAccount){
         setAmount(payout.getAmount());
         setReference(payout.getTransactionReference());
-        setBeneficiaryName(StringUtils.defaultIfBlank(withdrawalAccount.getAccountName(),payout.getCreator().getName()));
+        setBeneficiary_name(StringUtils.defaultIfBlank(withdrawalAccount.getAccountName(),payout.getCreator().getName()));
         setNarration("Payout on "+ new Date());
-        setAccountNumber(withdrawalAccount.getAccountNumber());
+        setAccount_number(withdrawalAccount.getAccountNumber());
     }
 }

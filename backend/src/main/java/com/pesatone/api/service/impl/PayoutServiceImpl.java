@@ -194,7 +194,6 @@ public class PayoutServiceImpl implements PayoutService {
     }
 
     private Mono<String> initiateMomoTransfer(FlwPayoutRequestDto request) {
-        log.info("Payout request: {}", gson.toJson(request));
         return flutterWaveService.initiateMomoTransfer(request)
                 .publishOn(Schedulers.boundedElastic())
                 .map(response -> {

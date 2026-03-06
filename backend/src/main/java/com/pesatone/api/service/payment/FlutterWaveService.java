@@ -1,8 +1,10 @@
 package com.pesatone.api.service.payment;
 
+import com.google.gson.Gson;
 import com.pesatone.api.configuration.properties.PaymentConfig;
 import com.pesatone.api.model.dto.flw.FlwPayoutRequestDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -11,9 +13,11 @@ import reactor.netty.http.client.HttpClient;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FlutterWaveService {
     private final PaymentConfig paymentConfig;
     private final HttpClient httpClient;
+    private final Gson gson;
 
     public Mono<String> getTransactionDetail(String transactionReference){
         return WebClient.builder()
@@ -44,6 +48,7 @@ public class FlutterWaveService {
     }
 
     public Mono<String> initiateMomoTransfer(FlwPayoutRequestDto requestDto){
+        log.info("Payout Request: {}:{}",paymentConfig.getFlwTransferUrl(), gson.toJson(requestDto));
         return WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .baseUrl(paymentConfig.getFlwTransferUrl())
