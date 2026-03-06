@@ -9,9 +9,7 @@ import com.pesatone.api.exception.PesatoneException;
 import com.pesatone.api.exception.PesatoneNotFoundException;
 import com.pesatone.api.model.dto.PayoutDto;
 import com.pesatone.api.model.dto.PayoutRequestDto;
-import com.pesatone.api.model.dto.flw.FlwPayoutDetail;
-import com.pesatone.api.model.dto.flw.FlwPayoutDetailResponseList;
-import com.pesatone.api.model.dto.flw.FlwPayoutRequestDto;
+import com.pesatone.api.model.dto.flw.*;
 import com.pesatone.api.model.entity.*;
 import com.pesatone.api.model.enumeration.*;
 import com.pesatone.api.model.pojo.WithdrawalAccountPojo;
@@ -196,8 +194,13 @@ public class PayoutServiceImpl implements PayoutService {
     }
 
     private Mono<String> initiateMomoTransfer(FlwPayoutRequestDto request) {
+        log.info("Payout request: {}", gson.toJson(request));
         return flutterWaveService.initiateMomoTransfer(request)
                 .publishOn(Schedulers.boundedElastic())
+                .map(response -> {
+                    log.info("FLW payout detail: {}", response);
+                    return "";
+                })
                 .onErrorResume(ex -> {
                     if (ex instanceof WebClientResponseException webClientException) {
                         log.error("FLUTTER WAVE PAYOUT INITIATION API ERROR {} : {}", webClientException.getStatusCode(), webClientException.getResponseBodyAsString());
