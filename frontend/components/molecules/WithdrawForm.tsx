@@ -50,8 +50,11 @@ export default function WithdrawForm({
   const error =
     !bankAccount?.accountNumber && !mobileMoneyAccount?.accountNumber ? (
       <div>
-        <p>Please add a withdrawal accounts to proceed</p>
-        <Link href="/settings#withdrawal-options" className="text-black">
+        <p>Please add a withdrawal account to proceed</p>
+        <Link
+          href="/settings#withdrawal-options"
+          className="text-blue-500 hover:underline"
+        >
           Add withdrawal account
         </Link>
       </div>

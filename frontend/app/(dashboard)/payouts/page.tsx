@@ -2,7 +2,6 @@
 import Pill from "@/components/atoms/Pill";
 import Pagination from "@/components/molecules/Pagination";
 import { useGetAllPayouts } from "@/services/payouts";
-import { useGetMe } from "@/services/users";
 import { useGetWallet } from "@/services/wallet";
 import { ECurrency, EStatus } from "@/types";
 import { IPayoutsFilters } from "@/types/payouts";
@@ -14,7 +13,7 @@ const WithdrawForm = dynamic(
 );
 
 export default function PayoutsPage() {
-  const { data: creator } = useGetMe();
+  // const { data: creator } = useGetMe();
 
   const [filters, setFilters] = useState<Partial<IPayoutsFilters>>({
     pageNumber: 1,
