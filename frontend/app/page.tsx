@@ -32,8 +32,8 @@ export default function page() {
             relationships
           </Card>
           <Card glow title="Transparent Earnings" icon="dollar">
-            Gain clear insight into earnings with Pesatone, easily tracking tips
-            and donations for effective financial management
+            Gain clear insight into earnings with Pesatone, easily tracking
+            gifts and donations for effective financial management
           </Card>
         </div>
       </section>
@@ -85,7 +85,7 @@ export default function page() {
               </SmallCard>
               <SmallCard icon="check" title="Support Your Favorites">
                 Show your appreciation and support for the creators you love by
-                tipping them through Pesatone
+                gifting them through Pesatone
               </SmallCard>
               <SmallCard icon="check" title="Exclusive Access ">
                 Gain access to exclusive perks and rewards as a loyal fan of
@@ -100,7 +100,7 @@ export default function page() {
             <h5 className="uppercase text-[#8A8A8B] mb-6">For creators</h5>
             <div className="flex flex-col gap-4">
               <SmallCard icon="check" title="Monetize Your Passion">
-                Turn your passion into profit by receiving tips and donations
+                Turn your passion into profit by receiving gifts and donations
                 from your loyal fanbase
               </SmallCard>
               <SmallCard icon="check" title="Direct Fan Engagement">
@@ -162,7 +162,8 @@ export default function page() {
               icon="user"
               className="max-w-full"
             >
-              Create and share your art. Connect with fans. Receive direct tips.
+              Create and share your art. Connect with fans. Receive direct
+              gifts.
             </Card>
           </div>
           <Card
@@ -247,20 +248,20 @@ export default function page() {
             <Card
               title={
                 <p className="max-w-[374px]">
-                  Search and tip your favorite creators
+                  Search and gift your favorite creators
                 </p>
               }
               icon="user"
               className="max-w-full"
             >
-              Follow, engage, and tip your beloved creators. Make a difference
+              Follow, engage, and gift your beloved creators. Make a difference
               today!
             </Card>
           </div>
           <Card
             title={
               <p className="text-[40px] leading-[49px]">
-                Tip to your favorite creator
+                Gift to your favorite creator
               </p>
             }
           >
@@ -272,7 +273,7 @@ export default function page() {
       <section className="lg:pt-24 page-padding">
         <div className="bg-[url('/lines-bg.png')] w-full bg-cover bg-no-repeat row-span-2 bg-transparent min-h-[450px] py-5 rounded-[32px] px-6 flex flex-col gap-[53px] items-center justify-center">
           <h1 className="max-w-[767px] font-mono text-white text-[47px] text-center">
-            Empowering African Influencers, One Tip at a Time.
+            Empowering African Influencers, One gift at a Time.
           </h1>
           <div className="flex flex-wrap gap-6">
             <DownloadApp os="android" className="bg-black border-black" />

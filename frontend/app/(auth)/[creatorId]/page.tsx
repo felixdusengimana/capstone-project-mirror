@@ -34,6 +34,9 @@ export default function SupportCreator() {
     formState: { errors },
   } = useForm<Tip>({
     resolver: zodResolver(tip),
+    defaultValues: {
+      currency: ECurrency.RWF,
+    },
   });
 
   const { mutate, isPending } = useMutation({
@@ -177,8 +180,17 @@ export default function SupportCreator() {
             </p>
           </div>
 
+          <Button
+            className="w-full mt-8"
+            onClick={() => {
+              seSuccessPayment(false);
+            }}
+          >
+            Gift Again
+          </Button>
+
           <Link href={"/"}>
-            <Button className="w-full mt-8">Back home</Button>
+            <Button className="w-full mt-3">Back home</Button>
           </Link>
         </div>
       ) : (
@@ -254,8 +266,8 @@ export default function SupportCreator() {
 
                 <div className="flex flex-col gap-4 w-full">
                   <Input
-                    label="Tip amount"
-                    placeholder="Tip amount"
+                    label="Gift amount"
+                    placeholder="Gift amount"
                     onChange={(e) =>
                       setValue("amount", Number(e.target.value), {
                         shouldValidate: true,
@@ -267,6 +279,7 @@ export default function SupportCreator() {
                     type="number"
                     right={
                       <select
+                        disabled
                         value={watch("currency")}
                         onChange={(e) => {
                           setValue("currency", e.target.value);
