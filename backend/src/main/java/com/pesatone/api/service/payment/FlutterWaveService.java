@@ -57,6 +57,8 @@ public class FlutterWaveService {
                 .header("Authorization", "Bearer "+ paymentConfig.getFlwSecretKey())
                 .bodyValue(requestDto)
                 .retrieve()
-                .bodyToMono(String.class);
+                .bodyToMono(String.class)
+                .doOnSuccess(response -> log.info("Payout Response: {}", response))
+                .doOnError(error -> log.error("Payout Error: {}", error.getMessage()));
     }
 }
