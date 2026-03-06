@@ -72,6 +72,7 @@ public class PayoutServiceImpl implements PayoutService {
         payout.setCreator(creator);
         payout.setWallet(wallet);
         payout.setPaymentStatus(PaymentStatusEnum.PENDING);
+        payout.setPayoutProcessingStatus(PayoutProcessingStatusEnum.PENDING_EXECUTION);
         payout.setTransactionReference(AppUtil.getTransactionReference("WT"));
         return payoutRepository.save(payout);
     }
