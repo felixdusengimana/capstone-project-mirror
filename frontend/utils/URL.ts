@@ -1,20 +1,24 @@
 export function isValidURL(input: string) {
-  // Regular expression pattern to match URL
-  var urlPattern = /^(ftp|http|https):\/\/[^ "]+$/;
-
-  // Test the input against the pattern
-  return urlPattern.test(input);
+  const pattern =
+    /^(https?:\/\/)?(www\.)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/;
+  return pattern.test(input);
 }
 
 export function extractDomainFromURL(url: string) {
   if (!isValidURL(url)) {
     return null;
   }
-  const hostname = new URL(url).hostname;
 
-  // get last two segments of hostname
-  const hostnameSegments = hostname.split(".");
-  return hostnameSegments.slice(-2).join(".");
+  const pattern = /^(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9-]+\.[a-zA-Z]{2,})/;
+  const match = url.match(pattern);
+  return match ? match[1] : null;
+}
+
+export function ensureHttps(url: string) {
+  if (!url.startsWith("http://") && !url.startsWith("https://")) {
+    return "https://" + url;
+  }
+  return url;
 }
 
 export function removeProtocol(url: string) {

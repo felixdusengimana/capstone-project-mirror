@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { EApprovalStatus } from ".";
+import { isValidURL } from "@/utils/URL";
 
 export interface IUser {
   id: string;
@@ -76,14 +77,19 @@ export const step3 = z.object({
 export const step4 = z.object({
   socialLinks: z
     .array(
-      z.object({
-        platform: z.string({
-          required_error: "Platform is required",
-        }),
-        link: z.string({
-          required_error: "Username is required",
-        }),
-      })
+      z
+        .object({
+          platform: z.string({
+            required_error: "Platform is required",
+          }),
+          link: z.string({
+            required_error: "Username is required",
+          }),
+        })
+        .refine((val) => isValidURL(val.link), {
+          message: "Invalid URL",
+          path: ["link"],
+        })
     )
     .min(1, "You need to add at least 1 link"),
 });

@@ -8,6 +8,7 @@ import {
   IUser,
 } from "@/types/user";
 import { ObjectToParams } from "@/utils/params";
+import { ensureHttps } from "@/utils/URL";
 
 export enum EOtpTypes {
   EMAIL_VERIFICATION = "EMAIL_VERIFICATION",
@@ -30,7 +31,11 @@ export function GetUser(id: string) {
 }
 
 export function UpdateUser(data: Partial<ICreateUser>) {
-  return axiosInstance.post(`/users/profile`, data);
+  const socialLinks = data.socialLinks?.map((link) => ({
+    ...link,
+    link: ensureHttps(link.link),
+  }));
+  return axiosInstance.post(`/users/profile`, { data, socialLinks });
 }
 
 export function UploadProfileImage(data: FormData) {

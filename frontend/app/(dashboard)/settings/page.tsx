@@ -23,7 +23,11 @@ import ImageCropProvider from "@/providers/ImageCropProvider";
 import { UpdateUser, UploadProfileImage, useGetMe } from "@/services/users";
 import { IUpdateUser, updateUser } from "@/types/user";
 import { supportedSocials } from "@/utils/socials";
-import { getURLPathName, removeProtocol } from "@/utils/URL";
+import {
+  extractDomainFromURL,
+  getURLPathName,
+  removeProtocol,
+} from "@/utils/URL";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
@@ -47,14 +51,7 @@ export default function UserSettings() {
       email: usr?.data?.email,
       name: usr?.data?.name,
       phoneNumber: usr?.data?.phoneNumber,
-      socialLinks:
-        usr?.data?.socialLinks?.map((d) => ({
-          link:
-            d?.platform?.toLocaleLowerCase() !== "others"
-              ? getURLPathName(d.link)
-              : removeProtocol(d.link),
-          platform: d.platform.toLowerCase(),
-        })) ?? [],
+      socialLinks: usr?.data?.socialLinks,
       profileImageUrl: usr?.data?.profileImageUrl,
     },
   });
@@ -62,19 +59,7 @@ export default function UserSettings() {
   const { mutate: updateProfile, isPending: isUpdating } = useMutation({
     mutationFn: UpdateUser,
     onSuccess: (data) => {
-      reset({
-        ...data?.data,
-        socialLinks:
-          data?.data?.socialLinks?.map(
-            (d: { platform: string; link: string }) => ({
-              link:
-                d?.platform?.toLocaleLowerCase() !== "others"
-                  ? getURLPathName(d.link)
-                  : removeProtocol(d.link),
-              platform: d.platform.toLowerCase(),
-            })
-          ) ?? [],
-      });
+      reset(data?.data);
       queryClient.invalidateQueries({
         queryKey: ["me"],
       });
@@ -110,17 +95,7 @@ export default function UserSettings() {
 
   useEffect(() => {
     if (!isLoading) {
-      reset({
-        ...usr?.data,
-        socialLinks:
-          usr?.data?.socialLinks?.map((d) => ({
-            link:
-              d?.platform?.toLocaleLowerCase() !== "others"
-                ? getURLPathName(d.link)
-                : removeProtocol(d.link),
-            platform: d.platform.toLowerCase(),
-          })) ?? [],
-      });
+      reset(usr?.data);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading]);
@@ -137,22 +112,9 @@ export default function UserSettings() {
       id: "updatingProfile",
     });
 
-    const socialLinks = data.socialLinks
-      ?.filter(
-        (link) => Boolean(link.link?.trim()) && Boolean(link.platform?.trim())
-      )
-      .map((link) => ({
-        platform: link.platform.toLocaleUpperCase(),
-        link:
-          link.platform === "others"
-            ? `https://${link.link}`
-            : `https://${link.platform.toLowerCase()}.com/${link.link}`,
-      }));
-
+    const socialLinks = data.socialLinks;
     updateProfile({ ...data, socialLinks });
   };
-
-  console.log({ d: watch("socialLinks") });
 
   return (
     <div className="min-h-full w-full dashboard-padding text-black pb-10">
@@ -218,7 +180,6 @@ export default function UserSettings() {
       </form>
 
       <form
-        id="social-links"
         onSubmit={handleSubmit(onSubmit)}
         className="max-w-[900px] bg-white px-10 lg:px-[67px] py-[55px] w-full rounded-lg mt-8 flex flex-wrap gap-y-2 gap-x-[107px] justify-between items-start"
       >
@@ -228,97 +189,57 @@ export default function UserSettings() {
         <div className="flex-grow">
           <div className="flex flex-col gap-4  max-w-full min-w-full lg:min-w-[486px]">
             {watch("socialLinks")?.map((link, index) => {
-              const isOtherPlatform = link.platform === "others";
-              const isPlatformSelectedNotOther =
-                Boolean(link.platform) && !isOtherPlatform;
-
+              const domain = extractDomainFromURL(link.link!);
+              const socialMedia =
+                Boolean(domain) && String(domain).split(".")[0];
+              const isIcon = Boolean(socialMedia)
+                ? supportedSocials.includes(String(socialMedia))
+                : false;
               return (
                 <div key={index} className="flex items-center">
                   <Input
-                    error={
-                      errors?.socialLinks?.message ||
-                      errors?.socialLinks?.[index]?.platform?.message ||
-                      errors?.socialLinks?.[index]?.link?.message
-                    }
-                    placeholder={
-                      isOtherPlatform
-                        ? "Enter website link"
-                        : isPlatformSelectedNotOther
-                        ? "username"
-                        : "Select platform"
-                    }
-                    label="Social Media Link"
+                    label={`Social Media Link ${index + 1}`}
                     className="flex-grow"
                     value={link.link}
-                    id={`social-link-${index}`}
+                    error={
+                      errors?.socialLinks?.message ||
+                      errors?.socialLinks?.[index]?.link?.message
+                    }
                     onChange={(e) => {
-                      const newLinks = [...watch("socialLinks")];
-                      // remove protocol from link
-                      const noProtocol = removeProtocol(e.target.value);
-                      const newURL = isOtherPlatform
-                        ? noProtocol
-                        : getURLPathName(e.target.value);
+                      const newLinks = [...(watch("socialLinks") ?? [])];
+                      const inDomain = extractDomainFromURL(e.target.value);
+                      const inSocialMedia =
+                        Boolean(inDomain) && String(inDomain).split(".")[0];
+
+                      const others =
+                        Boolean(inSocialMedia) &&
+                        !supportedSocials.includes(String(inSocialMedia));
 
                       newLinks[index] = {
-                        ...newLinks[index],
-                        link: newURL,
+                        link: e.target.value,
+                        platform:
+                          inSocialMedia === "twitter"
+                            ? "X"
+                            : others
+                            ? "OTHERS"
+                            : String(inSocialMedia)?.toLocaleUpperCase(),
                       };
-
                       setValue("socialLinks", newLinks, {
                         shouldDirty: true,
                         shouldValidate: true,
                       });
                     }}
                     left={
-                      <div className="flex gap-1">
-                        <select
-                          className="bg-transparent"
-                          value={link.platform}
-                          onChange={(e) => {
-                            const newLinks = [...watch("socialLinks")];
-                            newLinks[index] = {
-                              ...newLinks[index],
-                              platform: e.target.value,
-                            };
-                            setValue("socialLinks", newLinks, {
-                              shouldDirty: true,
-                              shouldValidate: true,
-                            });
-                          }}
-                        >
-                          <option value="">Select platform</option>
-                          {supportedSocials.map((social) => (
-                            <option
-                              key={social.name}
-                              className="capitalize"
-                              value={social.name}
-                            >
-                              {social.emoji} {social.name}
-                            </option>
-                          ))}
-                        </select>
-                        <div className="w-max">
-                          {/* formatted selected social link */}
-                          {isOtherPlatform ? (
-                            <label
-                              htmlFor={`social-link-${index}`}
-                              className="text-gray-500"
-                            >
-                              https://
-                            </label>
-                          ) : isPlatformSelectedNotOther ? (
-                            <label
-                              htmlFor={`social-link-${index}`}
-                              className="text-gray-500"
-                            >
-                              https://{link.platform.toLowerCase()}.com/
-                            </label>
-                          ) : null}
-                        </div>
+                      <div className="mr-2">
+                        <Icon
+                          width={20}
+                          height={20}
+                          name={isIcon ? (socialMedia as IconNames) : "alt"}
+                        />
                       </div>
                     }
                     right={
-                      watch("socialLinks").length > 1 ? (
+                      watch("socialLinks")?.length > 1 ? (
                         <button
                           className="bg-red-200 -mr-4 p-4 block border border-red-400 rounded-r-xl"
                           onClick={() => {
