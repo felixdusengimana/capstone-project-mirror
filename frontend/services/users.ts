@@ -35,7 +35,7 @@ export function UpdateUser(data: Partial<ICreateUser>) {
     ...link,
     link: ensureHttps(link.link),
   }));
-  return axiosInstance.post(`/users/profile`, { data, socialLinks });
+  return axiosInstance.post(`/users/profile`, { ...data, socialLinks });
 }
 
 export function UploadProfileImage(data: FormData) {
