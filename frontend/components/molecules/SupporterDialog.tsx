@@ -65,7 +65,7 @@ export default function SupporterDialog({
               </div>
 
               <div className="flex text-base font-normal text-gray-600 justify-between">
-                <p className="text-gray-400">Payment fee</p>
+                <p className="text-gray-400">Transaction fee</p>
                 <p>
                   {transaction?.currency} {transaction?.transactionFee}
                 </p>

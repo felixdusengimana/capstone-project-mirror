@@ -190,7 +190,9 @@ export default function SupportCreator() {
           </Button>
 
           <Link href={"/"}>
-            <Button className="w-full mt-3">Back home</Button>
+            <Button className="w-full mt-3" variant="gray">
+              Back home
+            </Button>
           </Link>
         </div>
       ) : (
