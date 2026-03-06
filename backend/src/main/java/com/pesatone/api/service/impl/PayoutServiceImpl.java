@@ -153,7 +153,7 @@ public class PayoutServiceImpl implements PayoutService {
             WithdrawalAccount account = withdrawalAccountRepository.findByCreatorAndAccountType(transaction.getCreator(), PayoutChannelEnum.MOBILE_MONEY)
                     .orElseThrow(() -> new PesatoneNotFoundException("No mobile money account found for the user"));
             FlwPayoutRequestDto dto = new FlwPayoutRequestDto(transaction, account);
-            initiateMomoTransfer(dto);
+            initiateMomoTransfer(dto).block();
             transaction.setPayoutProcessingStatus(PayoutProcessingStatusEnum.PROCESSING);
             payoutRepository.save(transaction);
         } catch (Exception ex) {
