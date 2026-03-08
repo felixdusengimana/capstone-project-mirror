@@ -19,10 +19,13 @@ export default function Profile({
   isUserLoading,
   ...rest
 }: ProfileProps) {
+  const firstName = user.name.split(" ")[0];
+  const lastName = user.name.split(" ")[1];
+  const fallBackText = `${firstName[0]}${lastName ? lastName[0] : ""}`;
   return (
     <div className={`flex gap-2 items-start ${className}`} {...rest}>
       <div className="w-10">
-        <Avatar src={user.photo} alt={user.name} />
+        <Avatar fallBackText={fallBackText} src={user.photo} alt={user.name} />
       </div>
       <div className="font-medium flex items-start flex-col">
         {isUserLoading ? (

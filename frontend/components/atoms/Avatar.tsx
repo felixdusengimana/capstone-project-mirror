@@ -1,7 +1,6 @@
 "use client";
 import { ComponentProps, useState, useEffect } from "react";
 import Icon from "./Icon";
-import Image from "next/image";
 
 interface AvatarProps extends ComponentProps<"div"> {
   src: string;
@@ -41,14 +40,36 @@ export default function Avatar({ ...props }: AvatarProps) {
     "2xl": "lg:w-[202px] lg:h-[202px] w-[143.98px] h-[143.98px]",
   };
 
+  const generateRandomColor = () => {
+    // color blackish and whitish should be avoided
+    const colors = [
+      "#FFB8B8",
+      "#FFD3B8",
+      "#FFF4B8",
+      "#D3FFB8",
+      "#B8FFD3",
+      "#B8FFF4",
+      "#B8D3FF",
+      "#B8B8FF",
+      "#D3B8FF",
+      "#F4B8FF",
+      "#FFB8F4",
+      "#FFB8D3",
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+  };
+  console.log(imageError);
   return (
     <div
       {...rest}
-      className={`${imageLoading ? "bg-gray-200" : "bg-transparent"} ${
+      className={`${imageLoading ? "bg-gray-200" : ""} ${
         circle ? "rounded-full" : "rounded"
       } ${bordered ? "border-2 border-white" : ""} ${
         sizeClasses[size]
-      } flex items-center justify-center overflow-hidden relative ${className}`}
+      } flex items-center text-black justify-center overflow-hidden relative ${className}`}
+      style={{
+        background: generateRandomColor(),
+      }}
     >
       {!imageError && src ? (
         // eslint-disable-next-line @next/next/no-img-element
