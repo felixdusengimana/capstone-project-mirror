@@ -17,7 +17,7 @@ export default function PayoutsPage() {
 
   const [filters, setFilters] = useState<Partial<IPayoutsFilters>>({
     pageNumber: 1,
-    pageSize: 1,
+    pageSize: 10,
     currency: ECurrency.RWF,
   });
 
