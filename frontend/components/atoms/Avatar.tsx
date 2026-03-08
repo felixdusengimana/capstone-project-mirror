@@ -58,7 +58,7 @@ export default function Avatar({ ...props }: AvatarProps) {
     ];
     return colors[Math.floor(Math.random() * colors.length)];
   };
-  console.log(imageError);
+
   return (
     <div
       {...rest}
@@ -68,7 +68,7 @@ export default function Avatar({ ...props }: AvatarProps) {
         sizeClasses[size]
       } flex items-center text-black justify-center overflow-hidden relative ${className}`}
       style={{
-        background: generateRandomColor(),
+        background: !src && fallBackText ? generateRandomColor() : "none",
       }}
     >
       {!imageError && src ? (
