@@ -52,7 +52,8 @@ export type IconNames =
   | "web"
   | "trash"
   | "calendar"
-  | "hamburger-menu";
+  | "hamburger-menu"
+  | "hamburger-menu2";
 
 interface IconProps extends ComponentProps<"svg"> {
   name: IconNames;
@@ -1078,7 +1079,7 @@ function Transactions({ fill, stroke, ...props }: IconComponentProps) {
   );
 }
 
-function Close({ fill, stroke, ...rest }: IconComponentProps) {
+function Close({ fill = "#4B5563", stroke, ...rest }: IconComponentProps) {
   return (
     <svg
       width="24"
@@ -1093,7 +1094,7 @@ function Close({ fill, stroke, ...rest }: IconComponentProps) {
           fillRule="evenodd"
           clipRule="evenodd"
           d="M6.79279 6.79308C6.98031 6.60561 7.23462 6.50029 7.49979 6.50029C7.76495 6.50029 8.01926 6.60561 8.20679 6.79308L11.9998 10.5861L15.7928 6.79308C15.885 6.69757 15.9954 6.62139 16.1174 6.56898C16.2394 6.51657 16.3706 6.48898 16.5034 6.48783C16.6362 6.48668 16.7678 6.51198 16.8907 6.56226C17.0136 6.61254 17.1253 6.68679 17.2192 6.78069C17.3131 6.87458 17.3873 6.98623 17.4376 7.10913C17.4879 7.23202 17.5132 7.3637 17.512 7.49648C17.5109 7.62926 17.4833 7.76048 17.4309 7.88249C17.3785 8.00449 17.3023 8.11483 17.2068 8.20708L13.4138 12.0001L17.2068 15.7931C17.3889 15.9817 17.4897 16.2343 17.4875 16.4965C17.4852 16.7587 17.38 17.0095 17.1946 17.1949C17.0092 17.3803 16.7584 17.4855 16.4962 17.4878C16.234 17.49 15.9814 17.3892 15.7928 17.2071L11.9998 13.4141L8.20679 17.2071C8.01818 17.3892 7.76558 17.49 7.50339 17.4878C7.24119 17.4855 6.99038 17.3803 6.80497 17.1949C6.61956 17.0095 6.51439 16.7587 6.51211 16.4965C6.50983 16.2343 6.61063 15.9817 6.79279 15.7931L10.5858 12.0001L6.79279 8.20708C6.60532 8.01955 6.5 7.76525 6.5 7.50008C6.5 7.23492 6.60532 6.98061 6.79279 6.79308Z"
-          fill="#4B5563"
+          fill={fill}
         />
       </g>
       <defs>
@@ -1271,6 +1272,29 @@ function HamburgerMenu({
     </svg>
   );
 }
+
+function HamburgerMenuSecondary({
+  width = 28,
+  height = 28,
+  fill = "#FFFFFF",
+  ...rest
+}: IconComponentProps) {
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox="0 0 28 28"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...rest}
+    >
+      <path
+        d="M3.5 19.8335V17.5002H19.8333V19.8335H3.5ZM5.83333 15.1669V12.8335H22.1667V15.1669H5.83333ZM8.16667 10.5002V8.16687H24.5V10.5002H8.16667Z"
+        fill={fill}
+      />
+    </svg>
+  );
+}
 export default function Icon({ name, ...props }: IconProps) {
   switch (name) {
     case "user":
@@ -1375,6 +1399,8 @@ export default function Icon({ name, ...props }: IconProps) {
       return <Calendar {...props} />;
     case "hamburger-menu":
       return <HamburgerMenu {...props} />;
+    case "hamburger-menu2":
+      return <HamburgerMenuSecondary {...props} />;
     default:
       return <Alt />;
   }
