@@ -1249,6 +1249,7 @@ function Calendar({
 function HamburgerMenu({
   width = 40,
   height = 40,
+  stroke = "#171719",
   ...rest
 }: IconComponentProps) {
   return (
@@ -1262,7 +1263,7 @@ function HamburgerMenu({
     >
       <path
         d="M6.625 9.9585H33.2917M6.625 19.9585H33.2917M6.625 29.9585H33.2917"
-        stroke="#171719"
+        stroke={stroke}
         strokeWidth="4"
         strokeLinecap="round"
         strokeLinejoin="round"

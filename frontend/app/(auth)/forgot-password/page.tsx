@@ -9,7 +9,7 @@ import {
 } from "@/types/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
@@ -44,9 +44,9 @@ export default function ForgotPassword() {
   };
 
   return (
-    <>
+    <Fragment>
       {emailSent ? (
-        <div className="flex flex-col items-center justify-center h-full">
+        <div className="flex flex-col items-center justify-center h-full  p-8 lg:p-0">
           <h1 className="text-2xl font-bold mb-4 text-black">Email Sent!</h1>
           <p className="text-center text-gray-600">
             We&apos;ve sent you an email to{" "}
@@ -65,7 +65,7 @@ export default function ForgotPassword() {
       ) : (
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col text-gray-700 justify-between h-full "
+          className="flex flex-col text-gray-700 justify-between h-full  p-8 lg:p-0"
         >
           <div className="max-w-[562px] h-fit my-auto">
             <h1 className="text-gray-700 text-4xl font-mono mb-2">
@@ -94,6 +94,6 @@ export default function ForgotPassword() {
           </div>
         </form>
       )}
-    </>
+    </Fragment>
   );
 }
