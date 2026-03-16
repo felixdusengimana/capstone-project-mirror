@@ -99,7 +99,7 @@ export default function SupportCreator() {
       <Script src="https://checkout.flutterwave.com/v3.js"></Script>
 
       {successPayment ? (
-        <div className="relative h-[calc(100vh-300px)] ">
+        <div className="relative h-[calc(100vh-300px)] px-8 lg:px-0 text-lg">
           <svg
             className="absolute -left-10"
             width="86"
