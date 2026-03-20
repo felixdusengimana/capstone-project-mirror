@@ -41,7 +41,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -198,7 +197,7 @@ public class UserServiceImpl implements UserService {
                             .or(qAppUser.name.containsIgnoreCase(filter.getName())));
         }
 
-        blazeQuery.orderBy(qAppUser.username.asc(),qAppUser.verified.desc().nullsLast(), qAppUser.id.asc());
+        blazeQuery.orderBy(qAppUser.verified.desc().nullsLast(),qAppUser.username.asc(),qAppUser.id.desc());
 
         PagedList<CreatorSearchResponse> pagedList = blazeQuery
                 .select(Projections.constructor(

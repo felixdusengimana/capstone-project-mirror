@@ -2,7 +2,6 @@ package com.pesatone.api.exception;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.pesatone.api.model.dto.ApiResponseObject;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +21,6 @@ import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.server.MethodNotAllowedException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.stream.Collectors;
 

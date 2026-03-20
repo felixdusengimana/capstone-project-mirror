@@ -26,7 +26,6 @@ import com.pesatone.api.service.PaymentTransactionService;
 import com.pesatone.api.service.payment.FlutterWaveService;
 import com.pesatone.api.util.AppUtil;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.StringPath;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

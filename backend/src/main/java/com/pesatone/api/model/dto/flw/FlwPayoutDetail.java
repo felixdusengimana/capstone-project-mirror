@@ -1,8 +1,5 @@
 package com.pesatone.api.model.dto.flw;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.pesatone.api.model.entity.Payout;
 import lombok.Getter;
 import lombok.Setter;
 

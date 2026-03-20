@@ -1,7 +1,5 @@
 package com.pesatone.api.util;
 
-import com.pesatone.api.model.dto.flw.FlwCallBackDto;
-import com.pesatone.api.model.dto.flw.FlwTransactionDetail;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;

@@ -4,29 +4,22 @@ import com.pesatone.api.configuration.auth.RequestPrincipal;
 import com.pesatone.api.exception.PesatoneNotFoundException;
 import com.pesatone.api.model.dto.ApiResponseObject;
 import com.pesatone.api.model.dto.PayoutRequestDto;
-import com.pesatone.api.model.dto.flw.FlwCallBackDto;
-import com.pesatone.api.model.dto.flw.FlwPayoutDetail;
 import com.pesatone.api.model.entity.AppUser;
-import com.pesatone.api.model.entity.PaymentTransaction;
 import com.pesatone.api.model.entity.Payout;
-import com.pesatone.api.model.pojo.PaymentTransactionPojo;
 import com.pesatone.api.model.pojo.PayoutPojo;
 import com.pesatone.api.model.search.filter.PayoutSearchFilter;
 import com.pesatone.api.model.search.response.PayoutSearchResponse;
 import com.pesatone.api.model.search.response.QueryResultPojo;
-import com.pesatone.api.service.PaymentProcessingService;
 import com.pesatone.api.service.PayoutService;
-import com.pesatone.api.util.AppUtil;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.BindException;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -34,6 +27,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @RequestMapping("payouts")
 @Tag(name = "4. Payout Controller")
+@Slf4j
 public class PayoutController {
     private final PayoutService payoutService;
     private final RequestPrincipal principal;

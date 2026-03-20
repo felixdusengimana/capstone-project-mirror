@@ -1,11 +1,6 @@
 package com.pesatone.api.background;
 
 import com.pesatone.api.model.entity.Payout;
-import com.pesatone.api.model.enumeration.CurrencyEnum;
-import com.pesatone.api.model.enumeration.PaymentStatusEnum;
-import com.pesatone.api.model.search.filter.PayoutSearchFilter;
-import com.pesatone.api.model.search.response.PayoutSearchResponse;
-import com.pesatone.api.model.search.response.QueryResultPojo;
 import com.pesatone.api.service.PayoutService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
