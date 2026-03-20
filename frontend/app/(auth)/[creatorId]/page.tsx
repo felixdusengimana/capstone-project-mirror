@@ -344,7 +344,7 @@ export default function SupportCreator() {
                   </div>
                 )} */}
                 <Button type="submit" className="w-full" isLoading={isPending}>
-                  Pay {watch("amount")?.toLocaleString()} {watch("currency")}
+                  Gift {watch("amount")?.toLocaleString()} {watch("currency")}
                 </Button>
               </div>
             </form>
