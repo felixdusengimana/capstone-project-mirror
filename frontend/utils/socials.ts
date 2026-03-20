@@ -1,9 +1,12 @@
 export const supportedSocials = [
-  "instagram",
-  "x",
   "facebook",
-  // "youtube",
-  "linkedin",
+  "x",
+  "instagram",
   "tiktok",
   "snapchat",
+  "reddit",
+  "youtube",
+  "linkedin",
+  "whatsapp",
+  "telegram",
 ];
