@@ -195,6 +195,7 @@ export default function UserSettings() {
               const isIcon = Boolean(socialMedia)
                 ? supportedSocials.includes(String(socialMedia))
                 : false;
+              const isTwitter = domain === "twitter";
               return (
                 <div key={index} className="flex items-center">
                   <Input
@@ -210,7 +211,6 @@ export default function UserSettings() {
                       const inDomain = extractDomainFromURL(e.target.value);
                       const inSocialMedia =
                         Boolean(inDomain) && String(inDomain).split(".")[0];
-
                       const others =
                         Boolean(inSocialMedia) &&
                         !supportedSocials.includes(String(inSocialMedia));
@@ -218,7 +218,7 @@ export default function UserSettings() {
                       newLinks[index] = {
                         link: e.target.value,
                         platform:
-                          inSocialMedia === "twitter"
+                          inDomain === "twitter"
                             ? "X"
                             : others
                             ? "OTHERS"
@@ -234,7 +234,13 @@ export default function UserSettings() {
                         <Icon
                           width={20}
                           height={20}
-                          name={isIcon ? (socialMedia as IconNames) : "alt"}
+                          name={
+                            isTwitter
+                              ? "x"
+                              : isIcon
+                              ? (socialMedia as IconNames)
+                              : "alt"
+                          }
                         />
                       </div>
                     }
