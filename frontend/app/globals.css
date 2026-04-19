@@ -189,3 +189,19 @@ select {
     font-size: 16px;
   }
 }
+
+
+@layer utilities {
+  @keyframes loader {
+    0% {
+      background-color: white;
+    }
+    100% {
+      background-color: transparent;
+    }
+  }
+
+  .animate-loader {
+    animation: loader 2s linear infinite;
+  }
+}
