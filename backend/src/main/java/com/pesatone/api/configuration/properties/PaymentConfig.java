@@ -15,4 +15,12 @@ public class PaymentConfig {
     private String flwTransactionDetailUrl;
     private String flwTransferUrl;
     private Integer transactionFeePercentage;
+    private String fdiAccountId;
+    private String fdiAppId;
+    private String fdiSecret;
+    private String fdiPayoutUrl;
+    private String fdiPaymentUrl;
+    private String fdiTransactionDetailUrl;
+    private String fdiAuthUrl;
+    private String fdiCallbackUrl;
 }

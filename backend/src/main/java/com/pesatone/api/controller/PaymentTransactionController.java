@@ -4,13 +4,16 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.pesatone.api.configuration.properties.PaymentConfig;
 import com.pesatone.api.model.dto.ApiResponseObject;
+import com.pesatone.api.model.dto.PaymentDto;
 import com.pesatone.api.model.dto.PayoutDto;
 import com.pesatone.api.model.dto.TransactionDto;
+import com.pesatone.api.model.dto.fdi.FdiResponse;
 import com.pesatone.api.model.dto.flw.FlwCallBackDto;
 import com.pesatone.api.model.dto.flw.FlwPayoutDetail;
 import com.pesatone.api.model.dto.flw.FlwTransactionDetail;
 import com.pesatone.api.model.entity.PaymentTransaction;
 import com.pesatone.api.model.entity.Payout;
+import com.pesatone.api.model.enumeration.PaymentProviderEnum;
 import com.pesatone.api.model.pojo.PaymentTransactionPojo;
 import com.pesatone.api.model.search.filter.TransactionSearchFilter;
 import com.pesatone.api.model.search.response.QueryResultPojo;
@@ -25,6 +28,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.Date;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -44,23 +51,25 @@ public class PaymentTransactionController {
     private final Gson gson;
     private final PaymentConfig paymentConfig;
 
-
     @Operation(summary = "Initiate Transaction", description = "Initiate payment transaction")
     @PostMapping("initiate")
-    public ResponseEntity<ApiResponseObject<PaymentTransactionPojo>> initiateTransaction(@RequestBody @Valid TransactionDto dto,
-                                                                          BindingResult bindingResult) throws BindException {
+    public ResponseEntity<ApiResponseObject<PaymentTransactionPojo>> initiateTransaction(
+            @RequestBody @Valid TransactionDto dto,
+            BindingResult bindingResult) throws BindException {
         if (bindingResult.hasErrors()) {
             throw new BindException(bindingResult);
         }
 
         PaymentTransaction transaction = paymentTransactionService.initiateTransaction(dto);
 
-        return ResponseEntity.ok(new ApiResponseObject<>("Payment initiated successfully", true, new PaymentTransactionPojo(transaction)));
+        return ResponseEntity.ok(new ApiResponseObject<>("Payment initiated successfully", true,
+                new PaymentTransactionPojo(transaction)));
     }
 
     @Operation(summary = "Get Transaction Status", description = "Get payment transaction detail")
     @GetMapping("/{transactionReference}/status")
-    public Mono<ResponseEntity<ApiResponseObject<PaymentTransactionPojo>>> getTransactionStatus(@PathVariable String transactionReference) {
+    public Mono<ResponseEntity<ApiResponseObject<PaymentTransactionPojo>>> getTransactionStatus(
+            @PathVariable String transactionReference) {
         PaymentTransaction transaction = paymentTransactionService.getByTransactionReference(transactionReference);
         return paymentTransactionService.checkStatus(transaction)
                 .map(txn -> ResponseEntity.ok(new ApiResponseObject<>("Transaction retrieved successfully",
@@ -70,26 +79,66 @@ public class PaymentTransactionController {
     @Hidden
     @PostMapping("/flw/callback")
     public ResponseEntity<ApiResponseObject<String>> processFlutterWaveCallBack(@RequestBody FlwCallBackDto dto,
-                                                                                @RequestHeader("verif-hash") String verifyHash) {
+            @RequestHeader("verif-hash") String verifyHash) {
         log.info("Callback: {}: {}", gson.toJson(dto), verifyHash);
         AppUtil.verifyCallBack(verifyHash, paymentConfig.getFlwVerifyHash(), gson.toJson(dto));
-        if(dto.isPaymentCallback()) {
-            FlwTransactionDetail data = gson.fromJson(gson.toJson(dto.getData()),new TypeToken<FlwTransactionDetail>(){}.getType());
+        if (dto.isPaymentCallback()) {
+            FlwTransactionDetail data = gson.fromJson(gson.toJson(dto.getData()),
+                    new TypeToken<FlwTransactionDetail>() {
+                    }.getType());
             PaymentTransaction transaction = paymentTransactionService.getByTransactionReference(data.getTx_ref());
             paymentProcessingService.processPayment(transaction, data.getPaymentDto());
         } else if (dto.isPayoutCallback()) {
-            FlwPayoutDetail data = gson.fromJson(gson.toJson(dto.getData()),new TypeToken<FlwPayoutDetail>(){}.getType());
+            FlwPayoutDetail data = gson.fromJson(gson.toJson(dto.getData()), new TypeToken<FlwPayoutDetail>() {
+            }.getType());
             Payout payout = payoutService.getByReference(data.getReference());
             paymentProcessingService.processPayout(payout, new PayoutDto(data));
         }
         return ResponseEntity.ok(new ApiResponseObject<>("Successful", true, "Notification received"));
     }
 
+    @Hidden
+    @PostMapping("/fdi/callback/payment")
+    public ResponseEntity<ApiResponseObject<String>> processFDIPayment(@RequestBody FdiResponse dto) {
+        log.info("FDI Payment Callback: {}: {}", gson.toJson(dto), dto);
+
+        if (dto.getData() != null
+                && StringUtils.isNotBlank(dto.getData().getState())
+                && StringUtils.isNotBlank(dto.getData().getTrxRef())) {
+            PaymentTransaction transaction = paymentTransactionService
+                    .getByTransactionReference(dto.getData().getTrxRef());
+            paymentProcessingService.processPayment(transaction, new PaymentDto(
+                    PaymentProviderEnum.FDI,
+                    "momo-mtn-rw",
+                    transaction.getAmount(),
+                    transaction.getCurrency(),
+                    dto.getPaymentStatus(),
+                    dto.getData().getChannelRef(),
+                    new Date()));
+        }
+        return ResponseEntity.ok(new ApiResponseObject<>("Successful", true, "Notification received"));
+    }
+
+    @Hidden
+    @PostMapping("/fdi/callback/payout")
+    public ResponseEntity<ApiResponseObject<String>> processFDIPayout(@RequestBody FdiResponse dto) {
+        log.info("FDI Payout Callback: {}: {}", gson.toJson(dto), dto);
+
+        if (dto.getData() != null
+                && StringUtils.isNotBlank(dto.getData().getState())
+                && StringUtils.isNotBlank(dto.getData().getTrxRef())) {
+            Payout payout = payoutService.getByReference(dto.getData().getTrxRef());
+            paymentProcessingService.processPayout(payout, new PayoutDto(dto, payout));
+        }
+        return ResponseEntity.ok(new ApiResponseObject<>("Successful", true, "Notification received"));
+    }
+
     @Operation(summary = "Search Payment Transactions", description = "Search Payment transactions")
     @GetMapping()
-    public ResponseEntity<ApiResponseObject<QueryResultPojo<TransactionSearchResponse>>> searchPaymentTransactions(@ParameterObject @Valid TransactionSearchFilter filter) {
+    public ResponseEntity<ApiResponseObject<QueryResultPojo<TransactionSearchResponse>>> searchPaymentTransactions(
+            @ParameterObject @Valid TransactionSearchFilter filter) {
         return ResponseEntity.ok(new ApiResponseObject<>("Transactions retrieved successfully",
-                true,paymentTransactionService.searchTransactions(filter)));
+                true, paymentTransactionService.searchTransactions(filter)));
     }
 
 }
