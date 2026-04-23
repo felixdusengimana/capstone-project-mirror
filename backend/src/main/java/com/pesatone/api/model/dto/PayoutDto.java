@@ -1,6 +1,8 @@
 package com.pesatone.api.model.dto;
 
+import com.pesatone.api.model.dto.fdi.FdiResponse;
 import com.pesatone.api.model.dto.flw.FlwPayoutDetail;
+import com.pesatone.api.model.entity.Payout;
 import com.pesatone.api.model.enumeration.CurrencyEnum;
 import com.pesatone.api.model.enumeration.PaymentProviderEnum;
 import com.pesatone.api.model.enumeration.PaymentStatusEnum;
@@ -29,6 +31,14 @@ public class PayoutDto{
         this.amount = detail.getAmount();
         this.currency = CurrencyEnum.RWF;
         this.paymentStatus = PaymentStatusEnum.valueOf(detail.getStatus());
+        this.processedAt = new Date();
+    }
+
+    public PayoutDto(FdiResponse detail, Payout payout){
+        this.paymentProvider = PaymentProviderEnum.FDI;
+        this.amount = payout.getAmount();
+        this.currency = CurrencyEnum.RWF;
+        this.paymentStatus = detail.successful() ? PaymentStatusEnum.SUCCESSFUL: PaymentStatusEnum.FAILED;
         this.processedAt = new Date();
     }
 

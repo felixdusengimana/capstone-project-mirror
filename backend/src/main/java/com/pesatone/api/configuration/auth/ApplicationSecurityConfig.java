@@ -33,7 +33,9 @@ public class ApplicationSecurityConfig {
             "/users/creators/**",
             "/transactions/initiate",
             "/transactions/*/status",
-            "/transactions/flw/callback"
+            "/transactions/flw/callback",
+            "/transactions/fdi/callback/payment",
+            "/transactions/fdi/callback/payout"
     };
 
     @Bean

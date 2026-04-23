@@ -5,8 +5,10 @@ import com.blazebit.persistence.PagedList;
 import com.blazebit.persistence.querydsl.BlazeJPAQuery;
 import com.google.gson.Gson;
 import com.pesatone.api.configuration.auth.RequestPrincipal;
+import com.pesatone.api.configuration.properties.PaymentConfig;
 import com.pesatone.api.exception.PesatoneNotFoundException;
 import com.pesatone.api.model.dto.TransactionDto;
+import com.pesatone.api.model.dto.fdi.FdiRequest;
 import com.pesatone.api.model.dto.flw.FlwTransactionDetail;
 import com.pesatone.api.model.dto.flw.FlwTransactionDetailResponse;
 import com.pesatone.api.model.entity.AppUser;
@@ -23,6 +25,7 @@ import com.pesatone.api.repository.AppUserRepository;
 import com.pesatone.api.repository.PaymentTransactionRepository;
 import com.pesatone.api.service.PaymentProcessingService;
 import com.pesatone.api.service.PaymentTransactionService;
+import com.pesatone.api.service.payment.FdiService;
 import com.pesatone.api.service.payment.FlutterWaveService;
 import com.pesatone.api.util.AppUtil;
 import com.querydsl.core.types.Projections;
@@ -53,6 +56,8 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
     private final EntityManager entityManager;
     private final RequestPrincipal requestPrincipal;
     private final PaymentProcessingService paymentProcessingService;
+    private final FdiService fdiService;
+    private final PaymentConfig paymentConfig;
 
     @Override
     public PaymentTransaction getByTransactionReference(String transactionReference) {
@@ -63,17 +68,28 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
     @Transactional
     @Override
     public PaymentTransaction initiateTransaction(TransactionDto dto) {
+        AppUser creator = appUserRepository.findActiveByUserNameAndRole(dto.getCreatorUserName(), RoleEnum.CREATOR)
+                .orElseThrow(() -> new PesatoneNotFoundException(
+                        String.format("Creator with tag %s not found", dto.getCreatorUserName())));
+        String txnRef = AppUtil.getTransactionReference("PT");
+        if (dto.getPaymentProvider().equals(PaymentProviderEnum.FDI)) {
+            fdiService.initiateTransaction(new FdiRequest(
+                    txnRef,
+                    paymentConfig.getFdiAccountId(),
+                    AppUtil.getMSSIDN(dto.getPhoneNumber()),
+                    dto.getAmount().toBigInteger().intValueExact(),
+                    paymentConfig.getFdiPaymentCallbackUrl()),
+                    true).block();
+        }
         PaymentTransaction transaction = new PaymentTransaction();
         transaction.setAmount(dto.getAmount());
         transaction.setCurrency(dto.getCurrency());
         transaction.setPaymentProvider(dto.getPaymentProvider());
         transaction.setPaymentStatus(PaymentStatusEnum.PENDING);
-        transaction.setTransactionReference(AppUtil.getTransactionReference("PT"));
+        transaction.setTransactionReference(txnRef);
         transaction.setDonorName(dto.getName());
         transaction.setDonorEmail(dto.getEmail());
         transaction.setNote(dto.getNote());
-        AppUser creator = appUserRepository.findActiveByUserNameAndRole(dto.getCreatorUserName(), RoleEnum.CREATOR)
-                .orElseThrow(() -> new PesatoneNotFoundException(String.format("Creator with tag %s not found", dto.getCreatorUserName())));
         transaction.setCreator(creator);
         appUserRepository.findActiveByUserNameAndRole(dto.getCreatorUserName(), RoleEnum.FAN)
                 .ifPresent(transaction::setDonor);
@@ -82,7 +98,8 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
 
     @Override
     public Mono<PaymentTransaction> checkStatus(PaymentTransaction transaction) {
-        if (transaction.canProcessPayment() && (transaction.getPaymentProvider().equals(PaymentProviderEnum.FLUTTERWAVE))) {
+        if (transaction.canProcessPayment()
+                && (transaction.getPaymentProvider().equals(PaymentProviderEnum.FLUTTERWAVE))) {
             try {
                 return checkFlwTransactionDetail(transaction);
             } catch (Exception ex) {
@@ -105,7 +122,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
                 .select(qPaymentTransaction).fetch();
 
         BigDecimal totalAmountReceived = transactions.stream()
-                .map(x-> x.getAmount().subtract(x.getTransactionFee()))
+                .map(x -> x.getAmount().subtract(x.getTransactionFee()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         Integer totalTransactions = transactions.size();
         BigDecimal biggestSupport = transactions.stream()
@@ -166,10 +183,11 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
                         qPaymentTransaction.currency,
                         qPaymentTransaction.creator.username,
                         qPaymentTransaction.creator.name,
-                        qPaymentTransaction.creator.profileImageUrl
-                )).fetchPage(filter.getOffset(), filter.getPageSize());
+                        qPaymentTransaction.creator.profileImageUrl))
+                .fetchPage(filter.getOffset(), filter.getPageSize());
 
-        return new QueryResultPojo<>(pagedList, filter.getPageNumber(), filter.getPageSize(), pagedList.getTotalPages());
+        return new QueryResultPojo<>(pagedList, filter.getPageNumber(), filter.getPageSize(),
+                pagedList.getTotalPages());
     }
 
     private Mono<PaymentTransaction> checkFlwTransactionDetail(PaymentTransaction transaction) {
@@ -177,13 +195,15 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
                 .publishOn(Schedulers.boundedElastic())
                 .map(response -> {
                     log.info("FLW transaction detail: {}", response);
-                    FlwTransactionDetailResponse detailResponse = gson.fromJson(response, FlwTransactionDetailResponse.class);
+                    FlwTransactionDetailResponse detailResponse = gson.fromJson(response,
+                            FlwTransactionDetailResponse.class);
                     FlwTransactionDetail transactionDetail = detailResponse.getData();
                     return paymentProcessingService.processPayment(transaction, transactionDetail.getPaymentDto());
                 })
                 .onErrorResume(ex -> {
                     if (ex instanceof WebClientResponseException webClientException) {
-                        log.error("FLUTTERWAVE API ERROR {} : {}", webClientException.getStatusCode(), webClientException.getResponseBodyAsString());
+                        log.error("FLUTTERWAVE API ERROR {} : {}", webClientException.getStatusCode(),
+                                webClientException.getResponseBodyAsString());
                     } else {
                         log.error("FLUTTERWAVE API ERROR: {}", ex.getMessage());
                     }

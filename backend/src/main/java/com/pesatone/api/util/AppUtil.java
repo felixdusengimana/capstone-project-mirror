@@ -37,7 +37,19 @@ public class AppUtil {
     }
 
     public static String formatAmount(BigDecimal amount) {
-        NumberFormat formatter = new DecimalFormat("###,###.00");
+        NumberFormat formatter = new DecimalFormat("###,###");
         return formatter.format(amount);
+    }
+
+    public static String getMSSIDN(String phoneNumber){
+        if(phoneNumber.startsWith("0")){
+            return phoneNumber;
+        }else if (phoneNumber.startsWith("+250")){
+            return phoneNumber.replace("+25", "");
+        }else if (phoneNumber.startsWith("250")){
+            return phoneNumber.replace("25", "");
+        }else{
+            throw new IllegalArgumentException("Invalid phone number");
+        }
     }
 }

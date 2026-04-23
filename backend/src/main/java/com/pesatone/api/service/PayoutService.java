@@ -2,7 +2,6 @@ package com.pesatone.api.service;
 
 import com.pesatone.api.model.dto.PayoutRequestDto;
 import com.pesatone.api.model.entity.AppUser;
-import com.pesatone.api.model.entity.PaymentTransaction;
 import com.pesatone.api.model.entity.Payout;
 import com.pesatone.api.model.search.filter.PayoutSearchFilter;
 import com.pesatone.api.model.search.response.PayoutSearchResponse;
