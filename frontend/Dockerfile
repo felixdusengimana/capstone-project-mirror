@@ -2,7 +2,7 @@
 FROM node:22 AS build
 
 # Install pnpm
-RUN npm install -g pnpm
+RUN npm install -g pnpm@10.10.0
 
 # Set the working directory
 WORKDIR /app
