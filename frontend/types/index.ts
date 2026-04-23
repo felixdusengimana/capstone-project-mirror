@@ -9,6 +9,16 @@ export enum EChannel {
   MOBILE_MONEY = "MOBILE_MONEY",
 }
 
+export enum EPaymentMethod {
+  MTN_MOBILE_MONEY = "MTN_MOBILE_MONEY",
+  AIRTEL_MONEY = "AIRTEL_MONEY",
+}
+
+export enum EPaymentProvider {
+  FLUTTERWAVE = "FLUTTERWAVE",
+  FDI="FDI",
+}
+
 export enum EStatus {
   PENDING = "PENDING",
   SUCCESSFUL = "SUCCESSFUL",

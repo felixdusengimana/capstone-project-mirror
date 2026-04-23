@@ -7,25 +7,21 @@ import Input from "@/components/atoms/Input";
 import TextArea from "@/components/atoms/TextArea";
 import {} from "@/services/resources";
 import { useGetCreator } from "@/services/users";
-import { Tip, tip, TransactionData } from "@/types/pay";
+import { Tip, tip } from "@/types/pay";
 import { supportedSocials } from "@/utils/socials";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-
-import Script from "next/script";
-import { useMutation } from "@tanstack/react-query";
-import { InitiateTransaction } from "@/services/pay";
-import toast from "react-hot-toast";
-import Link from "next/link";
-import { ECurrency } from "@/types";
+import { ECurrency, EPaymentProvider } from "@/types";
+import { usePaymentStore } from "@/store/payment";
 
 export default function SupportCreator() {
   const { creatorId } = useParams() as { creatorId: string };
-  const [successPayment, seSuccessPayment] = useState(false);
+  const {setPaymentDetails} = usePaymentStore();
+  // const [successPayment, seSuccessPayment] = useState(false);
   const { data, isLoading } = useGetCreator(creatorId);
-
+  const router = useRouter();
   const {
     handleSubmit,
     watch,
@@ -39,47 +35,50 @@ export default function SupportCreator() {
     },
   });
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: InitiateTransaction,
-    onSuccess: async (data) => {
-      if (data?.data?.transactionReference) {
-        // @ts-ignore
-        FlutterwaveCheckout({
-          public_key: process.env.NEXT_PUBLIC_FLUTTER_WAVE_KEY,
-          tx_ref: data?.data?.transactionReference,
-          amount: data?.data.amount,
-          currency: data?.data.currency,
-          payment_options: "card, banktransfer, ussd",
-          meta: {
-            source: "docs-inline-test",
-          },
-          customer: {
-            email: watch("email"),
-            name: data?.data.donorName,
-          },
-          customizations: {
-            title: `Support ${data?.data.creatorUserName}`,
-            description: data?.data.note,
-            logo: "/app-logo.svg",
-          },
-          callback: function (success_data: TransactionData) {
-            if (success_data.status === "successful") {
-              seSuccessPayment(true);
-            } else {
-              toast.error("Payment failed");
-            }
-          },
-          // success_data
-          onclose: function () {},
-        });
-      } else {
-        toast.error("Error initiating this payment");
-      }
-    },
-  });
+  // TODO: remove this flutter wave script
+  // const { mutate, isPending } = useMutation({
+  //   mutationFn: InitiateTransaction,
+  //   onSuccess: async (data) => {
+  //     if (data?.data?.transactionReference) {
+  //       // @ts-ignore
+  //       FlutterwaveCheckout({
+  //         public_key: process.env.NEXT_PUBLIC_FLUTTER_WAVE_KEY,
+  //         tx_ref: data?.data?.transactionReference,
+  //         amount: data?.data.amount,
+  //         currency: data?.data.currency,
+  //         payment_options: "card, banktransfer, ussd",
+  //         meta: {
+  //           source: "docs-inline-test",
+  //         },
+  //         customer: {
+  //           email: watch("email"),
+  //           name: data?.data.donorName,
+  //         },
+  //         customizations: {
+  //           title: `Support ${data?.data.creatorUserName}`,
+  //           description: data?.data.note,
+  //           logo: "/app-logo.svg",
+  //         },
+  //         callback: function (success_data: TransactionData) {
+  //           if (success_data.status === "successful") {
+  //             seSuccessPayment(true);
+  //           } else {
+  //             toast.error("Payment failed");
+  //           }
+  //         },
+  //         // success_data
+  //         onclose: function () {},
+  //       });
+  //     } else {
+  //       toast.error("Error initiating this payment");
+  //     }
+  //   },
+  // });
 
-  function onSubmit(data: Tip) {
-    mutate(data);
+  function onSubmit(formData: Tip) {
+    setPaymentDetails({createFullName: data?.data?.name,...formData});
+    router.push("/pay");
+    // mutate(data);
   }
 
   useEffect(() => {
@@ -88,7 +87,7 @@ export default function SupportCreator() {
         creatorUserName: data?.data.username ?? "",
         currency: ECurrency.RWF,
         donorUserName: "",
-        paymentProvider: "FLUTTERWAVE",
+        paymentProvider: EPaymentProvider.FDI,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -96,9 +95,9 @@ export default function SupportCreator() {
 
   return (
     <>
-      <Script src="https://checkout.flutterwave.com/v3.js"></Script>
+      {/* <Script src="https://checkout.flutterwave.com/v3.js"></Script> */}
 
-      {successPayment ? (
+      {/* {successPayment ? (
         <div className="relative h-[calc(100vh-300px)] px-8 lg:px-0 text-lg">
           <svg
             className="absolute -left-10"
@@ -196,7 +195,7 @@ export default function SupportCreator() {
           </Link>
         </div>
       ) : (
-        <>
+        <> */}
           {isLoading ? (
             // add skeleton loader for below content
             <div className="flex flex-col items-center gap-24 h-full p-8 lg:p-0">
@@ -311,7 +310,7 @@ export default function SupportCreator() {
                   />
 
                   <Input
-                    label="Your email"
+                    label="Your email (Optional)"
                     placeholder="Your email"
                     value={watch("email")}
                     error={errors.email?.message}
@@ -343,14 +342,14 @@ export default function SupportCreator() {
                     ))}
                   </div>
                 )} */}
-                <Button type="submit" className="w-full" isLoading={isPending}>
+                <Button type="submit" className="w-full">
                   Gift {watch("amount")?.toLocaleString()} {watch("currency")}
                 </Button>
               </div>
             </form>
           )}
         </>
-      )}
-    </>
+    //   )}
+    // </>
   );
 }

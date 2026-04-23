@@ -1,3 +1,4 @@
+import { normalizePhoneNumber } from "@/utils/phone";
 import { z } from "zod";
 
 export const tip = z.object({
@@ -24,14 +25,23 @@ export const tip = z.object({
   email: z
     .string({
       required_error: "Email is required",
-    })
-    .email("Email should be valid"),
+    }).optional(),
   note: z.string({
     required_error: "Note is required",
   }),
 });
 
-export type Tip = z.infer<typeof tip>;
+export const tipSchemaPhone = z.object({
+  phoneNumber: z
+    .string({
+      required_error: "Phone number is required",
+    })
+    .min(1, "Invalid phone number")
+})
+  
+
+export type TipSchemaPhoneType = z.infer<typeof tipSchemaPhone>;
+export type Tip = z.infer<typeof tip> & z.infer<typeof tipSchemaPhone>;
 
 interface Customer {
   name: string;
