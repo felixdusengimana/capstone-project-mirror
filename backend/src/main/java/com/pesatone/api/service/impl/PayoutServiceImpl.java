@@ -5,10 +5,12 @@ import com.blazebit.persistence.PagedList;
 import com.blazebit.persistence.querydsl.BlazeJPAQuery;
 import com.google.gson.Gson;
 import com.pesatone.api.configuration.auth.RequestPrincipal;
+import com.pesatone.api.configuration.properties.PaymentConfig;
 import com.pesatone.api.exception.PesatoneException;
 import com.pesatone.api.exception.PesatoneNotFoundException;
 import com.pesatone.api.model.dto.PayoutDto;
 import com.pesatone.api.model.dto.PayoutRequestDto;
+import com.pesatone.api.model.dto.fdi.FdiRequest;
 import com.pesatone.api.model.dto.flw.*;
 import com.pesatone.api.model.entity.*;
 import com.pesatone.api.model.enumeration.*;
@@ -19,6 +21,7 @@ import com.pesatone.api.model.search.response.QueryResultPojo;
 import com.pesatone.api.repository.PayoutRepository;
 import com.pesatone.api.repository.WithdrawalAccountRepository;
 import com.pesatone.api.service.*;
+import com.pesatone.api.service.payment.FdiService;
 import com.pesatone.api.service.payment.FlutterWaveService;
 import com.pesatone.api.util.AppUtil;
 import com.querydsl.core.types.Projections;
@@ -50,6 +53,8 @@ public class PayoutServiceImpl implements PayoutService {
     private final PaymentProcessingService paymentProcessingService;
     private final WithdrawalAccountService withdrawalAccountService;
     private final WithdrawalAccountRepository withdrawalAccountRepository;
+    private final FdiService fdiService;
+    private final PaymentConfig paymentConfig;
 
     @Override
     public Payout getByReference(String reference) {
@@ -71,7 +76,23 @@ public class PayoutServiceImpl implements PayoutService {
         payout.setPaymentStatus(PaymentStatusEnum.PENDING);
         payout.setPayoutProcessingStatus(PayoutProcessingStatusEnum.PENDING_EXECUTION);
         payout.setTransactionReference(AppUtil.getTransactionReference("WT"));
-        return payoutRepository.save(payout);
+        payoutRepository.save(payout);
+
+        if(payout.getPaymentChannel().equals(PayoutChannelEnum.MOBILE_MONEY)){
+            WithdrawalAccount account = withdrawalAccountRepository.findByCreatorAndAccountType(creator, PayoutChannelEnum.MOBILE_MONEY)
+                    .orElseThrow(() -> new PesatoneNotFoundException("No mobile money account found for the user"));
+
+            fdiService.initiateTransaction(new FdiRequest(
+                    payout.getTransactionReference(),
+                    paymentConfig.getFdiAccountId(),
+                    AppUtil.getMSSIDN(account.getAccountNumber()),
+                    payout.getAmount().toBigInteger().intValueExact(),
+                    paymentConfig.getFdiCallbackUrl()),
+                    false).block();
+        }else{
+            throw new PesatoneNotFoundException("Withdrawal mode not supported. Try Mobile money");
+        }
+        return payout;
     }
 
     @Override
@@ -209,6 +230,7 @@ public class PayoutServiceImpl implements PayoutService {
                 });
     }
 
+  
     private Mono<Payout> checkFlwPayoutDetail(Payout payout) {
         return flutterWaveService.getTransferDetail(payout.getTransactionReference())
                 .publishOn(Schedulers.boundedElastic())

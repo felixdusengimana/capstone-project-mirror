@@ -40,4 +40,16 @@ public class AppUtil {
         NumberFormat formatter = new DecimalFormat("###,###.00");
         return formatter.format(amount);
     }
+
+    public static String getMSSIDN(String phoneNumber){
+        if(phoneNumber.startsWith("0")){
+            return phoneNumber;
+        }else if (phoneNumber.startsWith("+250")){
+            return phoneNumber.replace("+25", "");
+        }else if (phoneNumber.startsWith("250")){
+            return phoneNumber.replace("25", "");
+        }else{
+            throw new IllegalArgumentException("Invalid phone number");
+        }
+    }
 }

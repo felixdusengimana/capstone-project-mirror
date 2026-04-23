@@ -77,7 +77,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
             fdiService.initiateTransaction(new FdiRequest(
                     txnRef,
                     paymentConfig.getFdiAccountId(),
-                    dto.getPhoneNumber(),
+                    AppUtil.getMSSIDN(dto.getPhoneNumber()),
                     dto.getAmount().toBigInteger().intValueExact(),
                     paymentConfig.getFdiCallbackUrl()),
                     true).block();
