@@ -14,6 +14,11 @@ export enum EPaymentMethod {
   AIRTEL_MONEY = "AIRTEL_MONEY",
 }
 
+export enum EPaymentProvider {
+  FLUTTERWAVE = "FLUTTERWAVE",
+  FDI="FDI",
+}
+
 export enum EStatus {
   PENDING = "PENDING",
   SUCCESSFUL = "SUCCESSFUL",

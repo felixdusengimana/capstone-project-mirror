@@ -23,11 +23,15 @@ export function useGetTransactions({
 
 export function useGetTransactionByReference(
   reference: string,
-  enabled = true
+  refetchInterval?: number,
 ) {
   return useQuery<IResponse<ITransaction>>({
     queryKey: ["transaction", reference],
     queryFn: async () => axiosInstance.get(`/transactions/${reference}/status`),
-    enabled,
+    enabled: Boolean(reference),
+    refetchOnWindowFocus: false,
+    ...(refetchInterval?{
+      refetchInterval: (refetchInterval as number) * 1000,
+    }:{})
   });
 }

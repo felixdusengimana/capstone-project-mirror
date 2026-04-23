@@ -1,4 +1,4 @@
-import { ECurrency } from ".";
+import { ECurrency, EStatus } from ".";
 
 export interface ITransaction {
   amount: number;
@@ -10,6 +10,7 @@ export interface ITransaction {
   donorName: string;
   donorEmail?: string;
   currency: ECurrency;
+  paymentStatus: EStatus;
 }
 
 export interface ITransactionFilter {
