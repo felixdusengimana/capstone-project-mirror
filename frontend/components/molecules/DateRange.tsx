@@ -16,6 +16,7 @@ export default function DateRange({
         maxValue={today(getLocalTimeZone())}
         visibleMonths={2}
         pageBehavior="single"
+        // @ts-ignore
         defaultValue={
           initialValue?.startDate && initialValue.endDate
             ? {
