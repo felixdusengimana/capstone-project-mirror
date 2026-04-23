@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.pesatone.api.configuration.auth.RequestPrincipal;
 import com.pesatone.api.configuration.properties.PaymentConfig;
 import com.pesatone.api.exception.PesatoneNotFoundException;
+import com.pesatone.api.model.dto.PaymentDto;
 import com.pesatone.api.model.dto.TransactionDto;
 import com.pesatone.api.model.dto.fdi.FdiRequest;
 import com.pesatone.api.model.dto.flw.FlwTransactionDetail;
@@ -42,6 +43,7 @@ import reactor.core.scheduler.Schedulers;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -99,9 +101,9 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
     @Override
     public Mono<PaymentTransaction> checkStatus(PaymentTransaction transaction) {
         if (transaction.canProcessPayment()
-                && (transaction.getPaymentProvider().equals(PaymentProviderEnum.FLUTTERWAVE))) {
+                && (transaction.getPaymentProvider().equals(PaymentProviderEnum.FDI))) {
             try {
-                return checkFlwTransactionDetail(transaction);
+                return checkFdiTransactionDetail(transaction);
             } catch (Exception ex) {
                 log.error(ex.getMessage(), ex);
             }
@@ -210,4 +212,34 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
                     return Mono.just(transaction);
                 });
     }
+
+    private Mono<PaymentTransaction> checkFdiTransactionDetail(PaymentTransaction transaction) {
+        return fdiService.getTransactionDetail(transaction.getTransactionReference())
+                .publishOn(Schedulers.boundedElastic())
+                .map(response -> {
+                    log.info("FDI transaction detail: {}", response);
+                    if (response.canProcess()) {
+                        return paymentProcessingService.processPayment(transaction, new PaymentDto(
+                                PaymentProviderEnum.FDI,
+                                "momo-mtn-rw",
+                                transaction.getAmount(),
+                                transaction.getCurrency(),
+                                response.getPaymentStatus(),
+                                response.getData().getChannelRef(),
+                                new Date()));
+                    }else{
+                        return transaction;
+                    }
+                })
+                .onErrorResume(ex -> {
+                    if (ex instanceof WebClientResponseException webClientException) {
+                        log.error("FDI API ERROR {} : {}", webClientException.getStatusCode(),
+                                webClientException.getResponseBodyAsString());
+                    } else {
+                        log.error("FDI API ERROR: {}", ex.getMessage());
+                    }
+                    return Mono.just(transaction);
+                });
+    }
+
 }
