@@ -250,7 +250,7 @@ const PaymentUI = () => {
             <p className='text-center'>
               If you do not see a popup prompt on your cell phone, Dial 
               <b>
-                {checked === EPaymentMethod.MTN_MOBILE_MONEY ? "*182*7*1#" : "*182*5*6*1# or *500*5*6*1#"}
+                {checked === EPaymentMethod.MTN_MOBILE_MONEY ? "*182*7*1#" : <span>*182*5*6*1# <small>or</small> *500*5*6*1#</span>}
               </b>To approve payment!</p>
           </div> : (
             <form onSubmit={handleSubmit(onSubmit)}>
