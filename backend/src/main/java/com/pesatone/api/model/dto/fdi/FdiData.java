@@ -11,4 +11,6 @@ public class FdiData {
     private String trxRef;
     private String channelRef;
     private String message;
+    private String trxStatus;
+    private String channelTrxStatus;
 }
