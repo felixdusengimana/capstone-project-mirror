@@ -14,6 +14,7 @@ import com.pesatone.api.model.entity.AppUser;
 import com.pesatone.api.model.entity.QAppUser;
 import com.pesatone.api.model.entity.SocialLink;
 import com.pesatone.api.model.enumeration.ApprovalStatusEnum;
+import com.pesatone.api.model.enumeration.CurrencyEnum;
 import com.pesatone.api.model.enumeration.ImageTypeEnum;
 import com.pesatone.api.model.enumeration.RoleEnum;
 import com.pesatone.api.model.enumeration.StatusEnum;
@@ -28,6 +29,7 @@ import com.pesatone.api.repository.SocialLinkRepository;
 import com.pesatone.api.service.NotificationService;
 import com.pesatone.api.service.PesatoneTokenService;
 import com.pesatone.api.service.UserService;
+import com.pesatone.api.service.WalletService;
 import com.querydsl.core.types.Projections;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -59,6 +61,7 @@ public class UserServiceImpl implements UserService {
     private final EntityManager entityManager;
     private final NotificationService notificationService;
     private final Gson gson;
+    private final WalletService walletService;
 
     @Value("${application.passwordResetUrl}")
     private String passwordResetUrl;
@@ -222,6 +225,7 @@ public class UserServiceImpl implements UserService {
                     creator.setVerified(true);
                 }
                 userRepository.save(creator);
+                walletService.getOrCreateWallet(creator,CurrencyEnum.RWF);
                 return creator;
         }
         throw new PesatoneException("Invalid user type");
