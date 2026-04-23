@@ -53,48 +53,48 @@ const PaymentUI = () => {
 
 
   const {
-      handleSubmit,
-      watch,
-      setValue,
-      setError,
-      formState: { errors },
-    } = useForm<TipSchemaPhoneType>({
-      resolver: zodResolver(tipSchemaPhone),
-      defaultValues: {
-        phoneNumber
-      },
-    });
+    handleSubmit,
+    watch,
+    setValue,
+    setError,
+    formState: { errors },
+  } = useForm<TipSchemaPhoneType>({
+    resolver: zodResolver(tipSchemaPhone),
+    defaultValues: {
+      phoneNumber
+    },
+  });
 
-    const onSubmit = (data: TipSchemaPhoneType) => {
-      const phoneNumber = normalizePhoneNumber(data.phoneNumber);
-      if(!Boolean(phoneNumber) || phoneNumber.length < 10 || phoneNumber.length > 10){
-        setError("phoneNumber", {
-          type: "manual",
-          message: "Please enter a valid phone number",
-        });
-        return;
-      }
+  const onSubmit = (data: TipSchemaPhoneType) => {
+    const phoneNumber = normalizePhoneNumber(data.phoneNumber);
+    if (!Boolean(phoneNumber) || phoneNumber.length < 10 || phoneNumber.length > 10) {
+      setError("phoneNumber", {
+        type: "manual",
+        message: "Please enter a valid phone number",
+      });
+      return;
+    }
 
-      if(checked === EPaymentMethod.MTN_MOBILE_MONEY && !phoneNumber.startsWith("078")){
-        setError("phoneNumber", {
-          type: "manual",
-          message: "Please enter a valid MTN Mobile Money number",
-        });
-        return;
-      }
+    if (checked === EPaymentMethod.MTN_MOBILE_MONEY && !phoneNumber.startsWith("078")) {
+      setError("phoneNumber", {
+        type: "manual",
+        message: "Please enter a valid MTN Mobile Money number",
+      });
+      return;
+    }
 
-      if(checked === EPaymentMethod.AIRTEL_MONEY && !phoneNumber.startsWith("072")){
-        setError("phoneNumber", {
-          type: "manual",
-          message: "Please enter a valid Airtel Money number",
-        });
-        return;
-      }
+    if (checked === EPaymentMethod.AIRTEL_MONEY && !phoneNumber.startsWith("072")) {
+      setError("phoneNumber", {
+        type: "manual",
+        message: "Please enter a valid Airtel Money number",
+      });
+      return;
+    }
 
-      setPhoneNumber(phoneNumber);
-      mutate();
-      setIsConfirming(true);
-      }
+    setPhoneNumber(phoneNumber);
+    mutate();
+    setIsConfirming(true);
+  }
   useEffect(() => {
     if (transactionInfos) {
       setPaymentStatus(transactionInfos?.data?.paymentStatus);
@@ -113,7 +113,7 @@ const PaymentUI = () => {
               <p className="text-xs text-gray-500">{email}</p>
             </div>
           </div>
-          {paymentStatus===EStatus.PENDING? <div className="flex flex-col w-full  items-baseline mb-6">
+          {paymentStatus === EStatus.PENDING ? <div className="flex flex-col w-full  items-baseline mb-6">
             <p className="text-xl font-bold text-gray-900">{amount.toLocaleString()} RWF</p>
             <button className="text-sm text-indigo-600 hover:text-indigo-800 focus:outline-none">
               Transaction breakdown
@@ -121,7 +121,7 @@ const PaymentUI = () => {
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
               </svg>
             </button>
-          </div>:null}
+          </div> : null}
           {paymentStatus === EStatus.SUCCESSFUL ? (
             <div className="relative  px-8 lg:px-0 text-lg">
               <svg
@@ -222,11 +222,11 @@ const PaymentUI = () => {
             </div>
           ) : (paymentStatus === EStatus.FAILED) ? (
             <>
-            <div className='text-red-500 flex items-center flex-col justify-center'>
-              Payment failed, please try again
-            </div>
+              <div className='text-red-500 flex items-center flex-col justify-center'>
+                Payment failed, please try again
+              </div>
 
-            <Button
+              <Button
                 className="w-full mt-8"
                 onClick={() => {
                   setPaymentStatus(EStatus.PENDING);
@@ -249,8 +249,8 @@ const PaymentUI = () => {
             </p>
             <p className='text-center'>
               If you do not see a popup prompt on your cell phone, Dial <b>
-                {checked === EPaymentMethod.MTN_MOBILE_MONEY ? "*182*7*1#" : ""}
-                </b> To approve payment!            </p>
+                *182*7*1#
+              </b> To approve payment!            </p>
           </div> : (
             <form onSubmit={handleSubmit(onSubmit)}>
               <p className="text-sm text-gray-700 mb-4">Please enter your {checked.replaceAll("_", " ").toLocaleLowerCase()} details to begin payment</p>
@@ -264,7 +264,7 @@ const PaymentUI = () => {
                   value={watch("phoneNumber")}
                   left={<p className='mr-2'>🇷🇼</p>}
                   name="phoneNumber"
-                  onChange={(e) => setValue("phoneNumber", e.target.value,{
+                  onChange={(e) => setValue("phoneNumber", e.target.value, {
                     shouldValidate: true,
                     shouldDirty: true,
                   })}
@@ -288,7 +288,7 @@ const PaymentUI = () => {
         </div>
 
 
-        {(!isConfirming && paymentStatus==EStatus.PENDING) ? (<div className="bg-gray-50 w-1/2 p-6 flex flex-col justify-start">
+        {(!isConfirming && paymentStatus == EStatus.PENDING) ? (<div className="bg-gray-50 w-1/2 p-6 flex flex-col justify-start">
           <div className="flex justify-end">
             <button onClick={() => {
               if (confirm("Are you sure you want to cancel this payment?")) {
@@ -317,7 +317,7 @@ const PaymentUI = () => {
             ))
             }
           </div>
-        </div>):null}
+        </div>) : null}
       </div>
     </div>
   );
