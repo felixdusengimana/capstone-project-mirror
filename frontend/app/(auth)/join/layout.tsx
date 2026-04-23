@@ -1,5 +1,5 @@
-import { PropsWithChildren, Suspense } from "react";
+import { ReactNode, Suspense } from "react";
 
-export default function JoinLayout({ children }: PropsWithChildren) {
+export default function JoinLayout({ children }: {children: ReactNode} ) {
   return <Suspense>{children}</Suspense>;
 }
