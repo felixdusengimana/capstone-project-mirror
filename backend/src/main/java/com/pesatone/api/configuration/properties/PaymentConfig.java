@@ -22,5 +22,6 @@ public class PaymentConfig {
     private String fdiPaymentUrl;
     private String fdiTransactionDetailUrl;
     private String fdiAuthUrl;
-    private String fdiCallbackUrl;
+    private String fdiPaymentCallbackUrl;
+    private String fdiPayoutCallbackUrl;
 }

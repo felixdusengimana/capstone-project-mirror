@@ -60,7 +60,6 @@ public class Payout {
     public boolean canProcessPayout(){
         return (paymentStatus != null &&
                 List.of(PaymentStatusEnum.PENDING, PaymentStatusEnum.FAILED).contains(paymentStatus))
-                && (payoutProcessingStatus != null &&
-                List.of(PayoutProcessingStatusEnum.PROCESSING, PayoutProcessingStatusEnum.FAILED).contains(payoutProcessingStatus));
+                && (payoutProcessingStatus != null && payoutProcessingStatus != PayoutProcessingStatusEnum.DONE);
     }
 }

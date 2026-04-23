@@ -76,7 +76,6 @@ public class PayoutServiceImpl implements PayoutService {
         payout.setPaymentStatus(PaymentStatusEnum.PENDING);
         payout.setPayoutProcessingStatus(PayoutProcessingStatusEnum.PENDING_EXECUTION);
         payout.setTransactionReference(AppUtil.getTransactionReference("WT"));
-        payoutRepository.save(payout);
 
         if(payout.getPaymentChannel().equals(PayoutChannelEnum.MOBILE_MONEY)){
             WithdrawalAccount account = withdrawalAccountRepository.findByCreatorAndAccountType(creator, PayoutChannelEnum.MOBILE_MONEY)
@@ -87,12 +86,13 @@ public class PayoutServiceImpl implements PayoutService {
                     paymentConfig.getFdiAccountId(),
                     AppUtil.getMSSIDN(account.getAccountNumber()),
                     payout.getAmount().toBigInteger().intValueExact(),
-                    paymentConfig.getFdiCallbackUrl()),
+                    paymentConfig.getFdiPayoutCallbackUrl()),
                     false).block();
         }else{
             throw new PesatoneNotFoundException("Withdrawal mode not supported. Try Mobile money");
         }
-        return payout;
+
+        return payoutRepository.save(payout);
     }
 
     @Override
@@ -159,7 +159,7 @@ public class PayoutServiceImpl implements PayoutService {
     public Mono<Payout> checkMomoPayoutStatus(Payout payout) {
         if (payout.canProcessPayout() && (payout.getPaymentChannel().equals(PayoutChannelEnum.MOBILE_MONEY))) {
             try {
-                return checkFlwPayoutDetail(payout);
+                return checkFdiPayoutStatus(payout);
             } catch (Exception ex) {
                 log.error(ex.getMessage(), ex);
             }
@@ -191,13 +191,13 @@ public class PayoutServiceImpl implements PayoutService {
             throw new PesatoneException("You must set up your withdrawal account in settings tab before you can proceed");
         }
 
-        if (dto.getPaymentChannel().equals(PayoutChannelEnum.BANK_ACCOUNT) && withdrawalAccounts.stream().noneMatch(a -> a.getAccountType().equals(PayoutChannelEnum.BANK_ACCOUNT))) {
-            throw new PesatoneException("No bank account information found. " +
+        if (dto.getPaymentChannel().equals(PayoutChannelEnum.MOBILE_MONEY) && withdrawalAccounts.stream().noneMatch(a -> a.getAccountType().equals(PayoutChannelEnum.MOBILE_MONEY))) {
+            throw new PesatoneException("No mobile money information found. " +
                     "You must set up your withdrawal account in settings tab before you can proceed");
         }
 
-        if (dto.getPaymentChannel().equals(PayoutChannelEnum.MOBILE_MONEY) && withdrawalAccounts.stream().noneMatch(a -> a.getAccountType().equals(PayoutChannelEnum.MOBILE_MONEY))) {
-            throw new PesatoneException("No mobile money information found. " +
+        if (dto.getPaymentChannel().equals(PayoutChannelEnum.BANK_ACCOUNT) && withdrawalAccounts.stream().noneMatch(a -> a.getAccountType().equals(PayoutChannelEnum.BANK_ACCOUNT))) {
+            throw new PesatoneException("No bank account information found. " +
                     "You must set up your withdrawal account in settings tab before you can proceed");
         }
 
@@ -229,8 +229,7 @@ public class PayoutServiceImpl implements PayoutService {
                     return Mono.just("");
                 });
     }
-
-  
+ 
     private Mono<Payout> checkFlwPayoutDetail(Payout payout) {
         return flutterWaveService.getTransferDetail(payout.getTransactionReference())
                 .publishOn(Schedulers.boundedElastic())
@@ -248,6 +247,22 @@ public class PayoutServiceImpl implements PayoutService {
                         log.error("FLUTTER WAVE API ERROR {} : {}", webClientException.getStatusCode(), webClientException.getResponseBodyAsString());
                     } else {
                         log.error("FLUTTER WAVE API ERROR: {}", ex.getMessage());
+                    }
+                    return Mono.just(payout);
+                });
+    }
+
+    private Mono<Payout> checkFdiPayoutStatus(Payout payout) {
+        return fdiService.getTransactionDetail(payout.getTransactionReference())
+                .publishOn(Schedulers.boundedElastic())
+                .map(response -> {
+                    return paymentProcessingService.processPayout(payout, new PayoutDto(response, payout));
+                })
+                .onErrorResume(ex -> {
+                    if (ex instanceof WebClientResponseException webClientException) {
+                        log.error("FDI API ERROR {} : {}", webClientException.getStatusCode(), webClientException.getResponseBodyAsString());
+                    } else {
+                        log.error("FDI API ERROR: {}", ex.getMessage());
                     }
                     return Mono.just(payout);
                 });

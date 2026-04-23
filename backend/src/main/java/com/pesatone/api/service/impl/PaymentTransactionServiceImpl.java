@@ -9,7 +9,6 @@ import com.pesatone.api.configuration.properties.PaymentConfig;
 import com.pesatone.api.exception.PesatoneNotFoundException;
 import com.pesatone.api.model.dto.TransactionDto;
 import com.pesatone.api.model.dto.fdi.FdiRequest;
-import com.pesatone.api.model.dto.fdi.FdiResponse;
 import com.pesatone.api.model.dto.flw.FlwTransactionDetail;
 import com.pesatone.api.model.dto.flw.FlwTransactionDetailResponse;
 import com.pesatone.api.model.entity.AppUser;
@@ -79,7 +78,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
                     paymentConfig.getFdiAccountId(),
                     AppUtil.getMSSIDN(dto.getPhoneNumber()),
                     dto.getAmount().toBigInteger().intValueExact(),
-                    paymentConfig.getFdiCallbackUrl()),
+                    paymentConfig.getFdiPaymentCallbackUrl()),
                     true).block();
         }
         PaymentTransaction transaction = new PaymentTransaction();

@@ -37,7 +37,7 @@ public class AppUtil {
     }
 
     public static String formatAmount(BigDecimal amount) {
-        NumberFormat formatter = new DecimalFormat("###,###.00");
+        NumberFormat formatter = new DecimalFormat("###,###");
         return formatter.format(amount);
     }
 

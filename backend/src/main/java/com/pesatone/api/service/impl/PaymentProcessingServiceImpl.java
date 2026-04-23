@@ -61,11 +61,11 @@ public class PaymentProcessingServiceImpl implements PaymentProcessingService {
                 String donorName = StringUtils.defaultIfBlank(transaction.getDonorName(), "A fan ");
                 String creatorName = StringUtils.defaultIfBlank(transaction.getCreator().getName(), " ");
                 String emailBody = "<b>Hello " +  creatorName + ",</b> <br/>" +
-                        donorName + " gifted you <b>"+ AppUtil.formatAmount(transaction.getAmount())+ transaction.getCurrency().name() +"</b> <br/><br/>";
+                        donorName + " gifted you <b>"+ AppUtil.formatAmount(transaction.getAmount())+ " " + transaction.getCurrency().name() +"</b> <br/><br/>";
                 if(StringUtils.isNotBlank(transaction.getNote())){
                     emailBody += "<b>With a note : </b>" + transaction.getNote() + "<br/><br/>";
                 }
-                emailBody+= "Your Pesatone balance is now <b>"+ AppUtil.formatAmount(wallet.getBalance())+ wallet.getCurrency().name() +"</b> <br/><br/>" +
+                emailBody+= "Your Pesatone balance is now <b>"+ AppUtil.formatAmount(wallet.getBalance())+ " " +  wallet.getCurrency().name() +"</b> <br/><br/>" +
                         " <br/>";
 
                 notificationService.sendEmail(transaction.getCreator().getEmail(), "Funds Received", emailBody);
@@ -90,7 +90,7 @@ public class PaymentProcessingServiceImpl implements PaymentProcessingService {
 
                 notificationService.sendEmail(payout.getCreator().getEmail(), "Successful withdrawal",
                         "<b>Hello " + StringUtils.defaultIfBlank(payout.getCreator().getName(), " ") + ",</b> <br/>" +
-                                "Your withdrawal of <b>"+ AppUtil.formatAmount(payout.getAmount())+ payout.getCurrency().name() +"</b> was successfully processed. <br/><br/>" +
+                                "Your withdrawal of <b>"+ AppUtil.formatAmount(payout.getAmount())+ " " +  payout.getCurrency().name() +"</b> was successfully processed. <br/><br/>" +
                                 "If you don't receive the funds within 1 working day, kindly send us an email on support@pesatone.com <br/>");
 
             } else if (dto.isFailed()) {
