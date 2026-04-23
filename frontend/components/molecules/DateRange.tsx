@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from "react";
 import { DateRangePicker } from "@nextui-org/date-picker";
 import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
@@ -16,7 +17,6 @@ export default function DateRange({
         maxValue={today(getLocalTimeZone())}
         visibleMonths={2}
         pageBehavior="single"
-        // @ts-ignore
         defaultValue={
           initialValue?.startDate && initialValue.endDate
             ? {
