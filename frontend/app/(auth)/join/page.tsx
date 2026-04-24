@@ -39,8 +39,6 @@ import ImageCrop from "@/components/organisms/ImageCrop";
 import ImageCropProvider from "@/providers/ImageCropProvider";
 import {
   extractDomainFromURL,
-  getURLPathName,
-  removeProtocol,
 } from "@/utils/URL";
 
 export default function Join() {
