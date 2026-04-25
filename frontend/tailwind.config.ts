@@ -18,6 +18,7 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-outfit)"],
         mono: ["var(--font-righteous)"],
+        inter: ["var(--font-inter)"],
       },
       colors: {
         secondary: "var(--secondary-color)",

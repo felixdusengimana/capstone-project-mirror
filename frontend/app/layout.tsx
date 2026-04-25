@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Righteous, Outfit } from "next/font/google";
+import { Righteous, Outfit, Inter } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 import Provider from "./provider";
@@ -10,6 +10,8 @@ const righteous = Righteous({
   variable: "--font-righteous",
   weight: "400",
 });
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", weight: "400" });
 
 export const metadata: Metadata = {
   title: "Pesatone - Search and gift your favorite creators",
@@ -27,7 +29,7 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
-      <body className={`${outfit.variable} ${righteous.variable} font-sans`}>
+      <body className={`${outfit.variable} ${inter.variable} ${righteous.variable} font-sans`}>
         <Toaster />
         <Provider>{children}</Provider>
       </body>
