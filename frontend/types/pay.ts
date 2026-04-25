@@ -1,4 +1,3 @@
-import { normalizePhoneNumber } from "@/utils/phone";
 import { z } from "zod";
 
 export const tip = z.object({
@@ -6,7 +5,7 @@ export const tip = z.object({
     .number({
       required_error: "Amount is required",
     })
-    .min(1, "Amount must be greater than 0"),
+    .min(100, "Amount must be greater than  or equal to 100RWF"),
   creatorUserName: z.string({
     required_error: "Creator username is required",
   }),

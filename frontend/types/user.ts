@@ -38,6 +38,21 @@ export const step0 = z.object({
     .min(6, "OTP must be 6 characters"),
 });
 
+const forbiddenTerms = [
+  "join",
+  "login",
+  "sign-up",
+  "forgot-password",
+  "pay",
+  "resolve",
+  "dashboard",
+  "payouts",
+  "settings",
+  "supporters",
+];
+
+const forbiddenRegex = new RegExp(forbiddenTerms.join("|"), "i");
+
 export const step1 = z.object({
   image: z.string({
     required_error: "Profile Picture is required",
@@ -62,7 +77,13 @@ export const step2 = z.object({
       required_error: "Pesatag is required",
     })
     .min(3, "Pesatag must be at least 3 characters")
-    .max(50, "Pesatag mus be less than 50 characters"),
+    .max(50, "Pesatag mus be less than 50 characters")
+    .refine(
+      (val) => !forbiddenRegex.test(val),
+      {
+        message: "Name contains restricted words like 'login' or 'dashboard'",
+      }
+    ),
 });
 
 export const step3 = z.object({
