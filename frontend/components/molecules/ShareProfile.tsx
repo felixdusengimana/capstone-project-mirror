@@ -25,7 +25,7 @@ export default function ShareProfile({
           )}
         </div>
       </DialogTrigger>
-      <Dialog className="p-4 pb-10 overflow-visible bg-[#d6d8dd]">
+      <Dialog showCloseButton={true} className="p-4 pb-10 overflow-visible bg-[#d6d8dd]">
         <PesatoneTipCard profile={profile!}/>
       </Dialog>
     </DialogRoot>
