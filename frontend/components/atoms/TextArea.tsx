@@ -23,13 +23,13 @@ export default function TextArea({ ...props }: TextAreaProps) {
       <textarea
         {...props}
         className={`py-[13px] min-h-[102px] px-4 border text-black outline-none w-full rounded-xl ${
-          error ? "border-red-400 bg-red-50" : "border-[#E5E9F0] bg-slate-50 "
+          error ? "border-orange-300 bg-slate-50" : "border-[#E5E9F0] bg-slate-50 "
         } ${props.className}`}
         id={props.id ?? id}
       />
       {Boolean(error) &&
         (typeof error === "string" ? (
-          <p className="text-red-500 text-sm mt-1">{error}</p>
+          <p className="text-orange-400 text-sm mt-1">{error}</p>
         ) : (
           error
         ))}

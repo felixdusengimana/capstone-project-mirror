@@ -3,9 +3,9 @@ import { z } from "zod";
 export const tip = z.object({
   amount: z
     .number({
-      required_error: "Amount is required",
+      required_error: "🙏🏾 Your generosity means so much. Show your support with some gift.",
     })
-    .min(100, "Amount must be greater than  or equal to 100RWF"),
+    .min(100, "🙏🏾 Your generosity means a lot! 500 RWF or more is a great way to show your support"),
   creatorUserName: z.string({
     required_error: "Creator username is required",
   }),
@@ -19,14 +19,14 @@ export const tip = z.object({
     required_error: "Payment provider is required",
   }),
   name: z.string({
-    required_error: "Name is required",
+    required_error: "😊 The person you are gifting would really love to know your name",
   }),
   email: z
     .string({
       required_error: "Email is required",
     }).optional(),
   note: z.string({
-    required_error: "Note is required",
+    required_error: "🫶🏾 A little message goes a long way in showing how you feel",
   }),
 });
 
