@@ -33,11 +33,16 @@ import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import java.time.Duration;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Slf4j
 @RestController
@@ -50,6 +55,11 @@ public class PaymentTransactionController {
     private final PayoutService payoutService;
     private final Gson gson;
     private final PaymentConfig paymentConfig;
+    @Value("${application.statusNotificationDuration}")
+    Integer statusNotificationDuration;
+
+    @Value("${application.statusNotificationEventKey}")
+    String statusNotificationEventKey;
 
     @Operation(summary = "Initiate Transaction", description = "Initiate payment transaction")
     @PostMapping("initiate")
@@ -74,6 +84,20 @@ public class PaymentTransactionController {
         return paymentTransactionService.checkStatus(transaction)
                 .map(txn -> ResponseEntity.ok(new ApiResponseObject<>("Transaction retrieved successfully",
                         true, new PaymentTransactionPojo(txn))));
+    }
+
+     @GetMapping("{transactionReference}/sse")
+    public Flux<ServerSentEvent<String>> sendTransactionStatus(@PathVariable String transactionReference) {
+         return Flux.interval(Duration.ofSeconds(statusNotificationDuration))
+                .publishOn(Schedulers.parallel())
+                .map(id -> {
+                    PaymentTransaction transaction = paymentTransactionService.getByTransactionReference(transactionReference);
+                    return ServerSentEvent.<String>builder()
+                            .id(String.valueOf(id))
+                            .event(statusNotificationEventKey)
+                            .data(transaction.getPaymentStatus().name())
+                            .build();
+                });
     }
 
     @Hidden

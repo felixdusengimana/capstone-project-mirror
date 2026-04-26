@@ -3,6 +3,7 @@ package com.pesatone.api.model.dto;
 import com.pesatone.api.model.enumeration.CurrencyEnum;
 import com.pesatone.api.model.enumeration.PaymentProviderEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -29,7 +30,7 @@ public class TransactionDto {
             description = "amount you want to gift",
             example = "1000")
     @NotNull(message = "amount is required")
-    @Min(value = 1, message = "amount cannot be less than 1")
+    @Min(value = 100, message = "amount cannot be less than 100")
     private BigDecimal amount;
 
     @Schema(name = "currency",
@@ -46,6 +47,7 @@ public class TransactionDto {
 
     @Schema(name = "name",
             description = "A name your favorite can call you")
+    @Max(value = 200, message = "We can only allow 200 characters at the moment")
     private String name;
 
     @Schema(name = "email",
@@ -59,5 +61,6 @@ public class TransactionDto {
     @Schema(name = "note",
             description = "Message to your favorite creator",
             example = "Say something nicem")
+    @Max(value = 500, message = "We can only allow 500 characters at the moment")
     private String note;
 }

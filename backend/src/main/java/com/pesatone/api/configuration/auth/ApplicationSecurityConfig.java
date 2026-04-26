@@ -33,6 +33,7 @@ public class ApplicationSecurityConfig {
             "/users/creators/**",
             "/transactions/initiate",
             "/transactions/*/status",
+            "/transactions/*/sse",
             "/transactions/flw/callback",
             "/transactions/fdi/callback/payment",
             "/transactions/fdi/callback/payout"

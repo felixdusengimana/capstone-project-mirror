@@ -74,15 +74,6 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
                 .orElseThrow(() -> new PesatoneNotFoundException(
                         String.format("Creator with tag %s not found", dto.getCreatorUserName())));
         String txnRef = AppUtil.getTransactionReference("PT");
-        if (dto.getPaymentProvider().equals(PaymentProviderEnum.FDI)) {
-            fdiService.initiateTransaction(new FdiRequest(
-                    txnRef,
-                    paymentConfig.getFdiAccountId(),
-                    AppUtil.getMSSIDN(dto.getPhoneNumber()),
-                    dto.getAmount().toBigInteger().intValueExact(),
-                    paymentConfig.getFdiPaymentCallbackUrl()),
-                    true).block();
-        }
         PaymentTransaction transaction = new PaymentTransaction();
         transaction.setAmount(dto.getAmount());
         transaction.setCurrency(dto.getCurrency());
@@ -95,7 +86,19 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
         transaction.setCreator(creator);
         appUserRepository.findActiveByUserNameAndRole(dto.getCreatorUserName(), RoleEnum.FAN)
                 .ifPresent(transaction::setDonor);
-        return paymentTransactionRepository.save(transaction);
+        paymentTransactionRepository.save(transaction);
+
+        if (dto.getPaymentProvider().equals(PaymentProviderEnum.FDI)) {
+            fdiService.initiateTransaction(new FdiRequest(
+                    txnRef,
+                    paymentConfig.getFdiAccountId(),
+                    AppUtil.getMSSIDN(dto.getPhoneNumber()),
+                    dto.getAmount().toBigInteger().intValueExact(),
+                    paymentConfig.getFdiPaymentCallbackUrl()),
+                    true).block();
+        }
+
+        return transaction;
     }
 
     @Override
@@ -217,7 +220,6 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
         return fdiService.getTransactionDetail(transaction.getTransactionReference())
                 .publishOn(Schedulers.boundedElastic())
                 .map(response -> {
-                    log.info("FDI transaction detail: {}", response);
                     if (response.canProcess()) {
                         return paymentProcessingService.processPayment(transaction, new PaymentDto(
                                 PaymentProviderEnum.FDI,
