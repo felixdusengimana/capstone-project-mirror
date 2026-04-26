@@ -14,7 +14,7 @@ import com.hazelcast.core.HazelcastInstance;
 public class HazelCacaheConfig {
 	@Bean
 	public Config hazelCastConfig() {
-		return new Config()
+		Config config = new Config()
 				.setInstanceName("pesatone-hazelcast")
 				.addMapConfig(new MapConfig()
 						.setName("paymentTransaction")
@@ -22,6 +22,10 @@ public class HazelCacaheConfig {
 				.addMapConfig(new MapConfig()
 						.setName("creator")
 						.setTimeToLiveSeconds(2880));
+
+		config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
+		config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(false);
+		return config;
 	}
 
 	@Bean
