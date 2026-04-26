@@ -58,16 +58,8 @@ public class UserController {
     @Operation(summary = "Get Creator's Profile", description = "Get Creators profile by Id or Username")
     @GetMapping("/creators/{reference}")
     public ResponseEntity<ApiResponseObject<UserPojo>> getCreator(@PathVariable String reference) {
-        AppUser user;
-        if (StringUtils.isNumeric(reference)) {
-            user = userRepository.findActiveByIdAndRole(Long.valueOf(reference), RoleEnum.CREATOR)
-                    .orElseThrow(() -> new PesatoneNotFoundException("Creator not found"));
-        } else {
-            user = userRepository.findActiveByUserNameAndRole(reference, RoleEnum.CREATOR)
-                    .orElseThrow(() -> new PesatoneNotFoundException("Creator not found"));
-        }
         return ResponseEntity.ok(new ApiResponseObject<>("Creator profile retrieved successfully",
-                true, UserPojo.stripDetails(userService.getUserDetails(user))));
+                true, UserPojo.stripDetails(userService.getCreator(reference))));
     }
 
     @Operation(summary = "Get Creator's Dashboard", description = "Get LoggedIn Creators Dashboard")

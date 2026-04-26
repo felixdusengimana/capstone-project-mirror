@@ -12,17 +12,20 @@ import com.hazelcast.core.HazelcastInstance;
 @Configuration
 @EnableCaching
 public class HazelCacaheConfig {
-	   @Bean
-	    public Config hazelCastConfig() {
-	        return new Config()
-	                .setInstanceName("pesatone-hazelcast")
-	                .addMapConfig(new MapConfig()
-	                        .setName("paymentTransaction")
-	                        .setTimeToLiveSeconds(1800));
-	    }
+	@Bean
+	public Config hazelCastConfig() {
+		return new Config()
+				.setInstanceName("pesatone-hazelcast")
+				.addMapConfig(new MapConfig()
+						.setName("paymentTransaction")
+						.setTimeToLiveSeconds(1800))
+				.addMapConfig(new MapConfig()
+						.setName("creator")
+						.setTimeToLiveSeconds(2880));
+	}
 
-	    @Bean
-	    public HazelcastInstance hazelcastInstance(Config config) {
-	        return Hazelcast.newHazelcastInstance(config);
-	    }
+	@Bean
+	public HazelcastInstance hazelcastInstance(Config config) {
+		return Hazelcast.newHazelcastInstance(config);
+	}
 }

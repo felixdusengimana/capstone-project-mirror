@@ -36,6 +36,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,6 +83,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
+    @CacheEvict(value = "creator", key = "#user.username")
     public AppUser updateUserDetails(AppUser user, UserDetailDto dto) {
         user = userRepository.findActiveById(user.getId()).orElse(user);
         if(!Boolean.TRUE.equals(user.getEmailVerified())){
@@ -111,13 +114,13 @@ public class UserServiceImpl implements UserService {
         if (dto.getSocialLinks() != null && !dto.getSocialLinks().isEmpty()) {
             setSocialLinks(user, dto.getSocialLinks());
         }
-        log.info("User id: {}", user.getId());
         userRepository.save(user);
         return user;
     }
 
     @Transactional
     @Override
+    @CacheEvict(value = "creator", key = "#user.username")
     public String uploadImage(AppUser user, MultipartFile file, ImageTypeEnum type) {
         String secureUrl = null;
         try {
@@ -161,6 +164,21 @@ public class UserServiceImpl implements UserService {
 
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
+    }
+
+    @Override
+    @Cacheable(value = "creator", key = "#reference")
+    public UserPojo getCreator(String reference){
+      log.info("Getting user info from DB: {}", reference);
+       AppUser user;
+        if (StringUtils.isNumeric(reference)) {
+            user = userRepository.findActiveByIdAndRole(Long.valueOf(reference), RoleEnum.CREATOR)
+                    .orElseThrow(() -> new PesatoneNotFoundException("Creator not found"));
+        } else {
+            user = userRepository.findActiveByUserNameAndRole(reference, RoleEnum.CREATOR)
+                    .orElseThrow(() -> new PesatoneNotFoundException("Creator not found"));
+        }
+        return getUserDetails(user);
     }
 
     @Override
@@ -218,6 +236,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
+    @CacheEvict(value = "creator", key = "#creator.username")
     public AppUser approveCreatorAccount(AppUser creator, ApprovalStatusEnum approvalStatus) {
         if(creator.getRole().equals(RoleEnum.CREATOR)){
                 creator.setApprovalStatus(approvalStatus);
@@ -233,6 +252,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
+    @CacheEvict(value = "creator", key = "#user.username")
     public void deleteAccount(AppUser user) {
         user.setStatus(StatusEnum.DELETED);
         userRepository.save(user);

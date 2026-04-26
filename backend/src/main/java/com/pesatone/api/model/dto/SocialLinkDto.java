@@ -1,5 +1,7 @@
 package com.pesatone.api.model.dto;
 
+import java.io.Serializable;
+
 import com.pesatone.api.model.enumeration.SocialPlatformEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -8,12 +10,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.URL;
 
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SocialLinkDto {
+public class SocialLinkDto implements Serializable{
     @Schema(name = "link",
             description = "Social link",
             example = "www.link.com")

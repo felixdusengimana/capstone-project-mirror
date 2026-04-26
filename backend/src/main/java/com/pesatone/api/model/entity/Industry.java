@@ -9,11 +9,12 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Getter @Setter
-public class Industry {
+public class Industry implements Serializable{
     @Id
     @GeneratedValue
     private Long id;

@@ -23,6 +23,8 @@ public interface UserService {
 
     void resetPassword(Long userId, String password);
 
+    UserPojo getCreator(String reference);
+
     UserPojo getUserDetails(AppUser user);
 
     QueryResultPojo<CreatorSearchResponse> searchCreators(CreatorSearchFilter filter);
