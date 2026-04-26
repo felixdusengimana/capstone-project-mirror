@@ -14,13 +14,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
 @Slf4j
 public class RateLimitFilter extends OncePerRequestFilter {
-    private static final int MAX_REQUESTS = 500; // requests
+    @Value("${application.ratelimitMaxRequest}")
+    private int MAX_REQUESTS;
     private static final Duration REFILL_DURATION = Duration.ofMinutes(1);
     private static final Set<String> CRAWLER_SIGNATURES = Set.of("Googlebot",
             "Bingbot",
