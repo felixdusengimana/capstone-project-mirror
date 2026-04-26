@@ -1,5 +1,6 @@
 import * as DialogPrimitives from "@radix-ui/react-dialog";
 import { motion } from "framer-motion";
+import Icon from "../atoms/Icon";
 
 const DialogTrigger = DialogPrimitives.Trigger;
 const DialogRoot = DialogPrimitives.Root;
@@ -10,6 +11,7 @@ export interface DialogProps extends React.HTMLAttributes<HTMLElement> {
   children: React.ReactNode;
   className?: string;
   preventCloseOnClickOutside?: boolean;
+  showCloseButton?: boolean;
 }
 
 export default function Dialog({
@@ -18,6 +20,7 @@ export default function Dialog({
   children,
   className,
   preventCloseOnClickOutside,
+  showCloseButton = false,
   ...rest
 }: DialogProps) {
   return (
@@ -31,15 +34,30 @@ export default function Dialog({
           transition={{
             delay: 0.1,
           }}
-          className={`relative max-h-[90vh] min-w-[calc(100vw-50px)] md:min-w-[600px] scrollbar-thin rounded-lg scrollbar-thumb-[#c0c0c0]
-           scrollbar-track-gray-50 scrollbar-track-rounded-lg scrollbar-thumb-rounded-lg h-auto z-50 grid gap-4 overflow-y-auto rounded-b-2xl border bg-white shadow-lg ${className}`}
+          className={`relative min-w-[calc(100vw-50px)] md:min-w-[600px] scrollbar-thin rounded-lg scrollbar-thumb-[#c0c0c0]
+           scrollbar-track-gray-50 scrollbar-track-rounded-lg scrollbar-thumb-rounded-lg h-auto z-50 grid gap-4 rounded-b-2xl border bg-white shadow-lg ${className}`}
           style={{ maxWidth: "90%" }}
         >
           <DialogPrimitives.Content
+          className=" max-h-[90vh] overflow-y-auto "
             onInteractOutside={(e) => {
               preventCloseOnClickOutside && e.preventDefault();
             }}
           >
+                {/* 👇 Optional Close Button */}
+            {showCloseButton && (
+              <DialogPrimitives.Close className="absolute right-4 top-4">
+                <Icon name="close" fill="#FFF" width={30} height={30}/>
+              </DialogPrimitives.Close>
+            )}
+
+            {/* 👇 Optional Title */}
+            {title && (
+              <div className={`text-lg font-semibold px-6 pt-6 ${titleClassName}`}>
+                {title}
+              </div>
+            )}
+
             {children}
           </DialogPrimitives.Content>
         </motion.div>

@@ -7,6 +7,7 @@ import CreatorDialog from "@/components/molecules/CreatorDialog";
 import { CustomTable } from "@/components/molecules/CustomTable";
 import DateRagePicker from "@/components/molecules/DateRagePicker";
 import SearchInput from "@/components/molecules/SearchInput";
+import ShareProfile from "@/components/molecules/ShareProfile";
 import Tab from "@/components/molecules/Tab";
 import { useGetAllCountries } from "@/services/resources";
 import { useGetCreators, useGetMe } from "@/services/users";
@@ -143,6 +144,14 @@ export default function AdminDashboard() {
             newStatus={EApprovalStatus.REJECTED}
             userId={info.getValue()}
           />
+
+          <ShareProfile
+            profile={info.row.original}
+            trigger={<button className="bg-gray-50 w-full flex-grow border text-center border-gray-200 text-[#0000008A] font-normal rounded-md px-4 py-2 text-sm">
+              Share Profile
+            </button>}
+
+          />
           {/* 
           <button className="bg-white px-4 py-2 font-medium text-sm text-white rounded-lg border border-[#E5E9F0]">
             <Icon name="more-horizontal" />
@@ -188,10 +197,10 @@ export default function AdminDashboard() {
                 isLoading={isPending}
                 label="Country"
                 className="w-[257px]"
-                // onChange={(e) =>
-                // setFilters({ ...filters, country: e.target.value })
-                // }
-                // value={filters.country || "all"}
+              // onChange={(e) =>
+              // setFilters({ ...filters, country: e.target.value })
+              // }
+              // value={filters.country || "all"}
               >
                 <option value="all">All</option>
                 {countries?.data.map((country) => (

@@ -11,6 +11,7 @@ import ChangeCreatorStatus from "./ChangeCreatorStatus";
 import { EApprovalStatus } from "@/types";
 import { useGetCreator } from "@/services/users";
 import { IconNames } from "../atoms/Icon";
+import ShareProfile from "./ShareProfile";
 
 interface CreatorDialogProps {
   trigger?: React.ReactNode;
@@ -82,6 +83,14 @@ export default function CreatorDialog({ trigger, userId }: CreatorDialogProps) {
                 }
                 newStatus={EApprovalStatus.REJECTED}
                 userId={userId}
+              />
+
+              <ShareProfile
+              profile={creator?.data}
+                trigger={<button className="bg-gray-50 w-full flex-grow border text-center border-gray-200 text-[#0000008A] font-normal rounded-md px-4 py-2 text-sm">
+                  Share
+                </button>}
+
               />
             </div>
           </div>
