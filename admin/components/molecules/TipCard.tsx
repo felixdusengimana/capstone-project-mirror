@@ -38,8 +38,8 @@ const PesatoneTipCard = ({ profile }: { profile: IUser }) => {
         <> 
             <div className="font-inter" ref={qrCodeRef}>
                 {/* Top Section */}
-                <div className="bg-[#0D1B2A] p-6 text-center space-y-4">
-                    <h1 contentEditable={true} className="font-bold text-lg break-all">
+                <div className="bg-[#0D1B2A] p-4 text-center space-y-4">
+                    <h1 contentEditable={true} className="font-bold text-4xl break-all">
                         If you liked {
                             profile?.name || profile?.username ? (
                                 <span className="text-[#F9AA33]">
@@ -62,9 +62,9 @@ const PesatoneTipCard = ({ profile }: { profile: IUser }) => {
                         />
                     </div>
 
-                    <p className="text-sm hidden font-medium">
+                    {/* <p className="text-sm hidden font-medium">
                         Scan with your phone camera<br />to tip via Pesatone
-                    </p>
+                    </p> */}
                 </div>
 
                 <div className="bg-[#1A1A1A] px-6 py-4 flex items-center justify-between">
