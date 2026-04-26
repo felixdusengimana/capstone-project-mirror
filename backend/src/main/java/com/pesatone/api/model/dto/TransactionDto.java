@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -47,7 +48,7 @@ public class TransactionDto {
 
     @Schema(name = "name",
             description = "A name your favorite can call you")
-    @Max(value = 200, message = "We can only allow 200 characters at the moment")
+    @Size(max = 200, message = "We can only allow 200 characters at the moment")
     private String name;
 
     @Schema(name = "email",
@@ -61,6 +62,6 @@ public class TransactionDto {
     @Schema(name = "note",
             description = "Message to your favorite creator",
             example = "Say something nicem")
-    @Max(value = 500, message = "We can only allow 500 characters at the moment")
+    @Size(max = 500, message = "We can only allow 500 characters at the moment")
     private String note;
 }
