@@ -87,7 +87,7 @@ public class PaymentTransactionController {
                         true, new PaymentTransactionPojo(txn))));
     }
 
-     @GetMapping(path = "{transactionReference}/sse" , produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(path = "{transactionReference}/sse" , produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<String>> sendTransactionStatus(@PathVariable String transactionReference) {
          return Flux.interval(Duration.ofSeconds(statusNotificationDuration))
                 .publishOn(Schedulers.parallel())
@@ -97,6 +97,7 @@ public class PaymentTransactionController {
                             .id(String.valueOf(id))
                             .event(statusNotificationEventKey)
                             .data(transaction.getPaymentStatus().name())
+                            .comment("keep-alive")
                             .build();
                 });
     }
