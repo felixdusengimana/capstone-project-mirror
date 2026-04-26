@@ -5,7 +5,7 @@ export const tip = z.object({
     .number({
       required_error: "🙏🏾 Your generosity means so much. Show your support with some gift.",
     })
-    .min(100, "🙏🏾 Your generosity means a lot! 500 RWF or more is a great way to show your support"),
+    .min(100, "🙏🏾 Your generosity means a lot! 1000 RWF or more is a great way to show your support"),
   creatorUserName: z.string({
     required_error: "Creator username is required",
   }),
