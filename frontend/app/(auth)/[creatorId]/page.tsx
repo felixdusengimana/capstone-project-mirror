@@ -21,6 +21,8 @@ export default function SupportCreator() {
   const {setPaymentDetails} = usePaymentStore();
   // const [successPayment, seSuccessPayment] = useState(false);
   const { data, isLoading } = useGetCreator(creatorId);
+  const maxChars = 500;
+
   const router = useRouter();
   const {
     handleSubmit,
@@ -299,6 +301,7 @@ export default function SupportCreator() {
                   <Input
                     label="Your name"
                     placeholder="Your name"
+                    maxLength={100}
                     value={watch("name")}
                     error={errors.name?.message}
                     onChange={(e) =>
@@ -325,6 +328,7 @@ export default function SupportCreator() {
                   <TextArea
                     label="Say something nice"
                     placeholder="Type something ....."
+                    maxLength={maxChars}
                     error={errors.note?.message}
                     value={watch("note")}
                     onChange={(e) =>
@@ -334,6 +338,7 @@ export default function SupportCreator() {
                       })
                     }
                   />
+                  <small className="text-gray-400 text-right">{watch("note")?.length || 0}/{maxChars}</small>
                 </div>
                 {/* {Object.keys(errors).length > 0 && (
                   <div className="bg-red-100 text-red-500 p-4 rounded-lg">

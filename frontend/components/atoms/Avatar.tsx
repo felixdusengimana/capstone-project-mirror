@@ -83,11 +83,11 @@ export default function Avatar({ ...props }: AvatarProps) {
             setImageLoading(false);
           }}
         />
-      ) : fallBackText ? (
-        fallBackText
-      ) : (
+      ) : (!imageLoading && fallBackText) ? (
+        (fallBackText??"")
+      )? !imageLoading : (
         <Icon name="user" />
-      )}
+      ):null}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import * as DialogPrimitives from "@radix-ui/react-dialog";
 import { motion } from "framer-motion";
+import Icon from "../atoms/Icon";
 
 const DialogTrigger = DialogPrimitives.Trigger;
 const DialogRoot = DialogPrimitives.Root;
@@ -10,6 +11,7 @@ export interface DialogProps extends React.HTMLAttributes<HTMLElement> {
   children: React.ReactNode;
   className?: string;
   preventCloseOnClickOutside?: boolean;
+  showCloseButton?: boolean;
 }
 
 export default function Dialog({
@@ -18,6 +20,7 @@ export default function Dialog({
   children,
   className,
   preventCloseOnClickOutside,
+  showCloseButton = false,
   ...rest
 }: DialogProps) {
   return (
@@ -40,6 +43,20 @@ export default function Dialog({
               preventCloseOnClickOutside && e.preventDefault();
             }}
           >
+              {/* 👇 Optional Close Button */}
+            {showCloseButton && (
+              <DialogPrimitives.Close className="absolute right-4 top-4">
+                <Icon name="close" fill="#FFF" width={30} height={30}/>
+              </DialogPrimitives.Close>
+            )}
+
+            {/* 👇 Optional Title */}
+            {title && (
+              <div className={`text-lg font-semibold px-6 pt-6 ${titleClassName}`}>
+                {title}
+              </div>
+            )}
+
             {children}
           </DialogPrimitives.Content>
         </motion.div>

@@ -26,8 +26,7 @@ const PaymentUI = () => {
   const [paymentStatus, setPaymentStatus] = useState(EStatus.PENDING);
   const router = useRouter();
   const { amount, email, clear, name, creatorUserName, currency, donorUserName, note, phoneNumber, createFullName, setPhoneNumber } = usePaymentStore();
-
-  const { data: transactionInfos, isLoading } = useGetTransactionByReference(transactionReference, 5)
+  const {data:transactionStatus,isLoading } = useGetTransactionByReference(transactionReference, paymentStatus, 3 )
 
   const { mutate, isPending } = useMutation({
     mutationFn: () => InitiateTransaction({
@@ -83,7 +82,7 @@ const PaymentUI = () => {
       return;
     }
 
-    if (checked === EPaymentMethod.AIRTEL_MONEY && !phoneNumber.startsWith("072")) {
+    if (checked === EPaymentMethod.AIRTEL_MONEY && !(phoneNumber.startsWith("072") || phoneNumber.startsWith("073"))) {
       setError("phoneNumber", {
         type: "manual",
         message: "Please enter a valid Airtel Money number",
@@ -96,15 +95,15 @@ const PaymentUI = () => {
     setIsConfirming(true);
   }
   useEffect(() => {
-    if (transactionInfos) {
-      setPaymentStatus(transactionInfos?.data?.paymentStatus);
-      setIsConfirming(transactionInfos?.data?.paymentStatus === EStatus.PENDING);
+    if (transactionStatus) {
+      setPaymentStatus(transactionStatus);
+      setIsConfirming(transactionStatus === EStatus.PENDING);
     }
-  }, [transactionInfos, isLoading]);
+  }, [transactionStatus, isLoading]);
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gray-100 p-4">
-      <div className="bg-white rounded-lg shadow-xl overflow-hidden flex w-full max-w-3xl">
+      <div className="bg-white rounded-lg shadow-xl overflow-hidden flex flex-col-reverse md:flex-row w-full max-w-3xl">
         <div className="p-8 w-full">
           <div className="flex gap-8 justify-between items-center mb-4">
             <Logo type='dark' />
@@ -196,11 +195,12 @@ const PaymentUI = () => {
                   />
                 </svg>
 
-                <h3 className="mt-8">Success !</h3>
+                <h2 className="mt-8 text-2xl font-bold">🎉 Another one! 🎉</h2>
                 <p className="max-w-[307px] text-center mt-4">
-                  Another one! Thanks for supporting{" "}
-                  <span className="font-bold">{createFullName}</span>. You smart,
-                  you loyal, you grateful.
+                  Your support means a lot—you are truly amazing! <br/>
+                  Your kindness touches us deeply, and  {" "}
+                  <span className="font-bold">{createFullName}</span> 
+                  {" "}  appreciates you 🙏🏾!
                 </p>
               </div>
 
@@ -223,7 +223,7 @@ const PaymentUI = () => {
           ) : (paymentStatus === EStatus.FAILED) ? (
             <>
               <div className='text-red-500 flex items-center flex-col justify-center'>
-                Payment failed, please try again
+                🥹 We failed to process this transaction. 🙏🏾 Please give it another shot.
               </div>
 
               <Button
@@ -234,12 +234,12 @@ const PaymentUI = () => {
                   setTransactionReference("");
                 }}
               >
-                Try Again
+                Try Again 🙏🏾
               </Button>
             </>
           ) : (paymentStatus === EStatus.CANCELLED) ? (
             <div>
-              Payment cancelled, please try again
+              🥹 It seems like you cancelled the transaction. 🙏🏾 Please give it another shot.
             </div>
           ) : isConfirming ? <div className='text-black flex items-center flex-col justify-center'>
             <DotsLoadingAnimation />
@@ -289,7 +289,7 @@ const PaymentUI = () => {
         </div>
 
 
-        {(!isConfirming && paymentStatus == EStatus.PENDING) ? (<div className="bg-gray-50 w-1/2 p-6 flex flex-col justify-start">
+        {(!isConfirming && paymentStatus == EStatus.PENDING) ? (<div className="bg-gray-50 w-full md:w-1/2 p-6 flex flex-col justify-start">
           <div className="flex justify-end">
             <button onClick={() => {
               if (confirm("Are you sure you want to cancel this payment?")) {
@@ -303,7 +303,7 @@ const PaymentUI = () => {
             </button>
           </div>
           <h2 className="text-sm font-semibold text-gray-700 mb-4">PAYMENT OPTIONS</h2>
-          <div className='flex flex-col gap-4'>
+          <div className='flex flex-row md:flex-col gap-4'>
             {Object.values(EPaymentMethod).map((method) => (
               <button
                 onClick={() => setChecked(method)}

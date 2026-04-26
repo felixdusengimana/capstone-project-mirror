@@ -66,7 +66,7 @@ export default function Input({ value, ...props }: InputProps) {
       <div>
         <div
           className={`w-full flex items-center px-4 border rounded-xl  ${
-            error ? "border-red-400 bg-red-50" : "border-[#E5E9F0]  "
+            error ? "border-orange-300 bg-red-50" : "border-[#E5E9F0]  "
           } ${props.disabled ? "bg-gray-300" : "bg-slate-50"}`}
         >
           {left && <>{left}</>}
@@ -95,9 +95,8 @@ export default function Input({ value, ...props }: InputProps) {
               </div>
             ))}
         </div>
-        {Boolean(error) &&
-          (typeof error === "string" ? (
-            <p className="text-red-500 text-sm mt-1">{error}</p>
+        {Boolean(error) && (typeof error === "string" ? (
+            <p className="text-orange-400 text-sm mt-1">{error}</p>
           ) : (
             error
           ))}
