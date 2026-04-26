@@ -1082,11 +1082,11 @@ function Transactions({ fill, stroke, ...props }: IconComponentProps) {
   );
 }
 
-function Close({ fill = "#4B5563", stroke, ...rest }: IconComponentProps) {
+function Close({ fill = "#4B5563", width=24, height=24, stroke, ...rest }: IconComponentProps) {
   return (
     <svg
-      width="24"
-      height="24"
+      width={width}
+      height={height}
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -1102,7 +1102,7 @@ function Close({ fill = "#4B5563", stroke, ...rest }: IconComponentProps) {
       </g>
       <defs>
         <clipPath id="clip0_1759_896">
-          <rect width="24" height="24" fill="white" />
+          <rect width={width} height={width} fill="white" />
         </clipPath>
       </defs>
     </svg>
