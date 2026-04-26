@@ -87,6 +87,15 @@ public class PaymentTransactionController {
                         true, new PaymentTransactionPojo(txn))));
     }
 
+    @Operation(summary = "Get Transaction Status", description = "Get payment transaction detail")
+    @GetMapping("/{transactionReference}/status-only")
+    public Mono<ResponseEntity<String>> getTransactionStatusString(
+            @PathVariable String transactionReference) {
+        PaymentTransaction transaction = paymentTransactionService.getByTransactionReference(transactionReference);
+        return paymentTransactionService.checkStatus(transaction)
+                .map(txn -> ResponseEntity.ok(txn.getPaymentStatus().name()));
+    }
+
     @GetMapping(path = "{transactionReference}/sse" , produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<String>> sendTransactionStatus(@PathVariable String transactionReference) {
          return Flux.interval(Duration.ofSeconds(statusNotificationDuration))
