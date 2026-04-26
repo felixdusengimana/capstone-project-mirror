@@ -92,8 +92,7 @@ public class PaymentTransactionController {
     public Mono<ResponseEntity<String>> getTransactionStatusString(
             @PathVariable String transactionReference) {
         PaymentTransaction transaction = paymentTransactionService.getByTransactionReference(transactionReference);
-        return paymentTransactionService.checkStatus(transaction)
-                .map(txn -> ResponseEntity.ok(txn.getPaymentStatus().name()));
+        return Mono.just(ResponseEntity.ok(transaction.getPaymentStatus().name()));
     }
 
     @GetMapping(path = "{transactionReference}/sse" , produces = MediaType.TEXT_EVENT_STREAM_VALUE)
