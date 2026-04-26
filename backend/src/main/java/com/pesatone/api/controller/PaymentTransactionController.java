@@ -95,7 +95,7 @@ public class PaymentTransactionController {
         return Mono.just(ResponseEntity.ok(transaction.getPaymentStatus().name()));
     }
 
-    @GetMapping(path = "{transactionReference}/sse" , produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @PostMapping(path = "{transactionReference}/sse" , produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<String>> sendTransactionStatus(@PathVariable String transactionReference) {
          return Flux.interval(Duration.ofSeconds(statusNotificationDuration))
                 .publishOn(Schedulers.parallel())
