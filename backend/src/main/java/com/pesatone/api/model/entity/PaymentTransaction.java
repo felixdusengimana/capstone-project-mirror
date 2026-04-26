@@ -10,6 +10,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -18,7 +19,7 @@ import java.util.List;
 @Setter
 @Getter
 @Table(uniqueConstraints= @UniqueConstraint(columnNames={"transaction_reference"}))
-public class PaymentTransaction {
+public class PaymentTransaction implements Serializable{
     @Id
     @GeneratedValue
     private Long id;

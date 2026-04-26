@@ -17,6 +17,7 @@ import com.pesatone.api.util.AppUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +36,7 @@ public class PaymentProcessingServiceImpl implements PaymentProcessingService {
 
     @Override
     @Transactional
+    @CachePut(value = "paymentTransaction", key = "#transaction.transactionReference")
     public PaymentTransaction processPayment(PaymentTransaction transaction, PaymentDto paymentDto) {
         if(transaction.canProcessPayment() && isValidPayment(transaction, paymentDto)){
             transaction.setPaymentStatus(paymentDto.paymentStatus());

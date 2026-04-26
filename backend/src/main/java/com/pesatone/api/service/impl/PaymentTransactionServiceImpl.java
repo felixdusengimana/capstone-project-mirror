@@ -34,6 +34,7 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -62,7 +63,9 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
     private final PaymentConfig paymentConfig;
 
     @Override
+    @Cacheable(value = "paymentTransaction", key = "#transactionReference")
     public PaymentTransaction getByTransactionReference(String transactionReference) {
+        log.info("Getting from DB :{}", transactionReference);
         return paymentTransactionRepository.findByTransactionReference(transactionReference)
                 .orElseThrow(() -> new PesatoneNotFoundException("Payment transaction not found"));
     }

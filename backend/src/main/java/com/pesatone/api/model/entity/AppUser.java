@@ -12,12 +12,13 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Table(uniqueConstraints= @UniqueConstraint(columnNames={"email","username"}))
 @Getter @Setter
-public class AppUser {
+public class AppUser implements Serializable{
     @Id
     @GeneratedValue
     private Long id;
