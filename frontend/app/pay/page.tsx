@@ -83,7 +83,7 @@ const PaymentUI = () => {
       return;
     }
 
-    if (checked === EPaymentMethod.AIRTEL_MONEY && !phoneNumber.startsWith("072")) {
+    if (checked === EPaymentMethod.AIRTEL_MONEY && !(phoneNumber.startsWith("072") || phoneNumber.startsWith("073"))) {
       setError("phoneNumber", {
         type: "manual",
         message: "Please enter a valid Airtel Money number",
