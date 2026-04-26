@@ -26,8 +26,7 @@ const PaymentUI = () => {
   const [paymentStatus, setPaymentStatus] = useState(EStatus.PENDING);
   const router = useRouter();
   const { amount, email, clear, name, creatorUserName, currency, donorUserName, note, phoneNumber, createFullName, setPhoneNumber } = usePaymentStore();
-
-  const { data: transactionInfos, isLoading } = useGetTransactionByReference(transactionReference, 5)
+  const {data:transactionStatus,isLoading } = useGetTransactionByReference(transactionReference, paymentStatus, 3 )
 
   const { mutate, isPending } = useMutation({
     mutationFn: () => InitiateTransaction({
@@ -96,11 +95,11 @@ const PaymentUI = () => {
     setIsConfirming(true);
   }
   useEffect(() => {
-    if (transactionInfos) {
-      setPaymentStatus(transactionInfos?.data?.paymentStatus);
-      setIsConfirming(transactionInfos?.data?.paymentStatus === EStatus.PENDING);
+    if (transactionStatus) {
+      setPaymentStatus(transactionStatus);
+      setIsConfirming(transactionStatus === EStatus.PENDING);
     }
-  }, [transactionInfos, isLoading]);
+  }, [transactionStatus, isLoading]);
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gray-100 p-4">
@@ -196,11 +195,12 @@ const PaymentUI = () => {
                   />
                 </svg>
 
-                <h3 className="mt-8">Success !</h3>
+                <h2 className="mt-8 text-2xl font-bold">🎉 Another one! 🎉</h2>
                 <p className="max-w-[307px] text-center mt-4">
-                  Another one! Thanks for supporting{" "}
-                  <span className="font-bold">{createFullName}</span>. You smart,
-                  you loyal, you grateful.
+                  Your support means a lot—you're truly amazing! <br/>
+                  Your kindness touches us deeply, and  {" "}
+                  <span className="font-bold">{createFullName}</span> 
+                  {" "}  appreciates you 🙏🏾!
                 </p>
               </div>
 
@@ -223,7 +223,7 @@ const PaymentUI = () => {
           ) : (paymentStatus === EStatus.FAILED) ? (
             <>
               <div className='text-red-500 flex items-center flex-col justify-center'>
-                Payment failed, please try again
+                🥹 We failed to process this transaction. 🙏🏾 Please give it another shot.
               </div>
 
               <Button
@@ -234,12 +234,12 @@ const PaymentUI = () => {
                   setTransactionReference("");
                 }}
               >
-                Try Again
+                Try Again 🙏🏾
               </Button>
             </>
           ) : (paymentStatus === EStatus.CANCELLED) ? (
             <div>
-              Payment cancelled, please try again
+              🥹 It seems like you cancelled the transaction. 🙏🏾 Please give it another shot.
             </div>
           ) : isConfirming ? <div className='text-black flex items-center flex-col justify-center'>
             <DotsLoadingAnimation />
