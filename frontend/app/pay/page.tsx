@@ -197,7 +197,7 @@ const PaymentUI = () => {
 
                 <h2 className="mt-8 text-2xl font-bold">🎉 Another one! 🎉</h2>
                 <p className="max-w-[307px] text-center mt-4">
-                  Your support means a lot—you're truly amazing! <br/>
+                  Your support means a lot—you are truly amazing! <br/>
                   Your kindness touches us deeply, and  {" "}
                   <span className="font-bold">{createFullName}</span> 
                   {" "}  appreciates you 🙏🏾!
