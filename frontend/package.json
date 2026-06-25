@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "engines": {
-    "pnpm": "10.10.0"
+    "pnpm": ">=10.10.0"
   },
   "dependencies": {
     "@frjoy/otp": "^0.1.5",
