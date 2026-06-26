@@ -1,13 +1,16 @@
 package com.pesatone.api.configuration;
 
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.spring.cache.HazelcastCacheManager;
 
 @Configuration
 @EnableCaching
@@ -29,6 +32,7 @@ public class HazelCacaheConfig {
 	}
 
 	@Bean
+	@Primary
 	public HazelcastInstance hazelcastInstance(Config config) {
 		return Hazelcast.newHazelcastInstance(config);
 	}
