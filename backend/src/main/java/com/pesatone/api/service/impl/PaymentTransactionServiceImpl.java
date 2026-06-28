@@ -28,6 +28,9 @@ import com.pesatone.api.service.PaymentProcessingService;
 import com.pesatone.api.service.PaymentTransactionService;
 import com.pesatone.api.service.payment.FdiService;
 import com.pesatone.api.service.payment.FlutterWaveService;
+import com.pesatone.api.service.payment.PoketMoneyService;
+import com.pesatone.api.model.dto.poketmoney.PoketMoneyPaymentRequest;
+import com.pesatone.api.model.dto.poketmoney.PoketMoneyStatusMapper;
 import com.pesatone.api.util.AppUtil;
 import com.querydsl.core.types.Projections;
 import jakarta.persistence.EntityManager;
@@ -35,6 +38,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -60,6 +64,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
     private final RequestPrincipal requestPrincipal;
     private final PaymentProcessingService paymentProcessingService;
     private final FdiService fdiService;
+    private final PoketMoneyService poketMoneyService;
     private final PaymentConfig paymentConfig;
 
     @Override
@@ -99,6 +104,19 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
                     dto.getAmount().toBigInteger().intValueExact(),
                     paymentConfig.getFdiPaymentCallbackUrl()),
                     true).block();
+        } else if (dto.getPaymentProvider().equals(PaymentProviderEnum.POKET_MONEY)) {
+            poketMoneyService.initiatePayment(
+                    PoketMoneyPaymentRequest.builder()
+                            .amount(dto.getAmount().toBigInteger().intValueExact())
+                            .msisdn(AppUtil.getMSSIDN(dto.getPhoneNumber()))
+                            .currency(dto.getCurrency().name())
+                            .metadata(java.util.Map.of(
+                                    "order_id", txnRef,
+                                    "customer_name", dto.getName() != null ? dto.getName() : "Customer"))
+                            .external_id(txnRef)
+                            .callback_url(paymentConfig.getPoketMoneyCallbackUrlPayment())
+                            .build()
+            ).block();
         }
 
         return transaction;
@@ -106,12 +124,19 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
 
     @Override
     public Mono<PaymentTransaction> checkStatus(PaymentTransaction transaction) {
-        if (transaction.canProcessPayment()
-                && (transaction.getPaymentProvider().equals(PaymentProviderEnum.FDI))) {
-            try {
-                return checkFdiTransactionDetail(transaction);
-            } catch (Exception ex) {
-                log.error(ex.getMessage(), ex);
+        if (transaction.canProcessPayment()) {
+            if (transaction.getPaymentProvider().equals(PaymentProviderEnum.FDI)) {
+                try {
+                    return checkFdiTransactionDetail(transaction);
+                } catch (Exception ex) {
+                    log.error(ex.getMessage(), ex);
+                }
+            } else if (transaction.getPaymentProvider().equals(PaymentProviderEnum.POKET_MONEY)) {
+                try {
+                    return checkPoketMoneyTransactionDetail(transaction);
+                } catch (Exception ex) {
+                    log.error(ex.getMessage(), ex);
+                }
             }
         }
         return Mono.just(transaction);
@@ -246,5 +271,52 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
                     return Mono.just(transaction);
                 });
     }
+
+    private Mono<PaymentTransaction> checkPoketMoneyTransactionDetail(PaymentTransaction transaction) {
+        return poketMoneyService.checkPaymentStatus(transaction.getTransactionReference())
+                .publishOn(Schedulers.boundedElastic())
+                .map(response -> {
+                    log.info("Poket Money transaction detail: status={}", response.getStatus());
+                    return paymentProcessingService.processPayment(transaction, new PaymentDto(
+                            PaymentProviderEnum.POKET_MONEY,
+                            "mobile-money",
+                            transaction.getAmount(),
+                            transaction.getCurrency(),
+                            PoketMoneyStatusMapper.mapStatus(response.getStatus()),
+                            response.getId(),
+                            new Date()));
+                })
+                .onErrorResume(ex -> {
+                    if (ex instanceof WebClientResponseException webClientException) {
+                        log.error("POKET_MONEY API ERROR {} : {}", webClientException.getStatusCode(),
+                                webClientException.getResponseBodyAsString());
+                    } else {
+                        log.error("POKET_MONEY API ERROR: {}", ex.getMessage());
+                    }
+                    return Mono.just(transaction);
+                });
+    }
+
+//    @Scheduled(fixedDelay = 10000, initialDelay = 30000) // Run every 10 seconds after 30 second startup delay
+//    @Transactional
+//    public void pollPendingPoketMoneyPayments() {
+//        try {
+//            log.debug("Polling pending POKET_MONEY payments...");
+//            List<PaymentTransaction> pendingPayments = paymentTransactionRepository.findAll().stream()
+//                    .filter(tx -> tx.getPaymentProvider() == PaymentProviderEnum.POKET_MONEY
+//                            && tx.getPaymentStatus() == PaymentStatusEnum.PENDING)
+//                    .toList();
+//
+//            for (PaymentTransaction transaction : pendingPayments) {
+//                try {
+//                    checkStatus(transaction).block();
+//                } catch (Exception ex) {
+//                    log.warn("Error checking status for {}: {}", transaction.getTransactionReference(), ex.getMessage());
+//                }
+//            }
+//        } catch (Exception ex) {
+//            log.error("Error in pollPendingPoketMoneyPayments: {}", ex.getMessage(), ex);
+//        }
+//    }
 
 }

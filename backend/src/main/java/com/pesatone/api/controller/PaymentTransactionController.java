@@ -3,6 +3,7 @@ package com.pesatone.api.controller;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.pesatone.api.configuration.properties.PaymentConfig;
+import com.pesatone.api.exception.PesatoneNotFoundException;
 import com.pesatone.api.model.dto.ApiResponseObject;
 import com.pesatone.api.model.dto.PaymentDto;
 import com.pesatone.api.model.dto.PayoutDto;
@@ -11,6 +12,8 @@ import com.pesatone.api.model.dto.fdi.FdiResponse;
 import com.pesatone.api.model.dto.flw.FlwCallBackDto;
 import com.pesatone.api.model.dto.flw.FlwPayoutDetail;
 import com.pesatone.api.model.dto.flw.FlwTransactionDetail;
+import com.pesatone.api.model.dto.poketmoney.PoketMoneyCallbackPayload;
+import com.pesatone.api.model.dto.poketmoney.PoketMoneyStatusMapper;
 import com.pesatone.api.model.entity.PaymentTransaction;
 import com.pesatone.api.model.entity.Payout;
 import com.pesatone.api.model.enumeration.PaymentProviderEnum;
@@ -32,6 +35,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -56,6 +61,7 @@ public class PaymentTransactionController {
     private final PayoutService payoutService;
     private final Gson gson;
     private final PaymentConfig paymentConfig;
+    private final CacheManager cacheManager;
     @Value("${application.statusNotificationDuration}")
     Integer statusNotificationDuration;
 
@@ -173,6 +179,131 @@ public class PaymentTransactionController {
             @ParameterObject @Valid TransactionSearchFilter filter) {
         return ResponseEntity.ok(new ApiResponseObject<>("Transactions retrieved successfully",
                 true, paymentTransactionService.searchTransactions(filter)));
+    }
+
+    @Hidden
+    @PostMapping("/poketmoney/callback/payment")
+    public ResponseEntity<ApiResponseObject<String>> processPoketMoneyPayment(@RequestBody PoketMoneyCallbackPayload dto) {
+        log.info("PoketMoney Payment Callback: external_id={}, status={}, amount={}, fees={}",
+                 dto.getExternalId(), dto.getStatus(), dto.getAmount(), dto.getAppliedFees());
+
+        try {
+            if (dto.getExternalId() == null || StringUtils.isBlank(dto.getExternalId())) {
+                log.warn("Invalid callback: external_id is missing");
+                return ResponseEntity.ok(new ApiResponseObject<>("Successful", true, "Notification received"));
+            }
+
+            String cacheKey = poketMoneyCallbackKey("payment", dto.getExternalId());
+            if (isDuplicatePoketMoneyCallback(cacheKey)) {
+                log.info("Duplicate Poket Money payment callback ignored for {}", dto.getExternalId());
+                return ResponseEntity.ok(new ApiResponseObject<>("Successful", true, "Notification received"));
+            }
+
+            PaymentTransaction transaction = paymentTransactionService.getByTransactionReference(dto.getExternalId());
+
+            // Only process if transaction is in PENDING or FAILED state (idempotent)
+            if (!transaction.canProcessPayment()) {
+                log.warn("Transaction {} already processed with status: {}", dto.getExternalId(), transaction.getPaymentStatus());
+                rememberPoketMoneyCallback(cacheKey);
+                return ResponseEntity.ok(new ApiResponseObject<>("Successful", true, "Notification received"));
+            }
+
+            // Validate amount matches
+            if (dto.getAmount() != null && transaction.getAmount().intValue() != dto.getAmount()) {
+                log.warn("Amount mismatch for {}: expected {}, got {}", dto.getExternalId(), transaction.getAmount(), dto.getAmount());
+            }
+
+            paymentProcessingService.processPayment(transaction, new PaymentDto(
+                    PaymentProviderEnum.POKET_MONEY,
+                    "mobile-money",
+                    transaction.getAmount(),
+                    transaction.getCurrency(),
+                    PoketMoneyStatusMapper.mapStatus(dto.getStatus()),
+                    dto.getId(),
+                    new Date()));
+
+            rememberPoketMoneyCallback(cacheKey);
+
+            log.info("Payment callback processed successfully for {}", dto.getExternalId());
+        } catch (PesatoneNotFoundException ex) {
+            log.warn("Transaction not found for external_id: {}", dto.getExternalId());
+        } catch (Exception ex) {
+            log.error("Error processing payment callback: {}", ex.getMessage(), ex);
+        }
+
+        return ResponseEntity.ok(new ApiResponseObject<>("Successful", true, "Notification received"));
+    }
+
+    @Hidden
+    @PostMapping("/poketmoney/callback/payout")
+    public ResponseEntity<ApiResponseObject<String>> processPoketMoneyPayout(@RequestBody PoketMoneyCallbackPayload dto) {
+        log.info("PoketMoney Payout Callback: external_id={}, status={}, amount={}, fees={}",
+                 dto.getExternalId(), dto.getStatus(), dto.getAmount(), dto.getAppliedFees());
+
+        try {
+            if (dto.getExternalId() == null || StringUtils.isBlank(dto.getExternalId())) {
+                log.warn("Invalid callback: external_id is missing");
+                return ResponseEntity.ok(new ApiResponseObject<>("Successful", true, "Notification received"));
+            }
+
+            String cacheKey = poketMoneyCallbackKey("payout", dto.getExternalId());
+            if (isDuplicatePoketMoneyCallback(cacheKey)) {
+                log.info("Duplicate Poket Money payout callback ignored for {}", dto.getExternalId());
+                return ResponseEntity.ok(new ApiResponseObject<>("Successful", true, "Notification received"));
+            }
+
+            Payout payout = payoutService.getByReference(dto.getExternalId());
+
+            // Only process if payout can be processed (idempotent)
+            if (!payout.canProcessPayout()) {
+                log.warn("Payout {} already processed with status: {}", dto.getExternalId(), payout.getPaymentStatus());
+                rememberPoketMoneyCallback(cacheKey);
+                return ResponseEntity.ok(new ApiResponseObject<>("Successful", true, "Notification received"));
+            }
+
+            // Validate amount matches
+            if (dto.getAmount() != null && payout.getAmount().intValue() != dto.getAmount()) {
+                log.warn("Amount mismatch for {}: expected {}, got {}", dto.getExternalId(), payout.getAmount(), dto.getAmount());
+            }
+
+            PayoutDto payoutDto = new PayoutDto();
+            payoutDto.setPaymentProvider(PaymentProviderEnum.POKET_MONEY);
+            payoutDto.setAmount(payout.getAmount());
+            payoutDto.setCurrency(payout.getCurrency());
+            payoutDto.setPaymentStatus(PoketMoneyStatusMapper.mapStatus(dto.getStatus()));
+            payoutDto.setProcessedAt(new Date());
+            paymentProcessingService.processPayout(payout, payoutDto);
+
+            rememberPoketMoneyCallback(cacheKey);
+
+            log.info("Payout callback processed successfully for {}", dto.getExternalId());
+        } catch (PesatoneNotFoundException ex) {
+            log.warn("Payout not found for external_id: {}", dto.getExternalId());
+        } catch (Exception ex) {
+            log.error("Error processing payout callback: {}", ex.getMessage(), ex);
+        }
+
+        return ResponseEntity.ok(new ApiResponseObject<>("Successful", true, "Notification received"));
+    }
+
+    private String poketMoneyCallbackKey(String type, String externalId) {
+        return "poketmoney:" + type + ":" + externalId;
+    }
+
+    private boolean isDuplicatePoketMoneyCallback(String key) {
+        Cache cache = cacheManager.getCache("poketMoneyCallback");
+        if (cache == null) {
+            return false;
+        }
+        Cache.ValueWrapper value = cache.get(key);
+        return value != null;
+    }
+
+    private void rememberPoketMoneyCallback(String key) {
+        Cache cache = cacheManager.getCache("poketMoneyCallback");
+        if (cache != null) {
+            cache.put(key, Boolean.TRUE);
+        }
     }
 
 }

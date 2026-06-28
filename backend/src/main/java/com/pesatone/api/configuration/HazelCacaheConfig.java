@@ -1,6 +1,5 @@
 package com.pesatone.api.configuration;
 
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,7 +9,6 @@ import com.hazelcast.config.Config;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.spring.cache.HazelcastCacheManager;
 
 @Configuration
 @EnableCaching
@@ -24,7 +22,10 @@ public class HazelCacaheConfig {
 						.setTimeToLiveSeconds(1800))
 				.addMapConfig(new MapConfig()
 						.setName("creator")
-						.setTimeToLiveSeconds(2880));
+						.setTimeToLiveSeconds(2880))
+				.addMapConfig(new MapConfig()
+						.setName("poketMoneyCallback")
+						.setTimeToLiveSeconds(86400));
 
 		config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
 		config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(false);

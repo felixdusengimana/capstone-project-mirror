@@ -88,9 +88,27 @@ public class RateLimitFilter extends OncePerRequestFilter {
                 .build());
     }
 
+    /**
+     * Allow pokemoney callback to bypass crawling as they send back header with pytj
+     */
+    private boolean isWebhookPath(String path) {
+
+        if (path == null) {
+            return false;
+        }
+
+        return path.contains("/poketmoney/callback");
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        if (isWebhookPath(request.getRequestURI())) {
+            filterChain.doFilter(request, response);
+            log.info("Webhook request detected: {}", request.getRequestURI());
+            return;
+        }
+
         String userAgent = request.getHeader("User-Agent");
         if (isCrawler(userAgent)) {
             log.error("Crawler detected: {}", userAgent);

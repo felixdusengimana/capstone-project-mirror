@@ -39,7 +39,8 @@ public class ApplicationSecurityConfig {
             "/transactions/*/sse",
             "/transactions/flw/callback",
             "/transactions/fdi/callback/payment",
-            "/transactions/fdi/callback/payout"
+            "/transactions/fdi/callback/payout",
+            "/transactions/poketmoney/callback/**"
     };
 
     @Bean
