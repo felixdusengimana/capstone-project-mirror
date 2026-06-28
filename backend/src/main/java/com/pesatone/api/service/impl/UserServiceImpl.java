@@ -83,26 +83,25 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    @CacheEvict(value = "creator", key = "#user.username")
+    @CacheEvict(value = "creator", key = "T(java.lang.String).valueOf(#user.id)")
     public AppUser updateUserDetails(AppUser user, UserDetailDto dto) {
         user = userRepository.findActiveById(user.getId()).orElse(user);
-        if(!Boolean.TRUE.equals(user.getEmailVerified())){
+        if (!Boolean.TRUE.equals(user.getEmailVerified())) {
             throw new IllegalArgumentException("Please verify your email to proceed");
         }
-        log.info("Profile update request: {}",gson.toJson(dto));
-        if (StringUtils.isNotBlank(dto.getUsername())){
+        log.info("Profile update request: {}", gson.toJson(dto));
+        if (StringUtils.isNotBlank(dto.getUsername())) {
             user.setUsername(dto.getUsername().toLowerCase());
         }
         if (StringUtils.isNotBlank(dto.getName())) {
             user.setName(dto.getName());
         }
-        if (StringUtils.isNotBlank(dto.getPhoneNumber())){
+        if (StringUtils.isNotBlank(dto.getPhoneNumber())) {
             user.setPhoneNumber(dto.getPhoneNumber());
         }
         if (StringUtils.isNotBlank(dto.getBio())) {
             user.setBio(dto.getBio());
         }
-
         if (StringUtils.isNotBlank(dto.getCountryIsoCode())) {
             countryRepository.findActiveByIsoCode(dto.getCountryIsoCode())
                     .ifPresent(user::setCountry);
@@ -120,20 +119,20 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    @CacheEvict(value = "creator", key = "#user.username")
+    @CacheEvict(value = "creator", key = "T(java.lang.String).valueOf(#user.id)")
     public String uploadImage(AppUser user, MultipartFile file, ImageTypeEnum type) {
         String secureUrl = null;
         try {
             String folder = "profile_images";
-            if(type.equals(ImageTypeEnum.VERIFICATION_IMAGE)){
+            if (type.equals(ImageTypeEnum.VERIFICATION_IMAGE)) {
                 folder = "verification_images";
             }
             Map uploadedFile = cloudinary.uploader().upload(file.getBytes(),
-                    ObjectUtils.asMap("public_id", file.getName()+"-"+System.currentTimeMillis(),
+                    ObjectUtils.asMap("public_id", file.getName() + "-" + System.currentTimeMillis(),
                             "folder", folder));
             secureUrl = (String) uploadedFile.get("secure_url");
 
-            if(type.equals(ImageTypeEnum.VERIFICATION_IMAGE)){
+            if (type.equals(ImageTypeEnum.VERIFICATION_IMAGE)) {
                 user.setVerificationImageUrl(secureUrl);
             } else {
                 user.setProfileImageUrl(secureUrl);
@@ -148,29 +147,34 @@ public class UserServiceImpl implements UserService {
     @Override
     public void initiatePasswordReset(AppUser user) {
         String token = tokenService.getPasswordResetToken(user);
-        notificationService.sendEmail(user.getEmail(),"Password reset",
-                "<b>Hello "+ StringUtils.defaultIfBlank(user.getName()," ") +",</b> <br/>" +
+        notificationService.sendEmail(user.getEmail(), "Password reset",
+                "<b>Hello " + StringUtils.defaultIfBlank(user.getName(), " ") + ",</b> <br/>" +
                         "Did you forget your password and would like to get new credentials? <br/>" +
                         "Please reset your password by clicking the link below. <br/> " +
-                passwordResetUrl+token+
-                "<br/><br/> This token will expire in "+ jwtExpiry/60 +" minutes");
+                        passwordResetUrl + token +
+                        "<br/><br/> This token will expire in " + jwtExpiry / 60 + " minutes");
     }
 
     @Transactional
     @Override
     public void resetPassword(Long userId, String password) {
+        if (userId == null) {
+            throw new IllegalArgumentException("UserId cannot be null");
+        }
+        if (password == null || password.isBlank()) {
+            throw new IllegalArgumentException("Password cannot be empty");
+        }
         AppUser user = userRepository.findActiveById(userId)
                 .orElseThrow(() -> new PesatoneNotFoundException("User not found"));
-
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
     }
 
     @Override
     @Cacheable(value = "creator", key = "#reference")
-    public UserPojo getCreator(String reference){
-      log.info("Getting user info from DB: {}", reference);
-       AppUser user;
+    public UserPojo getCreator(String reference) {
+        log.info("Getting user info from DB: {}", reference);
+        AppUser user;
         if (StringUtils.isNumeric(reference)) {
             user = userRepository.findActiveByIdAndRole(Long.valueOf(reference), RoleEnum.CREATOR)
                     .orElseThrow(() -> new PesatoneNotFoundException("Creator not found"));
@@ -192,12 +196,10 @@ public class UserServiceImpl implements UserService {
             industryRepository.findById(user.getIndustry().getId())
                     .ifPresent(ind -> pojo.setIndustryName(ind.getName()));
         }
-
         pojo.setSocialLinks(socialLinkRepository.findByAppUser(user)
                 .stream()
                 .map(link -> new SocialLinkDto(link.getLink(), link.getPlatform()))
                 .toList());
-
         return pojo;
     }
 
@@ -215,20 +217,20 @@ public class UserServiceImpl implements UserService {
 
         if (StringUtils.isNotBlank(filter.getName())) {
             blazeQuery.where(qAppUser.username.contains(filter.getName().toLowerCase())
-                            .or(qAppUser.name.containsIgnoreCase(filter.getName())));
+                    .or(qAppUser.name.containsIgnoreCase(filter.getName())));
         }
 
-        blazeQuery.orderBy(qAppUser.verified.desc().nullsLast(),qAppUser.username.asc(),qAppUser.id.desc());
+        blazeQuery.orderBy(qAppUser.verified.desc().nullsLast(), qAppUser.username.asc(), qAppUser.id.desc());
 
         PagedList<CreatorSearchResponse> pagedList = blazeQuery
                 .select(Projections.constructor(
-                                CreatorSearchResponse.class,
-                                qAppUser.id,
-                                qAppUser.username,
-                                qAppUser.name,
-                                qAppUser.profileImageUrl,
-                                qAppUser.verified
-                        ))
+                        CreatorSearchResponse.class,
+                        qAppUser.id,
+                        qAppUser.username,
+                        qAppUser.name,
+                        qAppUser.profileImageUrl,
+                        qAppUser.verified
+                ))
                 .fetchPage(filter.getOffset(), filter.getPageSize());
 
         return new QueryResultPojo<>(pagedList, filter.getPageNumber(), filter.getPageSize(), pagedList.getTotalPages());
@@ -236,23 +238,23 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    @CacheEvict(value = "creator", key = "#creator.username")
+    @CacheEvict(value = "creator", key = "T(java.lang.String).valueOf(#creator.id)")
     public AppUser approveCreatorAccount(AppUser creator, ApprovalStatusEnum approvalStatus) {
-        if(creator.getRole().equals(RoleEnum.CREATOR)){
-                creator.setApprovalStatus(approvalStatus);
-                if(approvalStatus.equals(ApprovalStatusEnum.APPROVED)) {
-                    creator.setVerified(true);
-                }
-                userRepository.save(creator);
-                walletService.getOrCreateWallet(creator,CurrencyEnum.RWF);
-                return creator;
+        if (creator.getRole().equals(RoleEnum.CREATOR)) {
+            creator.setApprovalStatus(approvalStatus);
+            if (approvalStatus.equals(ApprovalStatusEnum.APPROVED)) {
+                creator.setVerified(true);
+            }
+            userRepository.save(creator);
+            walletService.getOrCreateWallet(creator, CurrencyEnum.RWF);
+            return creator;
         }
         throw new PesatoneException("Invalid user type");
     }
 
     @Transactional
     @Override
-    @CacheEvict(value = "creator", key = "#user.username")
+    @CacheEvict(value = "creator", key = "T(java.lang.String).valueOf(#user.id)")
     public void deleteAccount(AppUser user) {
         user.setStatus(StatusEnum.DELETED);
         userRepository.save(user);
