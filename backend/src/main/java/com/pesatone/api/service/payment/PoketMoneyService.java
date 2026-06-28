@@ -1,7 +1,6 @@
 package com.pesatone.api.service.payment;
 
 import com.pesatone.api.configuration.properties.PaymentConfig;
-import com.pesatone.api.model.dto.poketmoney.PoketMoneyCallbackPayload;
 import com.pesatone.api.model.dto.poketmoney.PoketMoneyPaymentRequest;
 import com.pesatone.api.model.dto.poketmoney.PoketMoneyPaymentResponse;
 import com.pesatone.api.model.dto.poketmoney.PoketMoneyStatusCheckRequest;
@@ -25,20 +24,15 @@ public class PoketMoneyService {
      * POST /api/v1/payments with Bearer token authentication
      */
     public Mono<PoketMoneyPaymentResponse> initiatePayment(PoketMoneyPaymentRequest request) {
-        log.info("Initiating Poket Money payment for external_id: {}", request.getExternal_id());
-        return WebClient.builder()
-                .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .baseUrl(paymentConfig.getPoketMoneyBaseUrl())
-                .build()
-                .post()
-                .uri("/api/v1/payments")
-                .header("Authorization", "Bearer " + paymentConfig.getPoketMoneyM2mApiKey())
-                .header("Content-Type", "application/json")
-                .bodyValue(request)
-                .retrieve()
-                .bodyToMono(PoketMoneyPaymentResponse.class)
-                .doOnSuccess(response -> log.info("Poket Money payment initiated successfully: {}", response.getId()))
-                .doOnError(error -> log.error("Poket Money payment initiation failed: {}", error.getMessage(), error));
+        return postRequest("/api/v1/payments", request, "payment");
+    }
+
+    /**
+     * Initiates a payout request with Poket Money API.
+     * This keeps mobile-money payouts on the same provider by default.
+     */
+    public Mono<PoketMoneyPaymentResponse> initiatePayout(PoketMoneyPaymentRequest request) {
+        return postRequest("/api/v1/payouts", request, "payout");
     }
 
     /**
@@ -46,22 +40,40 @@ public class PoketMoneyService {
      * POST /api/v1/payments/check-status with Bearer token authentication
      */
     public Mono<PoketMoneyPaymentResponse> checkPaymentStatus(String externalId) {
-        log.info("Checking Poket Money payment status for external_id: {}", externalId);
         PoketMoneyStatusCheckRequest request = new PoketMoneyStatusCheckRequest(externalId);
+        return postRequest("/api/v1/payments/check-status", request, "payment status");
+    }
+
+    /**
+     * Checks the status of a payout request with Poket Money API.
+     */
+    public Mono<PoketMoneyPaymentResponse> checkPayoutStatus(String externalId) {
+        PoketMoneyStatusCheckRequest request = new PoketMoneyStatusCheckRequest(externalId);
+        return postRequest("/api/v1/payouts/check-status", request, "payout status");
+    }
+
+    private Mono<PoketMoneyPaymentResponse> postRequest(String uri, Object request, String action) {
+        String externalId = request instanceof PoketMoneyPaymentRequest paymentRequest
+                ? paymentRequest.getExternal_id()
+                : request instanceof PoketMoneyStatusCheckRequest statusRequest
+                ? statusRequest.getExternalId()
+                : "unknown";
+
+        log.info("Initiating Poket Money {} for external_id: {}", action, externalId);
 
         return WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .baseUrl(paymentConfig.getPoketMoneyBaseUrl())
                 .build()
                 .post()
-                .uri("/api/v1/payments/check-status")
+                .uri(uri)
                 .header("Authorization", "Bearer " + paymentConfig.getPoketMoneyM2mApiKey())
                 .header("Content-Type", "application/json")
                 .bodyValue(request)
                 .retrieve()
                 .bodyToMono(PoketMoneyPaymentResponse.class)
-                .doOnSuccess(response -> log.info("Poket Money payment status checked: {}, status: {}", externalId, response.getStatus()))
-                .doOnError(error -> log.error("Poket Money status check failed for {}: {}", externalId, error.getMessage(), error));
+                .doOnSuccess(response -> log.info("Poket Money {} initiated successfully: {}", action, response != null ? response.getId() : null))
+                .doOnError(error -> log.error("Poket Money {} failed for {}: {}", action, externalId, error.getMessage(), error));
     }
 }
 

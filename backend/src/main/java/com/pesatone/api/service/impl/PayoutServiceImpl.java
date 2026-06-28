@@ -10,8 +10,9 @@ import com.pesatone.api.exception.PesatoneException;
 import com.pesatone.api.exception.PesatoneNotFoundException;
 import com.pesatone.api.model.dto.PayoutDto;
 import com.pesatone.api.model.dto.PayoutRequestDto;
-import com.pesatone.api.model.dto.fdi.FdiRequest;
 import com.pesatone.api.model.dto.flw.*;
+import com.pesatone.api.model.dto.poketmoney.PoketMoneyPaymentRequest;
+import com.pesatone.api.model.dto.poketmoney.PoketMoneyStatusMapper;
 import com.pesatone.api.model.entity.*;
 import com.pesatone.api.model.enumeration.*;
 import com.pesatone.api.model.pojo.WithdrawalAccountPojo;
@@ -23,6 +24,7 @@ import com.pesatone.api.repository.WithdrawalAccountRepository;
 import com.pesatone.api.service.*;
 import com.pesatone.api.service.payment.FdiService;
 import com.pesatone.api.service.payment.FlutterWaveService;
+import com.pesatone.api.service.payment.PoketMoneyService;
 import com.pesatone.api.util.AppUtil;
 import com.querydsl.core.types.Projections;
 import jakarta.persistence.EntityManager;
@@ -36,7 +38,9 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -54,6 +58,7 @@ public class PayoutServiceImpl implements PayoutService {
     private final WithdrawalAccountService withdrawalAccountService;
     private final WithdrawalAccountRepository withdrawalAccountRepository;
     private final FdiService fdiService;
+    private final PoketMoneyService poketMoneyService;
     private final PaymentConfig paymentConfig;
 
     @Override
@@ -81,13 +86,7 @@ public class PayoutServiceImpl implements PayoutService {
             WithdrawalAccount account = withdrawalAccountRepository.findByCreatorAndAccountType(creator, PayoutChannelEnum.MOBILE_MONEY)
                     .orElseThrow(() -> new PesatoneNotFoundException("No mobile money account found for the user"));
 
-            fdiService.initiateTransaction(new FdiRequest(
-                    payout.getTransactionReference(),
-                    paymentConfig.getFdiAccountId(),
-                    AppUtil.getMSSIDN(account.getAccountNumber()),
-                    payout.getAmount().toBigInteger().intValueExact(),
-                    paymentConfig.getFdiPayoutCallbackUrl()),
-                    false).block();
+            initiatePoketMoneyPayout(payout, account).block();
         }else{
             throw new PesatoneNotFoundException("Withdrawal mode not supported. Try Mobile money");
         }
@@ -159,7 +158,7 @@ public class PayoutServiceImpl implements PayoutService {
     public Mono<Payout> checkMomoPayoutStatus(Payout payout) {
         if (payout.canProcessPayout() && (payout.getPaymentChannel().equals(PayoutChannelEnum.MOBILE_MONEY))) {
             try {
-                return checkFdiPayoutStatus(payout);
+                return checkPoketMoneyPayoutStatus(payout);
             } catch (Exception ex) {
                 log.error(ex.getMessage(), ex);
             }
@@ -172,10 +171,7 @@ public class PayoutServiceImpl implements PayoutService {
         try {
             WithdrawalAccount account = withdrawalAccountRepository.findByCreatorAndAccountType(transaction.getCreator(), PayoutChannelEnum.MOBILE_MONEY)
                     .orElseThrow(() -> new PesatoneNotFoundException("No mobile money account found for the user"));
-            FlwPayoutRequestDto dto = new FlwPayoutRequestDto(transaction, account);
-            initiateMomoTransfer(dto).block();
-            transaction.setPayoutProcessingStatus(PayoutProcessingStatusEnum.PROCESSING);
-            payoutRepository.save(transaction);
+            initiatePoketMoneyPayout(transaction, account).block();
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
         }
@@ -229,7 +225,40 @@ public class PayoutServiceImpl implements PayoutService {
                     return Mono.just("");
                 });
     }
- 
+
+    private Mono<Payout> initiatePoketMoneyPayout(Payout payout, WithdrawalAccount account) {
+        PoketMoneyPaymentRequest request = PoketMoneyPaymentRequest.builder()
+                .amount(payout.getAmount().intValueExact())
+                .msisdn(AppUtil.getMSSIDN(account.getAccountNumber()))
+                .currency(payout.getCurrency().name())
+                .metadata(Map.of(
+                        "transaction_reference", payout.getTransactionReference(),
+                        "payment_channel", payout.getPaymentChannel().name(),
+                        "creator_username", payout.getCreator().getUsername()))
+                .external_id(payout.getTransactionReference())
+                .callback_url(paymentConfig.getPoketMoneyCallbackUrlPayout())
+                .build();
+
+        return poketMoneyService.initiatePayout(request)
+                .publishOn(Schedulers.boundedElastic())
+                .map(response -> {
+                    if (response != null) {
+                        payout.setProviderReference(response.getId());
+                        payout.setPayoutProcessingStatus(PayoutProcessingStatusEnum.PROCESSING);
+                        payoutRepository.save(payout);
+                    }
+                    return payout;
+                })
+                .onErrorResume(ex -> {
+                    if (ex instanceof WebClientResponseException webClientException) {
+                        log.error("POKET MONEY PAYOUT INITIATION API ERROR {} : {}", webClientException.getStatusCode(), webClientException.getResponseBodyAsString());
+                    } else {
+                        log.error("POKET MONEY PAYOUT INITIATION API ERROR: {}", ex.getMessage());
+                    }
+                    return Mono.just(payout);
+                });
+    }
+
     private Mono<Payout> checkFlwPayoutDetail(Payout payout) {
         return flutterWaveService.getTransferDetail(payout.getTransactionReference())
                 .publishOn(Schedulers.boundedElastic())
@@ -263,6 +292,32 @@ public class PayoutServiceImpl implements PayoutService {
                         log.error("FDI API ERROR {} : {}", webClientException.getStatusCode(), webClientException.getResponseBodyAsString());
                     } else {
                         log.error("FDI API ERROR: {}", ex.getMessage());
+                    }
+                    return Mono.just(payout);
+                });
+    }
+
+    private Mono<Payout> checkPoketMoneyPayoutStatus(Payout payout) {
+        return poketMoneyService.checkPayoutStatus(payout.getTransactionReference())
+                .publishOn(Schedulers.boundedElastic())
+                .map(response -> {
+                    if (response == null) {
+                        return payout;
+                    }
+
+                    PayoutDto payoutDto = new PayoutDto();
+                    payoutDto.setPaymentProvider(PaymentProviderEnum.POKET_MONEY);
+                    payoutDto.setAmount(payout.getAmount());
+                    payoutDto.setCurrency(payout.getCurrency());
+                    payoutDto.setPaymentStatus(PoketMoneyStatusMapper.mapStatus(response.getStatus()));
+                    payoutDto.setProcessedAt(new Date());
+                    return paymentProcessingService.processPayout(payout, payoutDto);
+                })
+                .onErrorResume(ex -> {
+                    if (ex instanceof WebClientResponseException webClientException) {
+                        log.error("POKET MONEY API ERROR {} : {}", webClientException.getStatusCode(), webClientException.getResponseBodyAsString());
+                    } else {
+                        log.error("POKET MONEY API ERROR: {}", ex.getMessage());
                     }
                     return Mono.just(payout);
                 });
