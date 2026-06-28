@@ -43,53 +43,57 @@ class UserServiceImplTest {
 
     @Test
     void resetPassword_withValidUser_shouldResetPasswordAndSaveChanges() {
-        // Given
         String newPassword = "newPassword456";
-        when(userRepository.findActiveById(testUser.getId())).thenReturn(Optional.of(testUser));
-        when(passwordEncoder.encode(newPassword)).thenReturn("encodedNewPassword");
 
-        // When
+        when(userRepository.findActiveById(testUser.getId()))
+                .thenReturn(Optional.of(testUser));
+
+        when(passwordEncoder.encode(newPassword))
+                .thenReturn("encodedNewPassword");
+
         userService.resetPassword(testUser.getId(), newPassword);
 
-        // Then
-        verify(userRepository).save(argThat(user -> user.getPassword().equals("encodedNewPassword")));
-        verifyNoMoreInteractions(userRepository);
+        verify(userRepository).findActiveById(testUser.getId());
+        verify(passwordEncoder).encode(newPassword);
+
+        verify(userRepository).save(argThat(user ->
+                user.getPassword().equals("encodedNewPassword")
+        ));
+
+        verifyNoMoreInteractions(userRepository, passwordEncoder);
     }
 
     @Test
     void resetPassword_withNonexistentUser_shouldThrowPesatoneNotFoundException() {
-        // Given
         Long nonexistentUserId = 999L;
-        when(userRepository.findActiveById(nonexistentUserId)).thenReturn(Optional.empty());
 
-        // When
-        assertThrows(PesatoneNotFoundException.class, () -> userService.resetPassword(nonexistentUserId, "newPassword"));
+        when(userRepository.findActiveById(nonexistentUserId))
+                .thenReturn(Optional.empty());
 
-        // Then
-        verifyNoInteractions(userRepository);
+        assertThrows(PesatoneNotFoundException.class, () ->
+                userService.resetPassword(nonexistentUserId, "newPassword")
+        );
+
+        verify(userRepository).findActiveById(nonexistentUserId);
+        verify(userRepository, never()).save(any());
+        verifyNoMoreInteractions(userRepository);
     }
 
     @Test
     void resetPassword_withNullUserId_shouldThrowIllegalArgumentException() {
-        // Given
-        Long nullUserId = null;
+        assertThrows(IllegalArgumentException.class, () ->
+                userService.resetPassword(null, "newPassword")
+        );
 
-        // When
-        assertThrows(PesatoneNotFoundException.class, () -> userService.resetPassword(nullUserId, "newPassword"));
-
-        // Then
-        verifyNoInteractions(userRepository);
+        verifyNoInteractions(userRepository, passwordEncoder);
     }
 
     @Test
     void resetPassword_withEmptyPassword_shouldThrowIllegalArgumentException() {
-        // Given
-        String emptyPassword = "";
+        assertThrows(IllegalArgumentException.class, () ->
+                userService.resetPassword(testUser.getId(), "")
+        );
 
-        // When
-        assertThrows(PesatoneNotFoundException.class, () -> userService.resetPassword(testUser.getId(), emptyPassword));
-
-        // Then
-        verifyNoInteractions(userRepository);
+        verifyNoInteractions(userRepository, passwordEncoder);
     }
 }

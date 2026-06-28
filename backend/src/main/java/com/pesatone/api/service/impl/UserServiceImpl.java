@@ -159,6 +159,15 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void resetPassword(Long userId, String password) {
+
+        if (userId == null) {
+            throw new IllegalArgumentException("UserId cannot be null");
+        }
+
+        if (password == null || password.isBlank()) {
+            throw new IllegalArgumentException("Password cannot be empty");
+        }
+
         AppUser user = userRepository.findActiveById(userId)
                 .orElseThrow(() -> new PesatoneNotFoundException("User not found"));
 
