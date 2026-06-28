@@ -24,4 +24,8 @@ public class PaymentConfig {
     private String fdiAuthUrl;
     private String fdiPaymentCallbackUrl;
     private String fdiPayoutCallbackUrl;
+    private String poketMoneyBaseUrl;
+    private String poketMoneyM2mApiKey;
+    private String poketMoneyCallbackUrlPayment;
+    private String poketMoneyCallbackUrlPayout;
 }

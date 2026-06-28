@@ -11,6 +11,8 @@ import com.pesatone.api.model.dto.fdi.FdiResponse;
 import com.pesatone.api.model.dto.flw.FlwCallBackDto;
 import com.pesatone.api.model.dto.flw.FlwPayoutDetail;
 import com.pesatone.api.model.dto.flw.FlwTransactionDetail;
+import com.pesatone.api.model.dto.poketmoney.PoketMoneyCallbackPayload;
+import com.pesatone.api.model.dto.poketmoney.PoketMoneyStatusMapper;
 import com.pesatone.api.model.entity.PaymentTransaction;
 import com.pesatone.api.model.entity.Payout;
 import com.pesatone.api.model.enumeration.PaymentProviderEnum;
@@ -173,6 +175,43 @@ public class PaymentTransactionController {
             @ParameterObject @Valid TransactionSearchFilter filter) {
         return ResponseEntity.ok(new ApiResponseObject<>("Transactions retrieved successfully",
                 true, paymentTransactionService.searchTransactions(filter)));
+    }
+
+    @Hidden
+    @PostMapping("/poketmoney/callback/payment")
+    public ResponseEntity<ApiResponseObject<String>> processPoketMoneyPayment(@RequestBody PoketMoneyCallbackPayload dto) {
+        log.info("PoketMoney Payment Callback: {}", gson.toJson(dto));
+
+        if (dto.getExternalId() != null && StringUtils.isNotBlank(dto.getExternalId())) {
+            PaymentTransaction transaction = paymentTransactionService.getByTransactionReference(dto.getExternalId());
+            paymentProcessingService.processPayment(transaction, new PaymentDto(
+                    PaymentProviderEnum.POKET_MONEY,
+                    "mobile-money",
+                    transaction.getAmount(),
+                    transaction.getCurrency(),
+                    PoketMoneyStatusMapper.mapStatus(dto.getStatus()),
+                    dto.getId(),
+                    new Date()));
+        }
+        return ResponseEntity.ok(new ApiResponseObject<>("Successful", true, "Notification received"));
+    }
+
+    @Hidden
+    @PostMapping("/poketmoney/callback/payout")
+    public ResponseEntity<ApiResponseObject<String>> processPoketMoneyPayout(@RequestBody PoketMoneyCallbackPayload dto) {
+        log.info("PoketMoney Payout Callback: {}", gson.toJson(dto));
+
+        if (dto.getExternalId() != null && StringUtils.isNotBlank(dto.getExternalId())) {
+            Payout payout = payoutService.getByReference(dto.getExternalId());
+            PayoutDto payoutDto = new PayoutDto();
+            payoutDto.setPaymentProvider(PaymentProviderEnum.POKET_MONEY);
+            payoutDto.setAmount(payout.getAmount());
+            payoutDto.setCurrency(payout.getCurrency());
+            payoutDto.setPaymentStatus(PoketMoneyStatusMapper.mapStatus(dto.getStatus()));
+            payoutDto.setProcessedAt(new Date());
+            paymentProcessingService.processPayout(payout, payoutDto);
+        }
+        return ResponseEntity.ok(new ApiResponseObject<>("Successful", true, "Notification received"));
     }
 
 }
