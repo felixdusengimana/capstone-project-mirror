@@ -21,7 +21,6 @@ public class PoketMoneyService {
 
     /**
      * Initiates a payment collection request with Poket Money API
-     * POST /api/v1/payments with Bearer token authentication
      */
     public Mono<PoketMoneyPaymentResponse> initiatePayment(PoketMoneyPaymentRequest request) {
         return postRequest("/api/v1/payments", request, "payment");
@@ -37,8 +36,7 @@ public class PoketMoneyService {
 
     /**
      * Checks the status of a payment transaction with Poket Money API
-     * POST /api/v1/payments/check-status with Bearer token authentication
-     */
+=     */
     public Mono<PoketMoneyPaymentResponse> checkPaymentStatus(String externalId) {
         PoketMoneyStatusCheckRequest request = new PoketMoneyStatusCheckRequest(externalId);
         return postRequest("/api/v1/payments/check-status", request, "payment status");
