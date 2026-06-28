@@ -38,6 +38,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -295,5 +296,27 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
                     return Mono.just(transaction);
                 });
     }
+
+//    @Scheduled(fixedDelay = 10000, initialDelay = 30000) // Run every 10 seconds after 30 second startup delay
+//    @Transactional
+//    public void pollPendingPoketMoneyPayments() {
+//        try {
+//            log.debug("Polling pending POKET_MONEY payments...");
+//            List<PaymentTransaction> pendingPayments = paymentTransactionRepository.findAll().stream()
+//                    .filter(tx -> tx.getPaymentProvider() == PaymentProviderEnum.POKET_MONEY
+//                            && tx.getPaymentStatus() == PaymentStatusEnum.PENDING)
+//                    .toList();
+//
+//            for (PaymentTransaction transaction : pendingPayments) {
+//                try {
+//                    checkStatus(transaction).block();
+//                } catch (Exception ex) {
+//                    log.warn("Error checking status for {}: {}", transaction.getTransactionReference(), ex.getMessage());
+//                }
+//            }
+//        } catch (Exception ex) {
+//            log.error("Error in pollPendingPoketMoneyPayments: {}", ex.getMessage(), ex);
+//        }
+//    }
 
 }

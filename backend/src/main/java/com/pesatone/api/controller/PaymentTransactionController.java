@@ -3,6 +3,7 @@ package com.pesatone.api.controller;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.pesatone.api.configuration.properties.PaymentConfig;
+import com.pesatone.api.exception.PesatoneNotFoundException;
 import com.pesatone.api.model.dto.ApiResponseObject;
 import com.pesatone.api.model.dto.PaymentDto;
 import com.pesatone.api.model.dto.PayoutDto;
@@ -180,10 +181,28 @@ public class PaymentTransactionController {
     @Hidden
     @PostMapping("/poketmoney/callback/payment")
     public ResponseEntity<ApiResponseObject<String>> processPoketMoneyPayment(@RequestBody PoketMoneyCallbackPayload dto) {
-        log.info("PoketMoney Payment Callback: {}", gson.toJson(dto));
+        log.info("PoketMoney Payment Callback: external_id={}, status={}, amount={}, fees={}",
+                 dto.getExternalId(), dto.getStatus(), dto.getAmount(), dto.getAppliedFees());
 
-        if (dto.getExternalId() != null && StringUtils.isNotBlank(dto.getExternalId())) {
+        try {
+            if (dto.getExternalId() == null || StringUtils.isBlank(dto.getExternalId())) {
+                log.warn("Invalid callback: external_id is missing");
+                return ResponseEntity.ok(new ApiResponseObject<>("Successful", true, "Notification received"));
+            }
+
             PaymentTransaction transaction = paymentTransactionService.getByTransactionReference(dto.getExternalId());
+
+            // Only process if transaction is in PENDING or FAILED state (idempotent)
+            if (!transaction.canProcessPayment()) {
+                log.warn("Transaction {} already processed with status: {}", dto.getExternalId(), transaction.getPaymentStatus());
+                return ResponseEntity.ok(new ApiResponseObject<>("Successful", true, "Notification received"));
+            }
+
+            // Validate amount matches
+            if (dto.getAmount() != null && transaction.getAmount().intValue() != dto.getAmount()) {
+                log.warn("Amount mismatch for {}: expected {}, got {}", dto.getExternalId(), transaction.getAmount(), dto.getAmount());
+            }
+
             paymentProcessingService.processPayment(transaction, new PaymentDto(
                     PaymentProviderEnum.POKET_MONEY,
                     "mobile-money",
@@ -192,17 +211,42 @@ public class PaymentTransactionController {
                     PoketMoneyStatusMapper.mapStatus(dto.getStatus()),
                     dto.getId(),
                     new Date()));
+
+            log.info("Payment callback processed successfully for {}", dto.getExternalId());
+        } catch (PesatoneNotFoundException ex) {
+            log.warn("Transaction not found for external_id: {}", dto.getExternalId());
+        } catch (Exception ex) {
+            log.error("Error processing payment callback: {}", ex.getMessage(), ex);
         }
+
         return ResponseEntity.ok(new ApiResponseObject<>("Successful", true, "Notification received"));
     }
 
     @Hidden
     @PostMapping("/poketmoney/callback/payout")
     public ResponseEntity<ApiResponseObject<String>> processPoketMoneyPayout(@RequestBody PoketMoneyCallbackPayload dto) {
-        log.info("PoketMoney Payout Callback: {}", gson.toJson(dto));
+        log.info("PoketMoney Payout Callback: external_id={}, status={}, amount={}, fees={}",
+                 dto.getExternalId(), dto.getStatus(), dto.getAmount(), dto.getAppliedFees());
 
-        if (dto.getExternalId() != null && StringUtils.isNotBlank(dto.getExternalId())) {
+        try {
+            if (dto.getExternalId() == null || StringUtils.isBlank(dto.getExternalId())) {
+                log.warn("Invalid callback: external_id is missing");
+                return ResponseEntity.ok(new ApiResponseObject<>("Successful", true, "Notification received"));
+            }
+
             Payout payout = payoutService.getByReference(dto.getExternalId());
+
+            // Only process if payout can be processed (idempotent)
+            if (!payout.canProcessPayout()) {
+                log.warn("Payout {} already processed with status: {}", dto.getExternalId(), payout.getPaymentStatus());
+                return ResponseEntity.ok(new ApiResponseObject<>("Successful", true, "Notification received"));
+            }
+
+            // Validate amount matches
+            if (dto.getAmount() != null && payout.getAmount().intValue() != dto.getAmount()) {
+                log.warn("Amount mismatch for {}: expected {}, got {}", dto.getExternalId(), payout.getAmount(), dto.getAmount());
+            }
+
             PayoutDto payoutDto = new PayoutDto();
             payoutDto.setPaymentProvider(PaymentProviderEnum.POKET_MONEY);
             payoutDto.setAmount(payout.getAmount());
@@ -210,7 +254,14 @@ public class PaymentTransactionController {
             payoutDto.setPaymentStatus(PoketMoneyStatusMapper.mapStatus(dto.getStatus()));
             payoutDto.setProcessedAt(new Date());
             paymentProcessingService.processPayout(payout, payoutDto);
+
+            log.info("Payout callback processed successfully for {}", dto.getExternalId());
+        } catch (PesatoneNotFoundException ex) {
+            log.warn("Payout not found for external_id: {}", dto.getExternalId());
+        } catch (Exception ex) {
+            log.error("Error processing payout callback: {}", ex.getMessage(), ex);
         }
+
         return ResponseEntity.ok(new ApiResponseObject<>("Successful", true, "Notification received"));
     }
 
