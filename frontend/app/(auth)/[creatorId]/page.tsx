@@ -89,7 +89,7 @@ export default function SupportCreator() {
         creatorUserName: data?.data.username ?? "",
         currency: ECurrency.RWF,
         donorUserName: "",
-        paymentProvider: EPaymentProvider.FDI,
+        paymentProvider: EPaymentProvider.POKET_MONEY,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

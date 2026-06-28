@@ -30,7 +30,7 @@ const PaymentUI = () => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: () => InitiateTransaction({
-      paymentProvider: EPaymentProvider.FDI,
+      paymentProvider: EPaymentProvider.POKET_MONEY,
       amount,
       currency,
       creatorUserName,

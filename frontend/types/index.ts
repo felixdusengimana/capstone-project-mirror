@@ -17,6 +17,7 @@ export enum EPaymentMethod {
 export enum EPaymentProvider {
   FLUTTERWAVE = "FLUTTERWAVE",
   FDI="FDI",
+  POKET_MONEY="POKET_MONEY",
 }
 
 export enum EStatus {
