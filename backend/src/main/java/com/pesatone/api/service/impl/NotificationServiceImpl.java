@@ -1,47 +1,40 @@
 package com.pesatone.api.service.impl;
 
-import com.mailjet.client.MailjetClient;
-import com.mailjet.client.errors.MailjetException;
-import com.mailjet.client.transactional.SendContact;
-import com.mailjet.client.transactional.SendEmailsRequest;
-import com.mailjet.client.transactional.TrackOpens;
-import com.mailjet.client.transactional.TransactionalEmail;
 import com.pesatone.api.service.NotificationService;
-import lombok.RequiredArgsConstructor;
+import com.resend.Resend;
+import com.resend.services.emails.model.CreateEmailOptions;
+import com.resend.services.emails.model.CreateEmailResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
+@Slf4j
 @Service
-@RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
-    private final MailjetClient mailjetClient;
+
+    @Value("${application.resend.api-key}")
+    private String resendApiKey;
 
     @Value("${application.mail.sender}")
     private String mailSender;
 
     @Override
     public void sendEmail(String recipient, String subject, String message) {
-        TransactionalEmail transactionalEmail = TransactionalEmail
-                .builder()
-                .to(new SendContact(recipient))
-                .from(new SendContact(mailSender, "Pesatone Team"))
-                .htmlPart(message)
-                .subject(subject)
-                .trackOpens(TrackOpens.ENABLED)
-                .customID(UUID.randomUUID().toString())
-                .build();
-
-        SendEmailsRequest request = SendEmailsRequest
-                .builder()
-                .message(transactionalEmail)
-                .build();
-
         try {
-            request.sendWith(mailjetClient);
-        } catch (MailjetException e) {
-            e.printStackTrace();
+            Resend resend = new Resend(resendApiKey);
+
+            CreateEmailOptions params = CreateEmailOptions.builder()
+                    .from(mailSender)
+                    .to(recipient)
+                    .subject(subject)
+                    .html(message)
+                    .build();
+
+            CreateEmailResponse response = resend.emails().send(params);
+            log.info("Email sent successfully to: {} with ID: {}", recipient, response.getId());
+
+        } catch (Exception e) {
+            log.error("Error sending email to {}: {}", recipient, e.getMessage(), e);
         }
     }
 }
