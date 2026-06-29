@@ -106,7 +106,7 @@ export default function Join() {
     mutationFn: VerifyOTP,
   });
 
-  const { mutate: updateProfilePic } = useMutation({
+  const { mutateAsync: updateProfilePicAsync, isPending: isUploadingProfilePic } = useMutation({
     mutationFn: UploadProfileImage,
     onSuccess: () => {
       toast.success("Profile picture updated successfully", {
@@ -158,15 +158,21 @@ export default function Join() {
       return;
     }
 
+    if (step === "2" && !watch("image") && !user?.data?.profileImageUrl) {
+      return toast.error("Profile image is required to continue", {
+        id: "update-profile",
+      });
+    }
+
     if (!isDirty) {
       return navigate();
     }
 
     toast.loading("Updating profile...", { id: "update-profile" });
     if (profilePhoto && step === "2") {
-      const data = new FormData();
-      data.append("image", profilePhoto);
-      await updateProfilePic(data);
+      const profileImageData = new FormData();
+      profileImageData.append("image", profilePhoto);
+      await updateProfilePicAsync(profileImageData);
     }
 
     const socialLinks = data.socialLinks;
@@ -180,11 +186,10 @@ export default function Join() {
 
   useEffect(() => {
     const c = Number(cookieStep);
+    const currentStep = Number(step);
+
     if (Number.isNaN(c)) {
       router.replace("/login");
-    } else if (Number(cookieStep) !== Number(step)) {
-      router.replace(`/join?step=${Number(cookieStep)}`);
-      return;
     }
 
     if (
@@ -194,6 +199,18 @@ export default function Join() {
       parseInt(step) > STEPS
     ) {
       return router.back();
+    }
+
+    // Never move users backwards due to stale cookie state.
+    // If URL step is ahead, promote cookie to keep progress monotonic.
+    if (!Number.isNaN(c) && currentStep > c) {
+      setCookie("pesatoneMiddleMan", String(currentStep), 7200);
+    }
+
+    // If user manually goes to a lower step, send them forward to latest progress.
+    if (!Number.isNaN(c) && currentStep < c) {
+      router.replace(`/join?step=${c}`);
+      return;
     }
 
     setRenderPage(true);
@@ -262,6 +279,7 @@ export default function Join() {
                 <ImageCrop
                   error={errors.image?.message}
                   defaultImage={user?.data.profileImageUrl ?? ""}
+                  avatarSize="xl"
                   callbackOnDone={(avatar) => {
                     if (avatar) {
                       setProfilePhoto(avatar);
@@ -505,7 +523,7 @@ export default function Join() {
           {parseInt(step!) > 2 && (
             <Button
               type="button"
-              disabled={isPending}
+              disabled={isPending || isUploadingProfilePic}
               outline={true}
               onClick={() => {
                 if (step === "1") {
@@ -522,7 +540,15 @@ export default function Join() {
           )}
         </div>
 
-        <Button isLoading={isPending} className="px-[72px]">
+        <Button
+          isLoading={isPending || isUploadingProfilePic}
+          disabled={
+            isPending
+            || isUploadingProfilePic
+            || (step === "2" && !watch("image") && !user?.data?.profileImageUrl)
+          }
+          className="px-[72px]"
+        >
           Next
         </Button>
       </div>

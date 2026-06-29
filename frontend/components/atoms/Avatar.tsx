@@ -23,11 +23,12 @@ export default function Avatar({ ...props }: AvatarProps) {
   } = props;
 
   const [imageError, setImageError] = useState(false);
-  const [imageLoading, setImageLoading] = useState(true);
+  const [imageLoading, setImageLoading] = useState(Boolean(props.src));
 
   useEffect(() => {
-    // Reset loading and error state when src changes
-    setImageLoading(true);
+    // Reset loading state when src changes.
+    // If there's no src, immediately show placeholder content.
+    setImageLoading(Boolean(src));
     setImageError(false);
   }, [src]);
 
@@ -59,17 +60,18 @@ export default function Avatar({ ...props }: AvatarProps) {
     return colors[Math.floor(Math.random() * colors.length)];
   };
 
+  const showPlaceholder = !src || imageError;
+  const fallbackBackground = !src && fallBackText ? generateRandomColor() : undefined;
+
   return (
     <div
       {...rest}
-      className={`${imageLoading ? "bg-gray-200" : ""} ${
+      className={`${imageLoading || showPlaceholder ? "bg-gray-200" : ""} ${
         circle ? "rounded-full" : "rounded"
       } ${bordered ? "border-2 border-white" : ""} ${
         sizeClasses[size]
       } flex items-center text-black justify-center overflow-hidden relative ${className}`}
-      style={{
-        background: !src && fallBackText ? generateRandomColor() : "none",
-      }}
+      style={fallbackBackground ? { background: fallbackBackground } : undefined}
     >
       {!imageError && src ? (
         // eslint-disable-next-line @next/next/no-img-element
@@ -83,11 +85,11 @@ export default function Avatar({ ...props }: AvatarProps) {
             setImageLoading(false);
           }}
         />
-      ) : (!imageLoading && fallBackText) ? (
-        (fallBackText??"")
-      )? !imageLoading : (
+      ) : !imageLoading && fallBackText ? (
+        fallBackText
+      ) : !imageLoading ? (
         <Icon name="user" />
-      ):null}
+      ) : null}
     </div>
   );
 }
