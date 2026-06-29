@@ -95,14 +95,14 @@
 			<version>${hibernate.version}</version>
 		</dependency>
 	<dependency>
-		<groupId>com.mailjet</groupId>
-		<artifactId>mailjet-client</artifactId>
-		<version>5.2.5</version>
-	</dependency>
-	<dependency>
 		<groupId>com.resend</groupId>
 		<artifactId>resend-java</artifactId>
 		<version>4.11.0</version>
+	</dependency>
+	<dependency>
+		<groupId>org.jetbrains</groupId>
+		<artifactId>annotations</artifactId>
+		<version>24.0.0</version>
 	</dependency>
 		<!--Test-->
 		<dependency>

@@ -11,8 +11,6 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.mailjet.client.ClientOptions;
-import com.mailjet.client.MailjetClient;
 import org.hibernate.proxy.AbstractLazyInitializer;
 import org.hibernate.proxy.map.MapLazyInitializer;
 import org.hibernate.proxy.pojo.BasicLazyInitializer;
@@ -45,10 +43,6 @@ public class AppConfiguration implements WebMvcConfigurer {
     private String cloudinaryApiKey;
     @Value("${application.cloudinary.api-secret}")
     private String cloudinaryApiSecret;
-    @Value("${application.mailjet.public-key}")
-    private String mailJetPublicKey;
-    @Value("${application.mailjet.secret-key}")
-    private String mailJetSecretKey;
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
@@ -110,15 +104,5 @@ public class AppConfiguration implements WebMvcConfigurer {
                 "api_key", cloudinaryApiKey,
                 "api_secret",cloudinaryApiSecret,
                 "shorten", true));
-    }
-
-    @Bean
-    public MailjetClient mailjetClient() {
-        ClientOptions options = ClientOptions.builder()
-                .apiKey(mailJetPublicKey)
-                .apiSecretKey(mailJetSecretKey)
-                .build();
-
-        return new MailjetClient(options);
     }
 }
