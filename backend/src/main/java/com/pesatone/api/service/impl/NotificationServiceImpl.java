@@ -18,20 +18,24 @@ public class NotificationServiceImpl implements NotificationService {
     @Value("${application.mail.sender}")
     private String mailSender;
 
+    @Value("${application.mail.brand-name}")
+    private String brandName;
+
     @Override
     public void sendEmail(String recipient, String subject, String message) {
         try {
+            String from = String.format("%s <%s>", brandName, mailSender);
             Resend resend = new Resend(resendApiKey);
 
             CreateEmailOptions params = CreateEmailOptions.builder()
-                    .from(mailSender)
+                    .from(from)
                     .to(recipient)
                     .subject(subject)
                     .html(message)
                     .build();
 
             CreateEmailResponse response = resend.emails().send(params);
-            log.info("Email sent successfully to: {} with ID: {}", recipient, response.getId());
+            log.info("Email sent successfully to: {} with ID: {} FROM: {}", recipient, response.getId(), from);
 
         } catch (Exception e) {
             log.error("Error sending email to {}: {}", recipient, e.getMessage(), e);
