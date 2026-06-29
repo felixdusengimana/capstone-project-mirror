@@ -74,7 +74,10 @@ const PaymentUI = () => {
       return;
     }
 
-    if (checked === EPaymentMethod.MTN_MOBILE_MONEY && !phoneNumber.startsWith("078")) {
+    if (
+      checked === EPaymentMethod.MTN_MOBILE_MONEY
+      && !(phoneNumber.startsWith("078") || phoneNumber.startsWith("079"))
+    ) {
       setError("phoneNumber", {
         type: "manual",
         message: "Please enter a valid MTN Mobile Money number",
@@ -270,7 +273,7 @@ const PaymentUI = () => {
                     shouldDirty: true,
                   })}
                   id="phoneNumber"
-                  placeholder={checked === EPaymentMethod.MTN_MOBILE_MONEY ? "078 000 000" : "072 000 000"}
+                  placeholder={checked === EPaymentMethod.MTN_MOBILE_MONEY ? "078/079 000 000" : "072 000 000"}
                 />
               </div>
               <Button
