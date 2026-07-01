@@ -8,10 +8,10 @@ export default function Footer() {
         <p className="font-normal text-lg text-[#8A8A8B]">
           @ {new Date().getFullYear()} Pesatone
         </p>
-        <Link href={"/"} className="font-normal text-lg text-[#8A8A8B]">
+        <Link href={"/terms-of-use"} className="font-normal text-lg text-[#8A8A8B]">
           Terms of Use
         </Link>
-        <Link href={"/"} className="font-normal text-lg text-[#8A8A8B]">
+        <Link href={"/privacy-policy"} className="font-normal text-lg text-[#8A8A8B]">
           Privacy Policy
         </Link>
       </div>
@@ -19,7 +19,7 @@ export default function Footer() {
         <a href="" target="_blank">
           <Icon name="linkedin" />
         </a>
-        <a href="" target="_blank">
+        <a href="https://www.instagram.com/pesatone" target="_blank">
           <Icon name="instagram" />
         </a>
         <a href="" target="_blank">

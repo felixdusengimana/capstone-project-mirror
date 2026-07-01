@@ -2,55 +2,63 @@
 import Button from "../atoms/Button";
 import Link from "next/link";
 import Logo from "../molecules/Logo";
-import { useAuth } from "@/hooks/useAuth";
-import { Fragment, useEffect, useState } from "react";
-import Icon, { IconNames } from "../atoms/Icon";
-import { useRouter } from "next/navigation";
+// import { useAuth } from "@/hooks/useAuth";
+// import { Fragment, useEffect, useState } from "react";
+// import Icon, { IconNames } from "../atoms/Icon";
+// import { useRouter } from "next/navigation";
 
 export default function Navbar() {
-  const isLoggedIn = false;
-  const [linkOpen, setLinkOpen] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const router = useRouter();
+  // const isLoggedIn = false;
+  // const [linkOpen, setLinkOpen] = useState(false);
+  // const [isAnimating, setIsAnimating] = useState(false);
+  // const router = useRouter();
 
-  useEffect(() => {
-    if (linkOpen) {
-      setIsAnimating(true);
-    } else {
-      const timer = setTimeout(() => setIsAnimating(false), 300);
-      return () => clearTimeout(timer);
-    }
-  }, [linkOpen]);
+  // useEffect(() => {
+  //   if (linkOpen) {
+  //     setIsAnimating(true);
+  //   } else {
+  //     const timer = setTimeout(() => setIsAnimating(false), 300);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [linkOpen]);
 
-  const links = [
-    {
-      label: "Home",
-      // icon: "dashboard",
-      href: "/",
-    },
-    {
-      label: "Signup Free",
-      // icon: "user-star",
-      href: "/sign-up",
-    },
-    {
-      label: "Login",
-      // icon: "inbox-out",
-      href: "/login",
-    },
-  ] as { label: string; href: string }[];
+  // const links = [
+  //   {
+  //     label: "Home",
+  //     href: "/",
+  //   },
+  //   {
+  //     label: "Signup Free",
+  //     href: "/sign-up",
+  //   },
+  //   {
+  //     label: "Login",
+  //     href: "/login",
+  //   },
+  // ] as { label: string; href: string }[];
 
   return (
     <div className="relative">
       <div className="page-padding w-full flex justify-between items-center">
         <Logo />
-        <div className="flex items-center gap-6">
-          <Icon
+        <div className="flex items-center gap-3 md:gap-6">
+          {/* Hamburger toggler — commented out for mobile, links shown directly instead */}
+          {/* <Icon
             fill="#fff"
             name={linkOpen ? "close" : "hamburger-menu2"}
             className={`md:hidden cursor-pointer`}
             onClick={() => setLinkOpen(!linkOpen)}
-          />
+          /> */}
+
+          {/* Mobile: plain text links */}
+          <Link href={"/login"} className="md:hidden text-white font-normal text-base">
+            Login
+          </Link>
+          <Link href={"/sign-up"} className="md:hidden text-white font-normal text-base">
+            Join
+          </Link>
+
+          {/* Desktop: button styles */}
           <Link href={"/login"} className="hidden md:block">
             <Button variant="secondary">Login</Button>
           </Link>
@@ -62,7 +70,8 @@ export default function Navbar() {
         </div>
       </div>
 
-      {(linkOpen || isAnimating) && (
+      {/* Dropdown menu — commented out, links shown directly above instead */}
+      {/* {(linkOpen || isAnimating) && (
         <div
           className={`absolute px-4 py-4 bg-[var(--bg)] w-full z-50 flex flex-col justify-center
               transition-opacity duration-300 ease-in-out
@@ -81,13 +90,12 @@ export default function Navbar() {
                 }}
                 className="flex items-center cursor-pointer gap-2 py-2 font-sans font-semibold text-lg"
               >
-                {/* <Icon name={link.icon} /> */}
                 <span className="text-white">{link.label}</span>
               </p>
             ))}
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }
