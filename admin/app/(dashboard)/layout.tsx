@@ -25,6 +25,11 @@ export default function DashBoardLayout({ children }: { children: ReactNode }) {
       icon: "payouts",
       href: "/payouts",
     },
+    {
+      label: "Configurations",
+      icon: "settings",
+      href: "/configurations",
+    },
   ] as { label: string; icon: IconNames; href: string }[];
 
   return (

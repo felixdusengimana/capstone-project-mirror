@@ -133,7 +133,7 @@ export default function PayoutsDashboard() {
   });
 
   return (
-    <div className="w-full bg-gray-200">
+    <div className="w-full px-10 bg-gray-200">
       <div className="w-full max-w-[1124px] mx-auto py-10">
         <div className="w-full flex justify-between items-center">
           <h1 className="text-2xl font-semibold text-gray-800 ">Payouts</h1>

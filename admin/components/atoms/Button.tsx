@@ -1,4 +1,4 @@
-import { ComponentProps } from "react";
+import { ComponentProps, forwardRef } from "react";
 
 interface ButtonProps extends ComponentProps<"button"> {
   variant?:
@@ -17,7 +17,10 @@ interface ButtonProps extends ComponentProps<"button"> {
   isLoading?: boolean;
 }
 
-export default function Button(props: ButtonProps) {
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  props,
+  ref
+) {
   const {
     variant = "dark",
     size = "md",
@@ -52,6 +55,7 @@ export default function Button(props: ButtonProps) {
   return (
     <button
       {...rest}
+      ref={ref}
       className={`flex items-center justify-center gap-1 lg:text-xl md:text-lg text-base font-normal rounded-full ${
         outline ? "border border-gray-200" : variantClasses[variant]
       } ${sizeClasses[size]} ${borderClasses} ${props.className} ${
@@ -64,4 +68,6 @@ export default function Button(props: ButtonProps) {
       {props.children}
     </button>
   );
-}
+});
+
+export default Button;
