@@ -23,6 +23,7 @@ public class Country implements Serializable{
     @NotNull
     private String name;
 
+    @Column(unique = true)
     private String isoCode;
 
     private String countryCode;

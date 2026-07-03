@@ -22,6 +22,7 @@ public class Bank {
     private String name;
 
     @NotNull
+    @Column(nullable = false, unique = true)
     private String code;
 
     @JsonIgnore

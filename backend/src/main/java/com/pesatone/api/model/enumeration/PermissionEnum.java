@@ -17,7 +17,8 @@ public enum PermissionEnum {
     DELETE_ACCOUNT("Delete account"),
     CREATE_WITHDRAWAL_ACCOUNT("Create withdrawal account"),
     UPDATE_WITHDRAWAL_ACCOUNT("Update withdrawal account"),
-    VIEW_WITHDRAWAL_ACCOUNT("View withdrawal account");
+    VIEW_WITHDRAWAL_ACCOUNT("View withdrawal account"),
+    MANAGE_RESOURCES("Manage configuration resources (industries, countries, banks)");
 
     private final String description;
 

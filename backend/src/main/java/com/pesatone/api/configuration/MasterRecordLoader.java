@@ -61,7 +61,7 @@ public class MasterRecordLoader {
             Industry[] dtoList = gson.fromJson(gson.newJsonReader(reader), Industry[].class);
             List<Industry> industries = new ArrayList<>();
             for (Industry industryDto : dtoList) {
-                if (industryRepository.findActiveByCode(industryDto.getCode()).isEmpty()) {
+                if (industryRepository.findFirstByCodeIgnoreCase(industryDto.getCode()).isEmpty()) {
                     industryDto.setStatus(StatusEnum.ACTIVE);
                     industries.add(industryDto);
                 }
@@ -78,7 +78,7 @@ public class MasterRecordLoader {
             Country[] dtoList = gson.fromJson(gson.newJsonReader(reader), Country[].class);
             List<Country> countries = new ArrayList<>();
             for (Country countryDto : dtoList) {
-                if (countryRepository.findActiveByIsoCode(countryDto.getIsoCode()).isEmpty()) {
+                if (countryRepository.findFirstByIsoCodeIgnoreCase(countryDto.getIsoCode()).isEmpty()) {
                     countryDto.setStatus(StatusEnum.ACTIVE);
                     countries.add(countryDto);
                 }

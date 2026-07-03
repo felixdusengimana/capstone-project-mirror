@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface IndustryRepository extends JpaRepository<Industry, Long> {
     @Query("select u from Industry  u where u.code = ?1 and u.status = 'ACTIVE'")
     Optional<Industry> findActiveByCode(String code);
+
+    Optional<Industry> findFirstByCodeIgnoreCase(String code);
 }
