@@ -32,6 +32,7 @@ import com.pesatone.api.service.NotificationService;
 import com.pesatone.api.service.PesatoneTokenService;
 import com.pesatone.api.service.UserService;
 import com.pesatone.api.service.WalletService;
+import com.pesatone.api.util.ReservedUsernames;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -99,6 +100,9 @@ public class UserServiceImpl implements UserService {
         }
         log.info("Profile update request: {}", gson.toJson(dto));
         if (StringUtils.isNotBlank(dto.getUsername())) {
+            if (ReservedUsernames.isReserved(dto.getUsername())) {
+                throw new PesatoneException("This username is not available");
+            }
             user.setUsername(dto.getUsername().toLowerCase());
         }
         if (StringUtils.isNotBlank(dto.getName())) {

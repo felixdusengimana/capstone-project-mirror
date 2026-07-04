@@ -31,13 +31,24 @@ public class OtpServiceImpl implements OtpService {
     @Value("${application.otpExpiry}")
     Integer otpExpiry;
 
+    private static final long OTP_RESEND_COOLDOWN_SECONDS = 30;
+
     @Override
     @Transactional
     public void sendOtp(AppUser recipient, OtpTypeEnum type) {
+        validateOtpCreation(recipient, type);
+        if (sentWithinCooldown(recipient, type)) {
+            return;
+        }
         invalidateOtp(recipient, type);
-        validateOtpCreation(recipient,type);
         OneTimePassword otp = createOtp(recipient, type);
         sendOtpNotification(recipient, otp);
+    }
+
+    private boolean sentWithinCooldown(AppUser recipient, OtpTypeEnum type) {
+        Date cutoff = Date.from(Instant.now().minusSeconds(OTP_RESEND_COOLDOWN_SECONDS));
+        return otpRepository.findUnexpiredByAppUserAndType(recipient, type).stream()
+                .anyMatch(o -> o.getCreatedAt() != null && o.getCreatedAt().after(cutoff));
     }
 
     @Override

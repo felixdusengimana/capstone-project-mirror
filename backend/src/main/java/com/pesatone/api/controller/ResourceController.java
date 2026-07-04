@@ -8,7 +8,9 @@ import com.pesatone.api.model.dto.ValidationDto;
 import com.pesatone.api.model.pojo.BankResponse;
 import com.pesatone.api.model.pojo.CountryResponse;
 import com.pesatone.api.model.pojo.IndustryResponse;
+import com.pesatone.api.model.pojo.UsernameAvailability;
 import com.pesatone.api.repository.AppUserRepository;
+import com.pesatone.api.util.ReservedUsernames;
 import com.pesatone.api.service.ResourceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,7 +21,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 @RestController
 @RequiredArgsConstructor
@@ -131,12 +137,68 @@ public class ResourceController {
     }
 
 
+    @Operation(summary = "Check username availability",
+            description = "Fast check whether a username (pesatag) is available, with suggestions if taken")
+    @GetMapping("/username-availability")
+    public ResponseEntity<ApiResponseObject<UsernameAvailability>> usernameAvailability(@RequestParam String username) {
+        String value = username == null ? "" : username.trim().toLowerCase();
+        boolean taken = value.isBlank()
+                || ReservedUsernames.isReserved(value)
+                || userRepository.usernameExists(value);
+        List<String> suggestions = taken ? suggestUsernames(value) : List.of();
+        return ResponseEntity.ok(new ApiResponseObject<>(taken ? "Username not available" : "Username available",
+                !taken, new UsernameAvailability(!taken, suggestions)));
+    }
+
+    private static final List<String> PREFIXES = List.of("the", "real", "official", "iam", "its", "hey");
+    private static final List<String> SUFFIXES = List.of("official", "hq", "tv", "world", "daily", "online", "real");
+
+    private List<String> suggestUsernames(String base) {
+        // keep the typed tag (dots allowed) but never leave a leading/trailing separator
+        String root = base.replaceAll("[^a-z0-9._]", "").replaceAll("^[._]+|[._]+$", "");
+        if (root.isBlank()) {
+            return List.of();
+        }
+        ThreadLocalRandom rng = ThreadLocalRandom.current();
+
+        // random mix: word affixes (with/without a dot) + a few random numbers
+        List<String> pool = new ArrayList<>();
+        PREFIXES.forEach(p -> pool.add(p + root));
+        SUFFIXES.forEach(s -> {
+            pool.add(root + s);
+            pool.add(root + "." + s);
+        });
+        pool.add(root + "_");
+        for (int i = 0; i < 5; i++) {
+            int n = rng.nextInt(1, 1000);
+            pool.add(root + n);
+            pool.add(root + "_" + n);
+        }
+        Collections.shuffle(pool, rng);
+        // single-digit fallback (also shuffled) appended last, so we always have enough free options
+        List<String> fallback = new ArrayList<>();
+        for (int i = 1; i <= 9; i++) {
+            fallback.add(root + i);
+        }
+        Collections.shuffle(fallback, rng);
+        pool.addAll(fallback);
+
+        Set<String> taken = userRepository.findTakenUsernames(pool);
+        return pool.stream()
+                .filter(c -> c.length() >= 3 && c.length() <= 30)
+                .filter(c -> !taken.contains(c) && !ReservedUsernames.isReserved(c))
+                .distinct()
+                .limit(3)
+                .toList();
+    }
+
     @Operation(summary = "Validate resource", description = "Check if a resource exists")
     @PostMapping("/validation")
     public ResponseEntity<ApiResponseObject<Object>> validateResource(@RequestBody @Valid ValidationDto dto) {
         boolean exists = false;
         switch (dto.getResourceType()) {
-            case PESA_TAG -> exists = userRepository.findByUserName(dto.getValue()).isPresent();
+            case PESA_TAG -> exists = ReservedUsernames.isReserved(dto.getValue())
+                    || userRepository.findByUserName(dto.getValue()).isPresent();
         }
 
         if(exists){

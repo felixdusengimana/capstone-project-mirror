@@ -24,6 +24,14 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     @Query("select u from AppUser  u where u.username = lower(?1)")
     Optional<AppUser> findByUserName(String username);
 
+    // fast existence check (SELECT 1, hits the unique index) for username availability
+    @Query("select case when count(u) > 0 then true else false end from AppUser u where u.username = lower(?1)")
+    boolean usernameExists(String username);
+
+    // which of these candidate usernames are already taken (single query, for suggestions)
+    @Query("select u.username from AppUser u where u.username in ?1")
+    java.util.Set<String> findTakenUsernames(java.util.Collection<String> usernames);
+
     @Query("select u from AppUser u left join fetch u.country " +
             "left join fetch u.industry " +
             "where u.id = ?1 " +
