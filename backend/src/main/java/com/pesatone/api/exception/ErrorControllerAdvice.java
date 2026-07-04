@@ -2,6 +2,7 @@ package com.pesatone.api.exception;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.pesatone.api.model.dto.ApiResponseObject;
+import org.springframework.dao.DataIntegrityViolationException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -119,6 +120,22 @@ public class ErrorControllerAdvice {
     public ResponseEntity<Object> handle(NoResourceFoundException e) {
         log.error("No resource exception {}",e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponseObject<>("Page not found",false));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Object> handleDataIntegrityViolation(DataIntegrityViolationException e) {
+        log.warn("DATA_INTEGRITY_VIOLATION {}", e.getMostSpecificCause().getMessage());
+        String message = "This record already exists";
+        String cause = e.getMostSpecificCause().getMessage();
+        if (cause != null) {
+            String lower = cause.toLowerCase();
+            if (lower.contains("username")) {
+                message = "This username is already taken";
+            } else if (lower.contains("email")) {
+                message = "This email is already in use";
+            }
+        }
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponseObject<>(message, false));
     }
 
     @ExceptionHandler(RuntimeException.class)

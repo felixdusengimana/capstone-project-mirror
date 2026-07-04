@@ -16,7 +16,10 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(uniqueConstraints= @UniqueConstraint(columnNames={"email","username"}))
+@Table(uniqueConstraints = {
+        @UniqueConstraint(name = "uk_app_user_email", columnNames = "email"),
+        @UniqueConstraint(name = "uk_app_user_username", columnNames = "username")
+})
 @Getter @Setter
 public class AppUser implements Serializable{
     @Id
