@@ -67,7 +67,7 @@ export const step1 = z.object({
       required_error: "Bio is required",
     })
     .min(20, "Bio must be at least 20 characters")
-    .max(250, "Bio should be less thank 250 characters"),
+    .max(300, "Bio should be less than 300 characters"),
   // profileImageUrl: z.string().url("Invalid URL"),
 });
 
