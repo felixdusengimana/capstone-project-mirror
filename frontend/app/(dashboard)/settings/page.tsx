@@ -156,7 +156,7 @@ export default function UserSettings() {
           />
           <Input label="Email" value={usr?.data.email} disabled />
           <Input
-            label="Phone"
+            label="Phone (optional)"
             value={watch("phoneNumber")}
             disabled={isUserLoading}
             onChange={(e) => handleChange("phoneNumber", e.target.value)}
