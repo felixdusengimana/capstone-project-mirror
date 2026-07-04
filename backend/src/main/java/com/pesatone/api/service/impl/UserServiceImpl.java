@@ -103,7 +103,7 @@ public class UserServiceImpl implements UserService {
             if (ReservedUsernames.isReserved(dto.getUsername())) {
                 throw new PesatoneException("This username is not available");
             }
-            user.setUsername(dto.getUsername().toLowerCase());
+            user.setUsername(dto.getUsername());
         }
         if (StringUtils.isNotBlank(dto.getName())) {
             user.setName(dto.getName());

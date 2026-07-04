@@ -32,6 +32,12 @@ public class AppUser implements Serializable{
 
     private String username;
 
+    // single normalization point: usernames are always stored lowercased & trimmed,
+    // so case can never create a duplicate regardless of which write path sets it
+    public void setUsername(String username) {
+        this.username = username == null ? null : username.trim().toLowerCase();
+    }
+
     private String name;
 
     private String phoneNumber;

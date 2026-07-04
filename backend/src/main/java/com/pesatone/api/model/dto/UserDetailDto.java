@@ -15,9 +15,10 @@ public class UserDetailDto {
             description = "PesaTag for identification",
             example = "pesatag")
     @UniqueUserName
-    // optional, but when present: 3-30 chars of a-z 0-9 . _ , no leading/trailing or consecutive dots
-    @Pattern(regexp = "^$|^(?!.*\\.\\.)[a-z0-9_][a-z0-9._]{1,28}[a-z0-9_]$",
-            message = "Pesatag must be 3-30 chars of lowercase letters, numbers, '.' or '_' (no leading/trailing or double dots)")
+    // optional, but when present: 3-30 chars of letters (any case, normalized to lowercase on save),
+    // numbers, '.' or '_' — no leading/trailing or consecutive dots
+    @Pattern(regexp = "^$|^(?!.*\\.\\.)[a-zA-Z0-9_][a-zA-Z0-9._]{1,28}[a-zA-Z0-9_]$",
+            message = "Pesatag must be 3-30 chars of letters, numbers, '.' or '_' (no leading/trailing or double dots)")
     private String username;
 
     @Schema(name = "name",
