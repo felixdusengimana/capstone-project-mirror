@@ -24,6 +24,9 @@ public class HazelCacaheConfig {
 						.setName("creator")
 						.setTimeToLiveSeconds(2880))
 				.addMapConfig(new MapConfig()
+						.setName("creatorSearch")
+						.setTimeToLiveSeconds(600))
+				.addMapConfig(new MapConfig()
 						.setName("poketMoneyCallback")
 						.setTimeToLiveSeconds(86400));
 

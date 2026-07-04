@@ -12,10 +12,12 @@ import com.pesatone.api.model.dto.SocialLinkDto;
 import com.pesatone.api.model.dto.UserDetailDto;
 import com.pesatone.api.model.entity.AppUser;
 import com.pesatone.api.model.entity.QAppUser;
+import com.pesatone.api.model.entity.QPaymentTransaction;
 import com.pesatone.api.model.entity.SocialLink;
 import com.pesatone.api.model.enumeration.ApprovalStatusEnum;
 import com.pesatone.api.model.enumeration.CurrencyEnum;
 import com.pesatone.api.model.enumeration.ImageTypeEnum;
+import com.pesatone.api.model.enumeration.PaymentStatusEnum;
 import com.pesatone.api.model.enumeration.RoleEnum;
 import com.pesatone.api.model.enumeration.StatusEnum;
 import com.pesatone.api.model.pojo.UserPojo;
@@ -30,7 +32,11 @@ import com.pesatone.api.service.NotificationService;
 import com.pesatone.api.service.PesatoneTokenService;
 import com.pesatone.api.service.UserService;
 import com.pesatone.api.service.WalletService;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.JPAExpressions;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +50,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -204,6 +213,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    // Cache only the default (no query) list: same result for everyone, hammered on every search-open.
+    @Cacheable(value = "creatorSearch", key = "#filter.pageNumber + '-' + #filter.pageSize",
+            condition = "#filter.name == null or #filter.name.trim().isEmpty()")
     public QueryResultPojo<CreatorSearchResponse> searchCreators(CreatorSearchFilter filter) {
         QAppUser qAppUser = QAppUser.appUser;
         BlazeJPAQuery<AppUser> blazeQuery = new BlazeJPAQuery<>(entityManager, builderFactory);
@@ -218,9 +230,20 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.isNotBlank(filter.getName())) {
             blazeQuery.where(qAppUser.username.contains(filter.getName().toLowerCase())
                     .or(qAppUser.name.containsIgnoreCase(filter.getName())));
+            // typed search: verified first, then alphabetical
+            blazeQuery.orderBy(qAppUser.verified.desc().nullsLast(), qAppUser.username.asc(), qAppUser.id.desc());
+        } else {
+            // default (no query): trending = most successful gifts in the last 7 days, verified as tie-break
+            QPaymentTransaction qTxn = QPaymentTransaction.paymentTransaction;
+            Date since = Date.from(Instant.now().minus(7, ChronoUnit.DAYS));
+            Expression<Long> recentGifts = JPAExpressions.select(qTxn.count())
+                    .from(qTxn)
+                    .where(qTxn.creator.eq(qAppUser)
+                            .and(qTxn.paymentStatus.eq(PaymentStatusEnum.SUCCESSFUL))
+                            .and(qTxn.createdAt.after(since)));
+            blazeQuery.orderBy(new OrderSpecifier<>(Order.DESC, recentGifts),
+                    qAppUser.verified.desc().nullsLast(), qAppUser.id.desc());
         }
-
-        blazeQuery.orderBy(qAppUser.verified.desc().nullsLast(), qAppUser.username.asc(), qAppUser.id.desc());
 
         PagedList<CreatorSearchResponse> pagedList = blazeQuery
                 .select(Projections.constructor(
@@ -233,7 +256,9 @@ public class UserServiceImpl implements UserService {
                 ))
                 .fetchPage(filter.getOffset(), filter.getPageSize());
 
-        return new QueryResultPojo<>(pagedList, filter.getPageNumber(), filter.getPageSize(), pagedList.getTotalPages());
+        // copy out of Blaze's PagedList into a plain serializable list so the result can be cached
+        return new QueryResultPojo<>(new ArrayList<>(pagedList), filter.getPageNumber(),
+                filter.getPageSize(), pagedList.getTotalPages());
     }
 
     @Transactional
