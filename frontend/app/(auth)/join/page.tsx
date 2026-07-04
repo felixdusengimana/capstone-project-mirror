@@ -9,7 +9,11 @@ import TextArea from "@/components/atoms/TextArea";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import countriesFlags from "@/data/countries.json";
-import { useGetAllCountries, useGetAllIndustries } from "@/services/resources";
+import {
+  useCheckUsername,
+  useGetAllCountries,
+  useGetAllIndustries,
+} from "@/services/resources";
 import { useEffect, useState } from "react";
 import { supportedSocials } from "@/utils/socials";
 import { ICountry } from "@/types/resources";
@@ -142,6 +146,35 @@ export default function Join() {
       socialLinks: [{ platform: "", link: "" }],
     },
   });
+
+  // debounced username availability check
+  const usernameValue = (watch("username") || "") as string;
+  const [debouncedUsername, setDebouncedUsername] = useState("");
+  useEffect(() => {
+    const t = setTimeout(
+      () => setDebouncedUsername(usernameValue.trim().toLowerCase()),
+      450
+    );
+    return () => clearTimeout(t);
+  }, [usernameValue]);
+  const usernameCheckEnabled =
+    step === "3" &&
+    debouncedUsername.length >= 3 &&
+    /^(?!.*\.\.)[a-z0-9_][a-z0-9._]{1,28}[a-z0-9_]$/.test(debouncedUsername) &&
+    !errors.username;
+  const { data: usernameCheck, isFetching: checkingUsername } = useCheckUsername(
+    debouncedUsername,
+    usernameCheckEnabled
+  );
+  const usernameAvailable = usernameCheck?.data?.available;
+  const usernameSuggestions = usernameCheck?.data?.suggestions ?? [];
+  // the user's own existing tag is fine (e.g. revisiting onboarding)
+  const isOwnUsername =
+    !!debouncedUsername &&
+    debouncedUsername === (user?.data?.username || "").toLowerCase();
+  // block step 3 until the tag is confirmed available (or it's already theirs)
+  const usernameStepBlocked =
+    step === "3" && !isOwnUsername && usernameAvailable !== true;
 
   const onSubmit = async (data: Partial<ICreateUser>) => {
     if (step === "1") {
@@ -343,13 +376,54 @@ export default function Join() {
                 </div>
               }
               onChange={(e) =>
-                setValue("username", e.target.value.trim(), {
+                // keep exactly what they type (incl. uppercase); backend is case-insensitive
+                // and stores it lowercased. Invalid chars are kept so zod shows a message.
+                setValue("username", e.target.value, {
                   shouldDirty: true,
                   shouldValidate: true,
                 })
               }
               error={errors.username?.message}
             />
+
+            {/* live availability feedback */}
+            {!errors.username && debouncedUsername.length >= 3 && (
+              <div className="mt-2 text-sm">
+                {checkingUsername ? (
+                  <p className="text-[#8A8A8B]">Checking availability…</p>
+                ) : usernameAvailable ? (
+                  <p className="text-green-600">
+                    @{debouncedUsername} is available
+                  </p>
+                ) : (
+                  <div>
+                    <p className="text-red-500">
+                      @{debouncedUsername} is taken
+                    </p>
+                    {usernameSuggestions.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-2 items-center">
+                        <span className="text-[#8A8A8B]">Try:</span>
+                        {usernameSuggestions.map((s) => (
+                          <button
+                            key={s}
+                            type="button"
+                            onClick={() =>
+                              setValue("username", s, {
+                                shouldDirty: true,
+                                shouldValidate: true,
+                              })
+                            }
+                            className="px-3 py-1 rounded-full border border-[#E5E9F0] text-[#475569] hover:bg-gray-50"
+                          >
+                            {s}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </>
         ) : step === "4" ? (
           <>
@@ -546,6 +620,7 @@ export default function Join() {
             isPending
             || isUploadingProfilePic
             || (step === "2" && !watch("image") && !user?.data?.profileImageUrl)
+            || usernameStepBlocked
           }
           className="px-[72px]"
         >

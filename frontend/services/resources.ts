@@ -3,6 +3,23 @@ import axiosInstance from "./axiosInstance";
 import { IResponse } from "@/types/common";
 import { IBank, ICountry, IIndustry } from "@/types/resources";
 
+export interface IUsernameAvailability {
+  available: boolean;
+  suggestions: string[];
+}
+
+export function useCheckUsername(username: string, enabled: boolean) {
+  return useQuery<IResponse<IUsernameAvailability>>({
+    queryKey: ["username-availability", username],
+    queryFn: async () =>
+      axiosInstance.get(
+        `/resources/username-availability?username=${encodeURIComponent(username)}`
+      ),
+    enabled,
+    staleTime: 60_000,
+  });
+}
+
 export function useGetAllIndustries({ enabled = true }: { enabled?: boolean }) {
   return useQuery<IResponse<IIndustry[]>>({
     queryKey: ["industries"],
