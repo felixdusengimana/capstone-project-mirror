@@ -33,10 +33,9 @@ import com.pesatone.api.service.PesatoneTokenService;
 import com.pesatone.api.service.UserService;
 import com.pesatone.api.service.WalletService;
 import com.querydsl.core.types.Expression;
-import com.querydsl.core.types.Order;
-import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
-import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -218,47 +217,57 @@ public class UserServiceImpl implements UserService {
             condition = "#filter.name == null or #filter.name.trim().isEmpty()")
     public QueryResultPojo<CreatorSearchResponse> searchCreators(CreatorSearchFilter filter) {
         QAppUser qAppUser = QAppUser.appUser;
-        BlazeJPAQuery<AppUser> blazeQuery = new BlazeJPAQuery<>(entityManager, builderFactory);
+        BooleanExpression base = qAppUser.status.eq(StatusEnum.ACTIVE)
+                .and(qAppUser.role.eq(RoleEnum.CREATOR))
+                .and(qAppUser.name.isNotNull())
+                .and(qAppUser.username.isNotNull());
 
-        blazeQuery.from(qAppUser)
-                .where(qAppUser.status.eq(StatusEnum.ACTIVE)
-                        .and(qAppUser.role.eq(RoleEnum.CREATOR))
-                        .and(qAppUser.name.isNotNull())
-                        .and(qAppUser.username.isNotNull())
-                );
-
-        if (StringUtils.isNotBlank(filter.getName())) {
-            blazeQuery.where(qAppUser.username.contains(filter.getName().toLowerCase())
-                    .or(qAppUser.name.containsIgnoreCase(filter.getName())));
-            // typed search: verified first, then alphabetical
-            blazeQuery.orderBy(qAppUser.verified.desc().nullsLast(), qAppUser.username.asc(), qAppUser.id.desc());
-        } else {
-            // default (no query): trending = most successful gifts in the last 7 days, verified as tie-break
-            QPaymentTransaction qTxn = QPaymentTransaction.paymentTransaction;
-            Date since = Date.from(Instant.now().minus(7, ChronoUnit.DAYS));
-            Expression<Long> recentGifts = JPAExpressions.select(qTxn.count())
-                    .from(qTxn)
-                    .where(qTxn.creator.eq(qAppUser)
-                            .and(qTxn.paymentStatus.eq(PaymentStatusEnum.SUCCESSFUL))
-                            .and(qTxn.createdAt.after(since)));
-            blazeQuery.orderBy(new OrderSpecifier<>(Order.DESC, recentGifts),
-                    qAppUser.verified.desc().nullsLast(), qAppUser.id.desc());
+        if (StringUtils.isBlank(filter.getName())) {
+            return trendingCreators(qAppUser, base, filter);
         }
 
+        BlazeJPAQuery<AppUser> blazeQuery = new BlazeJPAQuery<>(entityManager, builderFactory);
+        blazeQuery.from(qAppUser)
+                .where(base.and(qAppUser.username.contains(filter.getName().toLowerCase())
+                        .or(qAppUser.name.containsIgnoreCase(filter.getName()))))
+                // typed search: verified first, then alphabetical
+                .orderBy(qAppUser.verified.desc().nullsLast(), qAppUser.username.asc(), qAppUser.id.desc());
+
         PagedList<CreatorSearchResponse> pagedList = blazeQuery
-                .select(Projections.constructor(
-                        CreatorSearchResponse.class,
-                        qAppUser.id,
-                        qAppUser.username,
-                        qAppUser.name,
-                        qAppUser.profileImageUrl,
-                        qAppUser.verified
-                ))
+                .select(creatorProjection(qAppUser))
                 .fetchPage(filter.getOffset(), filter.getPageSize());
 
         // copy out of Blaze's PagedList into a plain serializable list so the result can be cached
         return new QueryResultPojo<>(new ArrayList<>(pagedList), filter.getPageNumber(),
                 filter.getPageSize(), pagedList.getTotalPages());
+    }
+
+    // Default list: trending = most successful gifts in the last 7 days, verified then newest as tie-break.
+    // Plain JPAQuery (left join + group by + order by count) — Blaze rejects a correlated subquery in ORDER BY.
+    private QueryResultPojo<CreatorSearchResponse> trendingCreators(QAppUser qAppUser,
+                                                                    BooleanExpression base,
+                                                                    CreatorSearchFilter filter) {
+        QPaymentTransaction qTxn = QPaymentTransaction.paymentTransaction;
+        Date since = Date.from(Instant.now().minus(7, ChronoUnit.DAYS));
+        List<CreatorSearchResponse> results = new JPAQuery<AppUser>(entityManager)
+                .from(qAppUser)
+                .leftJoin(qTxn).on(qTxn.creator.eq(qAppUser)
+                        .and(qTxn.paymentStatus.eq(PaymentStatusEnum.SUCCESSFUL))
+                        .and(qTxn.createdAt.after(since)))
+                .where(base)
+                .groupBy(qAppUser.id, qAppUser.username, qAppUser.name,
+                        qAppUser.profileImageUrl, qAppUser.verified)
+                .orderBy(qTxn.count().desc(), qAppUser.verified.desc().nullsLast(), qAppUser.id.desc())
+                .offset(filter.getOffset())
+                .limit(filter.getPageSize())
+                .select(creatorProjection(qAppUser))
+                .fetch();
+        return new QueryResultPojo<>(new ArrayList<>(results), filter.getPageNumber(), filter.getPageSize(), 1);
+    }
+
+    private Expression<CreatorSearchResponse> creatorProjection(QAppUser qAppUser) {
+        return Projections.constructor(CreatorSearchResponse.class,
+                qAppUser.id, qAppUser.username, qAppUser.name, qAppUser.profileImageUrl, qAppUser.verified);
     }
 
     @Transactional
