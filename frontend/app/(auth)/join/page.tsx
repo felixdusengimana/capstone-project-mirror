@@ -162,19 +162,23 @@ export default function Join() {
     debouncedUsername.length >= 3 &&
     /^(?!.*\.\.)[a-z0-9_][a-z0-9._]{1,28}[a-z0-9_]$/.test(debouncedUsername) &&
     !errors.username;
-  const { data: usernameCheck, isFetching: checkingUsername } = useCheckUsername(
-    debouncedUsername,
-    usernameCheckEnabled
-  );
+  const {
+    data: usernameCheck,
+    isFetching: checkingUsername,
+    isError: usernameCheckError,
+  } = useCheckUsername(debouncedUsername, usernameCheckEnabled);
   const usernameAvailable = usernameCheck?.data?.available;
   const usernameSuggestions = usernameCheck?.data?.suggestions ?? [];
   // the user's own existing tag is fine (e.g. revisiting onboarding)
   const isOwnUsername =
     !!debouncedUsername &&
     debouncedUsername === (user?.data?.username || "").toLowerCase();
-  // block step 3 until the tag is confirmed available (or it's already theirs)
+  // block step 3 only while checking or when the tag is explicitly taken.
+  // (on a failed check we let it through — the backend's unique constraint is the real guard)
   const usernameStepBlocked =
-    step === "3" && !isOwnUsername && usernameAvailable !== true;
+    step === "3" &&
+    !isOwnUsername &&
+    (checkingUsername || usernameAvailable === false);
 
   const onSubmit = async (data: Partial<ICreateUser>) => {
     if (step === "1") {
@@ -391,11 +395,15 @@ export default function Join() {
               <div className="mt-2 text-sm">
                 {checkingUsername ? (
                   <p className="text-[#8A8A8B]">Checking availability…</p>
-                ) : usernameAvailable ? (
+                ) : usernameCheckError ? (
+                  <p className="text-[#8A8A8B]">
+                    Couldn&apos;t check availability. Please try again.
+                  </p>
+                ) : usernameAvailable === true ? (
                   <p className="text-green-600">
                     @{debouncedUsername} is available
                   </p>
-                ) : (
+                ) : usernameAvailable === false ? (
                   <div>
                     <p className="text-red-500">
                       @{debouncedUsername} is taken
@@ -421,7 +429,7 @@ export default function Join() {
                       </div>
                     )}
                   </div>
-                )}
+                ) : null}
               </div>
             )}
           </>
