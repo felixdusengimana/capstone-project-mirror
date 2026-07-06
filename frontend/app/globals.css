@@ -1,0 +1,207 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #141416;
+  --bg-hover: #232326;
+  --secondary-color: #17171A;
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+  --animated-card-direction: to right;
+}
+
+
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+* {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: rgb(var(--foreground-rgb));
+  font-size: 16px;
+}
+
+/* Change the white to any color */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  transition: background-color 5000s ease-in-out 0s;
+  -webkit-text-size-adjust: 100%;
+}
+
+input,
+textarea,
+select {
+  font-size: 16px;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+.heading {
+  font-size: clamp(2.25rem, 5.4vw, 64px);
+}
+
+
+.intro {
+  background: url('/home-bg.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position-x: calc(100% + 160px);
+  background-position-y: -120px;
+}
+
+.page-padding {
+  width: 80%;
+  max-width: 1728px;
+  margin: 0 auto;
+}
+
+.dashboard-padding {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.animated-icon::before,
+.animated-card:hover:before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  right: 0;
+  bottom: 0;
+  left: -2px;
+  z-index: -1;
+  border: 1px solid;
+  border-radius: 23px;
+  width: 101%;
+  height: 101%;
+  border: 0;
+  background: linear-gradient(var(--animated-card-direction), #FFFFFF, rgba(252, 252, 252, 0));
+}
+
+.animated-icon::before {
+  border-radius: 11px;
+  height: 103%;
+  width: 105%;
+  max-width: fit-content;
+  background: linear-gradient(60%, #FFFFFF, rgba(252, 252, 252, 0));
+}
+
+.crop-container {
+  position: relative;
+  width: 236px;
+  height: 236px;
+
+  background: linear-gradient(to right, #cbd4e1 8px, transparent 8px) 0 0,
+    linear-gradient(to right, #cbd4e1 8px, transparent 8px) 0 100%,
+    linear-gradient(to left, #cbd4e1 8px, transparent 8px) 100% 0,
+    linear-gradient(to left, #cbd4e1 8px, transparent 8px) 100% 100%,
+    linear-gradient(to bottom, #cbd4e1 8px, transparent 8px) 0 0,
+    linear-gradient(to bottom, #cbd4e1 8px, transparent 8px) 100% 0,
+    linear-gradient(to top, #cbd4e1 8px, transparent 8px) 0 100%,
+    linear-gradient(to top, #cbd4e1 8px, transparent 8px) 100% 100%;
+
+  background-repeat: no-repeat;
+  background-size: 70px 70px;
+}
+
+/* .reactEasyCrop_CropArea {
+  color: rgba(255, 255, 255, 0.8) !important;
+} */
+
+@media screen and (max-width: 1230px) {
+  body {
+    font-size: 14px;
+  }
+
+  .page-padding {
+    width: 90%;
+  }
+
+  .intro {
+    background-size: 0px;
+  }
+
+  .dashboard-padding {
+    width: 95%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  body {
+    font-size: 12px;
+  }
+
+  .page-padding {
+    width: 95%;
+  }
+
+  .intro {
+    background-size: 0px;
+  }
+
+  .dashboard-padding {
+    width: 98%;
+  }
+
+}
+
+/* edit scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #fff;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--bg-hover);
+}
+
+
+@media screen and (max-width: 768px) and (-webkit-min-device-pixel-ratio: 2) {
+
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+
+
+@layer utilities {
+  @keyframes loader {
+    0% {
+      background-color: white;
+    }
+    100% {
+      background-color: transparent;
+    }
+  }
+
+  .animate-loader {
+    animation: loader 2s linear infinite;
+  }
+}

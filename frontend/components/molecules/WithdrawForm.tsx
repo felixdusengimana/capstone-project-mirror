@@ -1,0 +1,434 @@
+"use client";
+import Dialog, { DialogRoot, DialogTrigger } from "./Dialog";
+import Button from "../atoms/Button";
+import Icon from "../atoms/Icon";
+import Input from "../atoms/Input";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { IInitiatePayout } from "@/types/payouts";
+import { useEffect, useState } from "react";
+import { EChannel, ECurrency } from "@/types";
+import Select from "../atoms/Select";
+import { EOtpTypes, GenerateOTP, useGetMe } from "@/services/users";
+import { convertEmail } from "@/utils/convertEmail";
+import OTPInput from "./OTPInput";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { InitiatePayouts } from "@/services/payouts";
+import toast from "react-hot-toast";
+import { z } from "zod";
+import { IWallet } from "@/types/wallet";
+import useIsNativeCurrency from "@/hooks/useIsNativeCurrency";
+import { useGetWithdrawAccounts } from "@/services/withdrawal-accounts";
+import Link from "next/link";
+
+export default function WithdrawForm({
+  trigger,
+  wallet,
+  walletLoading,
+  errorMessage,
+}: {
+  trigger?: React.ReactNode;
+  wallet: IWallet;
+  errorMessage?: string;
+  walletLoading?: boolean;
+}) {
+  const { data: me, isPending: loadingUser } = useGetMe();
+  const [active, setActive] = useState<"form" | "otp" | "success">("form");
+  const [open, setOpen] = useState(false);
+  const isNativeCurrency = useIsNativeCurrency({ currency: wallet?.currency });
+  const queryClient = useQueryClient();
+  const { data: accounts, isPending: loadingAccounts } = useGetWithdrawAccounts(
+    { enabled: open }
+  );
+  const bankAccount = accounts?.data?.find(
+    (account) => account.accountType == EChannel.BANK_ACCOUNT
+  );
+  const mobileMoneyAccount = accounts?.data?.find(
+    (account) => account.accountType == EChannel.MOBILE_MONEY
+  );
+
+  const error =
+    !bankAccount?.accountNumber && !mobileMoneyAccount?.accountNumber ? (
+      <div>
+        <p>Please add a withdrawal account to proceed</p>
+        <Link
+          href="/settings#withdrawal-options"
+          className="text-blue-500 hover:underline"
+        >
+          Add withdrawal account
+        </Link>
+      </div>
+    ) : (
+      errorMessage
+    );
+
+  const isLoading = loadingUser || walletLoading || loadingAccounts;
+
+  const currencyMinWithdraw = {
+    [ECurrency.RWF]: 1000,
+    [ECurrency.USD]: 10,
+    [ECurrency.GBP]: 10,
+  };
+
+  const {
+    handleSubmit,
+    setValue,
+    reset,
+    watch,
+    formState: { errors },
+  } = useForm<IInitiatePayout>({
+    resolver: zodResolver(
+      z.object({
+        amount: z
+          .number({
+            required_error: "Amount is required",
+          })
+          .min(
+            currencyMinWithdraw[wallet?.currency],
+            `Amount must be greater than ${
+              currencyMinWithdraw[wallet?.currency]
+            }${wallet?.currency}`
+          )
+          .max(
+            wallet?.balance ?? 0,
+            `Amount must be less than ${wallet?.balance.toLocaleString()} ${
+              wallet?.currency
+            }`
+          ),
+        paymentChannel: z.nativeEnum(EChannel, {
+          required_error: "Payment channel is required",
+          invalid_type_error: "Please select payment channel",
+        }),
+        currency: z.nativeEnum(ECurrency, {
+          required_error: "Currency is required",
+          invalid_type_error: "Please select Currency",
+        }),
+      })
+    ),
+  });
+
+  // set otp if user didn't verify email
+  const { mutate: sendFirstOtp, isPending: isSendingOTP } = useMutation({
+    mutationFn: () => GenerateOTP({ otpType: EOtpTypes.PAYOUT }),
+    onSuccess() {
+      setActive("otp");
+    },
+    onError(error) {
+      toast.error(error.message);
+    },
+  });
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: InitiatePayouts,
+    onSuccess: () => {
+      toast.success(
+        "Your payout has been initiated. Your money would be in your account soon.",
+        {
+          id: "payout",
+        }
+      );
+      setOpen(false);
+      queryClient.invalidateQueries({
+        queryKey: ["payouts"],
+      });
+      reset();
+    },
+    onError(error) {
+      toast.error(error.message, {
+        id: "payout",
+      });
+    },
+  });
+
+  const onSubmit = (data: IInitiatePayout) => {
+    sendFirstOtp();
+  };
+
+  useEffect(() => {
+    reset({
+      currency: wallet?.currency,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wallet]);
+
+  // if no bank information remove bank in option, is is not native of no mobile money remove mobile money
+  const options = [
+    ...(isNativeCurrency && mobileMoneyAccount ? [EChannel.MOBILE_MONEY] : []),
+    ...(bankAccount ? [EChannel.BANK_ACCOUNT] : []),
+  ];
+
+  return (
+    <DialogRoot onOpenChange={setOpen} open={open}>
+      <DialogTrigger>
+        <div>
+          {trigger ?? (
+            <Button className="flex gap-0.5 items-center">
+              <Icon name="cash-out" />
+              <p className="font-medium text-sm text-white">Withdraw</p>
+            </Button>
+          )}
+        </div>
+      </DialogTrigger>
+      <Dialog preventCloseOnClickOutside className="p-10 bg-[#F0F2F7]">
+        {Boolean(error) && !isLoading ? (
+          <>
+            <div className="bg-red-100 text-red-500 p-4 rounded-lg">
+              {error}
+            </div>
+            <Button className="w-full mt-4" onClick={() => setOpen(false)}>
+              Close
+            </Button>
+          </>
+        ) : active === "form" ? (
+          <>
+            <div className="w-full py-6 pb-16 bg-white rounded-lg border-gray-200">
+              <div className="px-8 border-b border-gray-100 pb-6 mb-6">
+                <p className="text-gray-500 text-base font-light">
+                  Available to withdraw
+                </p>
+                {walletLoading ? (
+                  <div className="animate-pulse h-8 w-24 bg-gray-200 rounded-lg mt-4"></div>
+                ) : (
+                  <h3 className=" text-gray-800 font-medium text-4xl flex items-center gap-2 mt-4">
+                    <span className="font-normal text-base text-gray-400">
+                      {wallet?.currency}
+                    </span>{" "}
+                    {wallet?.balance.toLocaleString()}
+                  </h3>
+                )}
+              </div>
+
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                className="px-8 flex flex-col gap-4"
+              >
+                <Input
+                  label="Enter amount"
+                  onChange={(e) =>
+                    setValue(
+                      "amount",
+                      Number(e.target.value.replaceAll(",", "")),
+                      {
+                        shouldValidate: true,
+                      }
+                    )
+                  }
+                  error={errors.amount?.message || errors.currency?.message}
+                  autoFocus
+                  type="number"
+                  left={
+                    <p className="text-gray-800 font-medium text-lg pr-1">
+                      {wallet?.currency}
+                    </p>
+                  }
+                />
+
+                <Select
+                  value={watch("paymentChannel")}
+                  label="Payment mode"
+                  error={errors.paymentChannel?.message}
+                  onChange={(e) =>
+                    setValue("paymentChannel", e.target.value as EChannel, {
+                      shouldValidate: true,
+                    })
+                  }
+                  placeholder="Select Payment Channel"
+                >
+                  {options.map((d) => (
+                    <option key={d} value={d}>
+                      {d.split("_").join(" ")}
+                    </option>
+                  ))}
+                </Select>
+
+                {watch("paymentChannel") && (
+                  <>
+                    {watch("paymentChannel") === EChannel.MOBILE_MONEY &&
+                    mobileMoneyAccount ? (
+                      <Input
+                        label="Mobile Money Number"
+                        disabled
+                        value={mobileMoneyAccount.accountNumber}
+                      />
+                    ) : null}
+
+                    {watch("paymentChannel") === EChannel.BANK_ACCOUNT &&
+                    bankAccount ? (
+                      <Input
+                        label="Bank Account Number"
+                        disabled
+                        value={
+                          bankAccount.accountNumber +
+                          "(" +
+                          bankAccount.bank?.name +
+                          ")"
+                        }
+                      />
+                    ) : null}
+                  </>
+                )}
+
+                <div className="flex flex-col gap-4">
+                  <Button
+                    disabled={
+                      Object.keys(errors).length > 0 ||
+                      isLoading ||
+                      walletLoading
+                    }
+                    className="w-full mt-8"
+                    isLoading={isSendingOTP}
+                  >
+                    Withdraw{" "}
+                    {Boolean(watch("amount"))
+                      ? Number(watch("amount"))?.toLocaleString()
+                      : " - "}
+                    RWF
+                  </Button>
+                  <Button
+                    className="w-full bg-gray-200 text-[#4B5563]"
+                    style={{
+                      color: "#4B5563",
+                    }}
+                    type="button"
+                    onClick={() => setOpen(false)}
+                    disabled={isSendingOTP}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </>
+        ) : active === "otp" ? (
+          <div className="max-w-[591px] flex items-center flex-col gap-10">
+            <p className="text-black">
+              Enter OTP code sent to{" "}
+              <span className="text-gray-700">
+                {convertEmail(me?.data?.email ?? "")}
+              </span>
+            </p>
+            <div className="max-w-[378]">
+              <OTPInput
+                onChange={(value) => {
+                  if (value.length === 6) {
+                    toast.loading("Initiating payout", { id: "payout" });
+                    mutate({ ...watch(), otp: value });
+                  }
+                }}
+                otpType={EOtpTypes.PAYOUT}
+              />
+            </div>
+
+            <div className="w-full flex flex-col gap-4">
+              <Button
+                isLoading={isPending}
+                disabled={Object.keys(errors).length > 0 || isLoading}
+                className="w-full mt-8"
+              >
+                Verify OTP
+              </Button>
+              <Button
+                disabled={isPending}
+                className="w-full bg-gray-200 text-[#4B5563]"
+                style={{
+                  color: "#4B5563",
+                }}
+                type="button"
+                onClick={() => setOpen(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-10 pt-10 relative">
+            <svg
+              width="86"
+              height="102"
+              viewBox="0 0 86 102"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="absolute -left-10"
+            >
+              <rect
+                x="-32"
+                width="118"
+                height="26"
+                rx="13"
+                fill="#10B981"
+                fill-opacity="0.29"
+              />
+              <circle cx="35" cy="91" r="11" fill="#AFE2D4" />
+            </svg>
+
+            <svg
+              width="70"
+              height="174"
+              viewBox="0 0 70 174"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="absolute -right-10"
+            >
+              <rect
+                x="11"
+                y="148"
+                width="118"
+                height="26"
+                rx="13"
+                fill="#10B981"
+                fill-opacity="0.29"
+              />
+              <circle cx="11" cy="11" r="11" fill="#B3AFE2" />
+            </svg>
+
+            <svg
+              width="65"
+              height="64"
+              viewBox="0 0 65 64"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect x="0.5" width="64" height="64" rx="32" fill="#10B981" />
+              <path
+                d="M43.6834 24.0164C43.5285 23.8602 43.3441 23.7362 43.141 23.6516C42.9379 23.567 42.7201 23.5234 42.5001 23.5234C42.2801 23.5234 42.0622 23.567 41.8591 23.6516C41.656 23.7362 41.4717 23.8602 41.3167 24.0164L28.9001 36.4498L23.6834 31.2164C23.5225 31.061 23.3326 30.9388 23.1245 30.8568C22.9165 30.7748 22.6943 30.7346 22.4706 30.7385C22.247 30.7424 22.0263 30.7902 21.8212 30.8794C21.616 30.9685 21.4305 31.0972 21.2751 31.2581C21.1197 31.419 20.9975 31.6089 20.9155 31.817C20.8335 32.0251 20.7933 32.2473 20.7971 32.4709C20.801 32.6945 20.8489 32.9152 20.938 33.1203C21.0272 33.3255 21.1559 33.511 21.3167 33.6664L27.7167 40.0664C27.8717 40.2227 28.056 40.3466 28.2591 40.4313C28.4622 40.5159 28.6801 40.5594 28.9001 40.5594C29.1201 40.5594 29.3379 40.5159 29.541 40.4313C29.7441 40.3466 29.9285 40.2227 30.0834 40.0664L43.6834 26.4664C43.8526 26.3104 43.9876 26.1209 44.0799 25.9101C44.1723 25.6993 44.22 25.4716 44.22 25.2414C44.22 25.0113 44.1723 24.7836 44.0799 24.5728C43.9876 24.3619 43.8526 24.1725 43.6834 24.0164Z"
+                fill="white"
+              />
+            </svg>
+            <p className="text-gray-800 font-light text-2xl">
+              Withdraw success !
+            </p>
+            <p className="font-medium text-4xl text-gray-800 flex items-start justify-start">
+              <span className="text-base font-medium text-gray-400">
+                {watch("currency")}
+              </span>
+              {watch("amount").toLocaleString()}
+            </p>
+
+            <p className="text-gray-800">Send to {me?.data?.name}</p>
+
+            <div className="w-full flex flex-col gap-4">
+              <Button
+                isLoading={isPending}
+                onClick={() => setOpen(false)}
+                className="w-full mt-8"
+              >
+                Back Home
+              </Button>
+              <Button
+                disabled={isPending}
+                className="w-full bg-gray-200 text-[#4B5563]"
+                style={{
+                  color: "#4B5563",
+                }}
+                type="button"
+                onClick={() => setOpen(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
+      </Dialog>
+    </DialogRoot>
+  );
+}
