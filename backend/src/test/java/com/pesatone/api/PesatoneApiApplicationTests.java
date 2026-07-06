@@ -1,8 +1,14 @@
 package com.pesatone.api;
 
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootApplication
+@SpringBootTest
+@ActiveProfiles("test")
 class PesatoneApiApplicationTests {
 
+    @Test
+    void contextLoads() {
+    }
 }
