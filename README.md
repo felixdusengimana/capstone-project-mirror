@@ -14,6 +14,18 @@ The frontends talk to the backend over HTTP, so start the backend first.
 
 ---
 
+## Demo video
+
+A full walkthrough of the platform:
+
+**▶ [Mission Capstone Final Demo](docs/Mission%20Capstone%20Final%20Demo.mp4)**
+
+The video is stored with [Git LFS](https://git-lfs.com). To get it when cloning,
+install Git LFS first (`git lfs install`), then clone as usual — or run
+`git lfs pull` in an existing clone.
+
+---
+
 ## Prerequisites
 
 - **Java 17** (JDK) — for `backend/`
