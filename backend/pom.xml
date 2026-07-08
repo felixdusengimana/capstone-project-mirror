@@ -15,9 +15,6 @@
 	<description>Pesatone API</description>
 	<properties>
 		<java.version>17</java.version>
-		<!-- Newer Lombok so IntelliJ's bundled JDK 21 runtime can compile it
-		     (fixes "TypeTag :: UNKNOWN" / ExceptionInInitializerError). -->
-		<lombok.version>1.18.36</lombok.version>
 		<querydsl.version>5.1.0</querydsl.version>
 		<testcontainers.version>1.19.7</testcontainers.version>
 		<jjwt.version>0.12.5</jjwt.version>
