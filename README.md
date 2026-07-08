@@ -43,7 +43,7 @@ Start a PostgreSQL instance (defaults match the app's fallback config):
 
 ```bash
 docker run --name pesatone-db -e POSTGRES_USER=pesatone \
-  -e POSTGRES_PASSWORD='p@ssw0rd' -e POSTGRES_DB=pesatone \
+  -e POSTGRES_PASSWORD='changeme' -e POSTGRES_DB=pesatone \
   -p 5432:5432 -d postgres:16
 ```
 
@@ -213,7 +213,7 @@ NEXT_PUBLIC_FLUTTER_WAVE_KEY=
 ```bash
 # 1. database + backend
 docker run --name pesatone-db -e POSTGRES_USER=pesatone \
-  -e POSTGRES_PASSWORD='p@ssw0rd' -e POSTGRES_DB=pesatone -p 5432:5432 -d postgres:16
+  -e POSTGRES_PASSWORD='changeme' -e POSTGRES_DB=pesatone -p 5432:5432 -d postgres:16
 (cd backend && ./mvnw spring-boot:run)     # :9093
 
 # 2. public web app

@@ -19,7 +19,7 @@ class PesatoneTokenServiceImplTest {
     @BeforeEach
     void setUp() {
         SecretKey key = Keys.hmacShaKeyFor(
-                "securesecuresecuresecuresecuresecuresecuresecure".getBytes());
+                "unit-test-only-signing-key-not-a-real-secret-000".getBytes());
         service = new PesatoneTokenServiceImpl(key);
         ReflectionTestUtils.setField(service, "jwtExpiry", 3600);
         user = new AppUser();
