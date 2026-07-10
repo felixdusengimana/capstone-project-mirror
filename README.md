@@ -230,3 +230,23 @@ docker run --name pesatone-db -e POSTGRES_USER=pesatone \
 (cd frontend && pnpm test -- --coverage)
 (cd admin    && pnpm test -- --coverage)
 ```
+
+---
+
+## Deployment
+
+All three services are deployed to **[DigitalOcean App Platform](https://www.digitalocean.com/products/app-platform)**, each as its own app built from the Dockerfile in its folder (`backend/Dockerfile`, `frontend/Dockerfile`, `admin/Dockerfile`).
+
+- **Backend** — deployed and live at `https://pesatone-api-qv3jv.ondigitalocean.app` (this is the exact host the PoketMoney payment callbacks point to in production, confirming the deployment is real and wired into the live payment flow, not just built).
+- **Frontend** and **Admin console** — deployed the same way, each from its own Dockerfile as a separate DigitalOcean App.
+- **Database** — managed PostgreSQL, referenced by the backend through the standard `DATABASE_*` environment variables (see `.env.example`).
+
+### Deploying a service
+
+1. In the DigitalOcean control panel, create a new App and connect it to this repository.
+2. Set the app's **source directory** to the service you're deploying (`backend`, `frontend`, or `admin`) — DigitalOcean detects the Dockerfile in that folder automatically and builds from it.
+3. Add the environment variables for that service from its `.env.example` (Settings → App-Level Environment Variables). For the backend, also attach a managed PostgreSQL database and map its connection details to `DATABASE_HOST` / `DATABASE_PORT` / `DATABASE_SCHEMA` / `DATABASE_USERNAME` / `DATABASE_PASSWORD`.
+4. Deploy. DigitalOcean builds the Docker image and exposes the service on its assigned `*.ondigitalocean.app` domain (port `8080` inside the container, per each Dockerfile).
+5. Point the frontend's `NEXT_PUBLIC_BASE_URL` and the admin console's `BASE_URL` at the deployed backend's URL, and redeploy those two so they talk to the live API instead of `localhost`.
+
+> Note: `backend/render.yaml` is a Render.com app spec also present in this folder. The confirmed live deployment (per the payment callback URLs above) is on DigitalOcean App Platform — double-check whether Render is still in use anywhere before citing it as a second deployment target.
