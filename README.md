@@ -248,5 +248,3 @@ All three services are deployed to **[DigitalOcean App Platform](https://www.dig
 3. Add the environment variables for that service from its `.env.example` (Settings → App-Level Environment Variables). For the backend, also attach a managed PostgreSQL database and map its connection details to `DATABASE_HOST` / `DATABASE_PORT` / `DATABASE_SCHEMA` / `DATABASE_USERNAME` / `DATABASE_PASSWORD`.
 4. Deploy. DigitalOcean builds the Docker image and exposes the service on its assigned `*.ondigitalocean.app` domain (port `8080` inside the container, per each Dockerfile).
 5. Point the frontend's `NEXT_PUBLIC_BASE_URL` and the admin console's `BASE_URL` at the deployed backend's URL, and redeploy those two so they talk to the live API instead of `localhost`.
-
-> Note: `backend/render.yaml` is a Render.com app spec also present in this folder. The confirmed live deployment (per the payment callback URLs above) is on DigitalOcean App Platform — double-check whether Render is still in use anywhere before citing it as a second deployment target.
