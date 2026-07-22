@@ -1,6 +1,6 @@
-# Pesatone — Capstone Project
+# Capstone Project
 
-Monorepo mirror of the Pesatone platform: a creator payments product (wallets,
+Monorepo mirror of the platform: a creator payments product (wallets,
 payouts, mobile-money / card payments) with a public web app and an admin
 console.
 
