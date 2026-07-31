@@ -88,7 +88,7 @@ Tests run **in-memory on H2 — no Docker required**:
 ```bash
 cd backend
 ./mvnw test                 # run the suite
-./mvnw verify               # run tests + JaCoCo coverage gate
+./mvnw verify               # run tests + JaCoCo check (threshold currently 0)
 ./mvnw jacoco:report        # coverage report
 ```
 
@@ -127,9 +127,11 @@ collide with the public app:
 cd admin
 pnpm install
 pnpm dev --port 3001      # http://localhost:3001
-pnpm test                 # vitest
-pnpm test -- --coverage
 ```
+
+> **No test suite yet.** Unlike `frontend/`, the admin console has no Vitest
+> setup and no `test` script, so there is nothing to run here. Adding one is
+> outstanding work, noted in [docs/RESULTS.md](docs/RESULTS.md).
 
 ---
 
@@ -221,8 +223,10 @@ NEXT_PUBLIC_FLUTTER_WAVE_KEY=
 ### `admin/.env`
 
 ```dotenv
-# Base URL of the backend API
-BASE_URL=http://localhost:9093
+# Base URL of the backend API. Must use this exact name: next.config.mjs
+# reads NEXT_PUBLIC_BASE_URL, and the dev server refuses to start without it
+# ("Invalid rewrite found").
+NEXT_PUBLIC_BASE_URL=http://localhost:9093
 NEXT_PUBLIC_FLUTTER_WAVE_KEY=
 ```
 
@@ -248,8 +252,10 @@ docker run --name pesatone-db -e POSTGRES_USER=pesatone \
 ```bash
 (cd backend  && ./mvnw verify)
 (cd frontend && pnpm test -- --coverage)
-(cd admin    && pnpm test -- --coverage)
 ```
+
+`admin/` has no test suite yet. Measured coverage and the reasoning behind the
+gap are in [docs/RESULTS.md](docs/RESULTS.md).
 
 ---
 
@@ -267,4 +273,4 @@ All three services are deployed to **[DigitalOcean App Platform](https://www.dig
 2. Set the app's **source directory** to the service you're deploying (`backend`, `frontend`, or `admin`) — DigitalOcean detects the Dockerfile in that folder automatically and builds from it.
 3. Add the environment variables for that service from its `.env.example` (Settings → App-Level Environment Variables). For the backend, also attach a managed PostgreSQL database and map its connection details to `DATABASE_HOST` / `DATABASE_PORT` / `DATABASE_SCHEMA` / `DATABASE_USERNAME` / `DATABASE_PASSWORD`.
 4. Deploy. DigitalOcean builds the Docker image and exposes the service on its assigned `*.ondigitalocean.app` domain (port `8080` inside the container, per each Dockerfile).
-5. Point the frontend's `NEXT_PUBLIC_BASE_URL` and the admin console's `BASE_URL` at the deployed backend's URL, and redeploy those two so they talk to the live API instead of `localhost`.
+5. Point the frontend's and the admin console's `NEXT_PUBLIC_BASE_URL` at the deployed backend's URL, and redeploy those two so they talk to the live API instead of `localhost`.
