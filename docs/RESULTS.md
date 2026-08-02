@@ -1,26 +1,28 @@
 # Results and Analysis
 
-Evaluation of **Pesatone**, a platform for direct audience support of Rwandan content
-creators over mobile-money rails. This document reports what was measured, and analyses
-what the measurements do and do not establish.
+This document evaluates **Pesatone**, a platform that enables audiences to support
+Rwandan content creators through familiar payment methods. It distinguishes technical
+verification from qualitative feedback and states the limits of the available evidence.
 
 Full write-up: see the capstone report. Walkthrough: [demo video](Mission%20Capstone%20Final%20Demo.mp4).
 
 ---
 
-## 1. How the evaluation was run
+## 1. Evidence used
 
-Exploratory task-based evaluation with structured user feedback, conducted in Kigali
-and several other Rwandan towns. Every participant completed a hands-on prototype
-walkthrough before providing ratings and open feedback.
+No formal interviews or controlled participant study were conducted. The project
+therefore makes no claims based on participant counts, survey ratings, completion
+percentages, or population prevalence. Feedback received from actual users during
+development is retained as qualitative product feedback only; it is not presented as a
+representative research sample.
 
-| Instrument | Participants | Analysis |
-|---|---|---|
-| Creator workflow and structured feedback | 8 Rwandan content creators | Descriptive grouping of feedback and ratings |
-| Supporter workflow and structured feedback | 10 supporters (fans) | Descriptive statistics |
-| Acceptance testing, 4 core tasks | all 18 participants | Task completion, unassisted |
+The assessment uses three evidence sources:
 
-Tasks: register and log in, discover a creator, send a gift, view earnings.
+| Evidence source | What it establishes |
+|---|---|
+| Automated tests, type checks and production builds | Whether tested software paths and localization catalogs behave as specified |
+| Manual workflow verification and the recorded demonstration | Whether the implemented prototype supports its core end-to-end workflows |
+| Qualitative feedback from actual users | Which product concerns and improvements users raised, without quantifying frequency or prevalence |
 
 ---
 
@@ -28,123 +30,93 @@ Tasks: register and log in, discover a creator, send a gift, view earnings.
 
 | FR | Expected behaviour | Result | Evidence |
 |---|---|---|---|
-| FR-01 | Register / log in with email and password | Pass | Unit tests + acceptance testing |
-| FR-02 | Search and discover creators by name or category | Pass | Manually verified |
-| FR-03 | Send digital gifts via PoketMoney (MTN / Airtel) | Pass | Acceptance testing (10/10 supporters) |
-| FR-04 | Creator dashboard: earnings, gift history, analytics | Pass | Manually verified |
-| FR-05 | Gift transactions recorded and stored securely | Pass | Manually verified |
-| FR-06 | Creator's personal contact details never publicly exposed | Pass | Manually verified |
-| FR-07 | Creators request withdrawals of earnings | Pass | Unit tests (9) + acceptance testing |
-| FR-08 | Email notification on gift received | Pass | Unit test |
-| FR-09 | Admin manages user accounts and content | Pass | Manually verified |
-| FR-10 | English, Kinyarwanda and French frontend | Pass | Catalog tests, type check, production build and browser verification; implemented after user-feedback sessions |
+| FR-01 | Register and log in with email and password | Pass | Unit tests and manual verification |
+| FR-02 | Search and discover creators | Pass | Manual workflow verification |
+| FR-03 | Send digital gifts through supported mobile-money rails | Pass | Manual workflow verification and recorded demonstration |
+| FR-04 | View earnings, gift history and analytics | Pass | Manual workflow verification and recorded demonstration |
+| FR-05 | Record gift transactions | Pass | Manual verification of the implemented transaction flow |
+| FR-06 | Avoid exposing a creator's personal contact details publicly | Pass | Manual interface verification |
+| FR-07 | Request withdrawal of creator earnings | Pass | Unit tests and manual workflow verification |
+| FR-08 | Send an email notification when a gift is received | Pass | Unit test; SMS remains outside the verified implementation |
+| FR-09 | Manage user accounts and content through the admin interface | Pass | Manual workflow verification |
+| FR-10 | Provide English, Kinyarwanda and French interfaces | Pass | Catalog-parity tests, type check, production build and browser verification |
 
 ---
 
-## 3. Measured results
+## 3. User feedback and product response
 
-### 3.1 Ease of use and task completion
+Actual user feedback helped refine the product direction. Users highlighted the value
+of familiar local payment methods, creator privacy, clear earnings information and an
+accessible interface. These observations support the relevance of the implemented
+features, but they do not establish how common each concern is among all Rwandan
+creators or supporters.
 
-| Metric | Result |
-|---|---|
-| Supporters rating finding a creator and sending a gift as easy or very easy | 10/10 (100%) |
-| Supporters giving the maximum rating (5, very easy) | 8/10 (80%) |
-| Average ease-of-use rating (1 to 5) | **4.8 / 5** |
-| Creators reporting profile setup was easy or intuitive | 8/8 (100%) |
-| Creators flagging withdrawal as needing fewer steps | 2/8 (25%) |
+The current frontend responds to this feedback with creator aliases and public profiles,
+earnings and transaction views, and localization in English, Kinyarwanda and French.
+Kinyarwanda and French were added across public, authentication, gifting, dashboard,
+settings and legal pages. Automated catalog checks confirm structural completeness;
+fluent-speaker review remains necessary for sensitive financial and legal terminology.
 
-### 3.2 Trust and security perceptions
-
-| Metric | Result |
-|---|---|
-| Creators concerned about sharing their phone number or payment details | 5/8 (62.5%) |
-| Creators reporting an actual fraud, scam or harassment incident | 2/8 (25%) |
-| Supporters' average rating of how much security concerns affect their willingness | 4.0 / 5 |
-| Creators naming a trusted local mobile-money partnership as decisive | 4/8 (50%) |
-
-### 3.3 Feature fit and most-requested feature
-
-| Metric | Result |
-|---|---|
-| Creators requesting QR-code based gifting | **8/8 (100%)** |
-| Supporters naming QR code / instant confirmation as their top feature | 4/10 (40%) |
-| Creators requesting an earnings or analytics dashboard | 4/8 (50%) |
-
-### 3.4 Engagement and willingness to support
-
-| Metric | Result |
-|---|---|
-| Creators previously blocked from a monetization programme | **4/8 (50%)** |
-| Supporters who had previously supported a creator financially | 5/10 (50%) |
-| Supporters preferring mobile money (MTN / Airtel) | 8/10 (80%) |
-| Creators preferring mobile money to receive funds | 5/8 (62.5%) |
-| Average supporter willingness to support a creator (1 to 5) | 4.2 / 5 |
-| Supporters who would use the platform again | **9/10 (90%)** yes, 1/10 maybe, 0 no |
+The project is focused on a Rwanda-based gifting experience that accepts locally used
+payment methods, protects creator identity, presents earnings clearly and supports
+local-language access. The evaluation is limited to evidence directly related to those
+goals.
 
 ---
 
-## 4. Analysis
+## 4. Assessment against project objectives
 
-Section 3 above reported what was observed during evaluation. This section analyses those observations. It assesses each result against the objectives and requirements stated in the project proposal, explains why the observed outcomes took the particular form they did, identifies the targets the project failed to meet and the reasons for those shortfalls, and relates the findings to the declared project scope.
-
-### 4.1 Achievement against stated objectives and requirements
-
-The project defined four specific objectives and eight non-functional requirements. The table below assesses each against the evidence actually gathered. The assessment distinguishes targets that were met, targets that were measured and missed, and targets that were never measured and therefore cannot be claimed in either direction.
-
-| Stated target | Outcome | Basis for the assessment |
+| Objective or target | Outcome | Basis |
 |---|---|---|
-| **Objective 1** establish why existing support channels fail in Rwanda | Achieved | 4/8 creators previously excluded; mobile money preferred by 80% of supporters and 62.5% of creators; privacy concerns raised unprompted |
-| **Objective 2** build a platform addressing those failures | Achieved | FR-01 to FR-10 verified; identity protection, discovery, verification, earnings records and frontend localization implemented |
-| **Objective 3** evaluate whether the failures were resolved | Partially achieved | Task completion, ease of use and reuse intent measured; the specified usability instrument was not administered |
-| **Objective 4** internationalize the public frontend | Achieved in software | English, Kinyarwanda and French catalogs, persistence, validation, metadata and locale-aware formatting implemented; fluent review and localized user evaluation remain |
-| NFR-01 TLS 1.3, bcrypt hashing | Met | Implemented and exercised in validation testing |
-| NFR-02 pages load within 3 s | **Not validated** | No load-time instrumentation was ever applied |
-| NFR-03 SUS score of 70+ | **Not met** | SUS never administered; a single general item collected instead |
-| NFR-04 10,000 concurrent users | **Not validated** | No load or stress testing performed |
-| NFR-05 99% uptime | **Not validated** | No monitoring over a defined observation period |
-| NFR-06 RESTful API documented with Swagger | Met | Swagger UI exposed and used in integration testing |
-| NFR-07 localization | Partially validated | Three complete frontend catalogs and automated parity checks implemented; fluent linguistic review remains |
-| NFR-08 accessibility | Partially validated | Responsive layouts, labels and meaningful translated interface text implemented; no dedicated accessibility evaluation |
-| Backend test coverage of 80% | **Not met** | ~24% line coverage measured by JaCoCo |
-| FR-08 notification on gift received | Partially met | Email verified; SMS gateway modelled but never connected |
+| Define the local creator-gifting problem | Supported, with limitations | Product requirements, secondary research and qualitative user feedback support the direction; no prevalence claim is made |
+| Build a Rwanda-focused creator-gifting platform | Achieved as a prototype | Core creator, supporter, payment, privacy, analytics and admin workflows are implemented |
+| Verify that the core workflows function | Achieved for the tested prototype | Automated tests, manual workflow checks and the recorded demonstration |
+| Internationalize the public frontend | Achieved in software | English, Kinyarwanda and French catalogs, persistence and automated parity validation are implemented |
+| TLS and password hashing controls | Implemented | Security configuration and validation checks |
+| Pages load within three seconds | Not validated | No formal performance measurement was conducted |
+| System Usability Scale score of 70 or higher | Not validated | No formal SUS study was conducted |
+| Support 10,000 concurrent users | Not validated | No load or stress test was conducted |
+| Maintain 99% uptime | Not validated | No production monitoring period was conducted |
+| REST API documented with Swagger | Met | Swagger interface is available in the backend |
+| Localization | Partially validated | Catalog completeness is automated; fluent linguistic review remains |
+| Accessibility | Partially validated | Responsive layouts and labels are implemented; no dedicated accessibility audit was conducted |
+| Backend test coverage of 80% | Not met | Approximately 24% line coverage was measured with JaCoCo |
 
-The distinction between a target that was not met and one that was not validated is material and is drawn deliberately. Backend test coverage was measured and found to be approximately 24 percent against a stated target of 80 percent: this is a known quantity with a known remedy. By contrast, the concurrent-user ceiling, page-load time and uptime targets were never measured at all. The system may or may not satisfy them, and this project provides no basis for asserting either. Three of the six non-functional requirements fall into this second category, which constitutes the most significant methodological weakness in the evaluation and is discussed further in Section 4.3 below.
-
-### 4.2 Why the observed results took the form they did
-
-The unassisted task-completion rate of 100 percent across all eighteen participants is best explained by the deliberate reuse of interaction patterns the participants already knew. The gifting flow terminates in the standard mobile-money authorisation prompt, in which the supporter confirms the transaction by entering an existing PIN on their own handset. No participant was required to learn an unfamiliar payment gesture, and none was asked to enter card details, which is the step at which card-dependent platforms typically lose Rwandan users. The result therefore reflects the choice of payment rail at least as much as the interface design, and attributing it solely to the latter would overstate what the evaluation shows.
-
-The mean ease-of-use rating of 4.8 out of 5 warrants similar caution. It was collected immediately after a walkthrough conducted in the researcher's presence, a setting known to produce more favourable responses than independent use, and it was captured through a single general satisfaction item rather than a validated instrument. The rating is therefore evidence that participants encountered no obstacle during a supervised first use. It is not evidence of sustained usability over time, and it is not equivalent to the System Usability Scale score specified in NFR-03.
-
-The most analytically significant result is that QR-code distribution was requested independently by all eight creators and by four of the ten supporters, neither group having been prompted toward it. This was not anticipated during design. Interpreted against the five failures set out in the problem statement, the request is a discovery request: creators already distribute handles and links in video descriptions and in physical settings, and a scannable code is the mechanism by which an offline audience reaches an online profile. The finding therefore corroborates discovery as the failure participants felt most acutely, and it does so through an unprompted feature request rather than through a direct question, which makes it less susceptible to the leading-question effects that affect the rating scales.
-
-The finding that four of eight creators had previously been excluded from a monetization programme is the strongest available confirmation that the problem addressed was real rather than assumed. Its analytical weight is nevertheless limited by the sampling method. Participants were selected purposively for direct relevance to creator monetization, so a high incidence of prior exclusion is partly an artefact of who was recruited. The finding establishes that the problem exists and is not rare within the population of interest. It does not establish its prevalence among Rwandan creators generally, and the limitations below should be read with that constraint in mind.
-
-### 4.3 Targets not met, and why
-
-Four distinct kinds of shortfall are present, and they have different causes. The first is a target that was measured and missed: backend test coverage reached approximately 24 percent against a stated 80 percent. The tests that exist concentrate on the highest-risk logic, namely wallet operations, token handling and utility functions, while controller and integration paths remain largely uncovered. A contributing factor was that the JaCoCo enforcement threshold in the build configuration was left at zero, so the build never failed on a coverage shortfall and the gap did not surface during routine development.
-
-The second kind is a requirement that was specified but never instrumented. NFR-02, NFR-04 and NFR-05 state quantitative thresholds for page-load time, concurrent users and uptime, none of which was measured. Establishing them would have required a load-testing harness and a monitoring period, neither of which was set up. The third kind is a requirement that was specified but silently substituted: NFR-03 names the System Usability Scale, a validated ten-item instrument, and the evaluation collected a single general ease-of-use item instead. This was a methodological error rather than a resource constraint, since administering the instrument would have cost little beyond what was already being collected. The fourth is partial delivery: FR-08 was implemented for email but the SMS gateway was modelled and never connected.
-
-In each case the shortfall arose from the same prioritisation. Available time was allocated to building and evaluating functionality rather than to instrumenting and verifying non-functional properties. For a prototype whose purpose was to establish whether the approach works at all, that was a defensible allocation. It nevertheless means that the non-functional claims are, with the exception of NFR-01 and NFR-06, design intentions rather than verified characteristics of the delivered system, and they should be read as such.
-
-### 4.4 Relationship of the results to the project scope
-
-The project was scoped to the design, development and evaluation of a prototype, conducted in Kigali and several other Rwandan towns with a purposive sample of eight creators and ten supporters, comprising four core modules, and explicitly excluding full commercial deployment, nationwide implementation and integration with all global payment systems. The results are consistent with that scope and support conclusions only within it. They demonstrate that the five failures identified in the problem statement can be addressed by the implemented design, and that users drawn from the target population could complete the core tasks and expressed willingness to return.
-
-They do not demonstrate that the platform would retain users over time, that creators would accumulate meaningful income through it, or that it would behave correctly under production load, because none of those questions falls within the scope that was set. The most consequential boundary is between demonstrating that a design resolves a set of identified failures, which this project did, and demonstrating that the resulting product is viable in sustained use, which it did not attempt and which remains the substance of any future work.
+The distinction between “not met” and “not validated” is important. Backend coverage
+was measured and fell below its target. Performance, usability, concurrency and uptime
+targets were not formally measured, so the project cannot honestly claim that they
+passed or failed.
 
 ---
 
-## 5. Reproducing the measurements
+## 5. Limitations and future evaluation
+
+The evidence demonstrates that the prototype and its tested workflows function; it does
+not demonstrate long-term adoption, nationwide demand, production-scale reliability or
+the statistical preferences of Rwandan creators and supporters. Qualitative feedback is
+useful for product improvement but cannot replace a documented research method.
+
+A future evaluation should recruit consenting creators and supporters through a clearly
+documented process, record whether sessions are remote or in person, use a validated
+usability instrument such as SUS, and report anonymized results without overstating what
+the sample establishes. Performance, accessibility, security and load testing should
+also be run with reproducible tools and recorded configurations.
+
+---
+
+## 6. Reproducing the technical checks
 
 ```bash
-cd backend && ./mvnw test          # unit tests
-cd backend && ./mvnw jacoco:report # coverage -> target/site/jacoco/index.html
-cd frontend && pnpm test -- --coverage
+cd backend && ./mvnw test
+cd backend && ./mvnw jacoco:report
+cd frontend && pnpm test
+cd frontend && pnpm exec tsc --noEmit
+cd frontend && pnpm lint
+cd frontend && pnpm build
 ```
 
-The localization implementation can be reproduced with the frontend test, type-check,
-lint and build commands documented in the root README. The non-functional targets
-marked *not validated* above cannot be reproduced because no instrumentation exists for
-them; adding it remains future work.
+The JaCoCo report is generated at `backend/target/site/jacoco/index.html`. The frontend
+catalog test verifies that English, Kinyarwanda and French contain matching message keys
+and interpolation variables. Targets marked *not validated* cannot be reproduced from
+the current project because the required formal evaluation or instrumentation was not
+performed.

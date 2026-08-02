@@ -30,18 +30,16 @@ install Git LFS first (`git lfs install`), then clone as usual, or run
 
 **📊 [Results and Analysis](docs/RESULTS.md)**
 
-Evaluation with 8 Rwandan content creators and 10 supporters: what was measured, and
-an analysis of what those measurements do and do not establish. Includes the
-functional-requirement verification table, an assessment of every stated objective and
-non-functional requirement against the evidence, and a section on which targets were
-missed and why.
+The results document separates reproducible technical verification from qualitative
+feedback received from actual users during development. No formal interviews or
+participant study were conducted, so the project does not claim participant counts,
+survey ratings, task-completion percentages, or population-level findings.
 
 | | |
 |---|---|
-| Average ease-of-use rating | 4.8 / 5 |
-| Supporters who would use it again | 9/10 (90%) |
-| Unassisted task completion | 18/18 (100%) |
-| Creators previously blocked from a monetization programme | 4/8 (50%) |
+| Core creator and supporter workflows | Functionally verified |
+| English, Kinyarwanda and French catalogs | Automated parity tests |
+| User feedback | Reported qualitatively, without invented statistics |
 | Backend line coverage against an 80% target | ~24% |
 
 ---
