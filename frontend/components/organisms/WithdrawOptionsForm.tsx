@@ -20,6 +20,7 @@ import {
   UpdateWithdrawAccount,
 } from "@/services/withdrawal-accounts";
 import toast from "react-hot-toast";
+import { useTranslations } from "next-intl";
 
 interface IWithdrawOptions {
   trigger: React.ReactNode;
@@ -31,6 +32,8 @@ export default function WithdrawOptionsForm({
   type,
   initialData,
 }: IWithdrawOptions) {
+  const t = useTranslations("components");
+  const common = useTranslations("common");
   const [openModal, setOpenModal] = useState(false);
   const queryClient = useQueryClient();
   const { data: banks, isPending: isLoadingBanks } = useGetAllBanks({
@@ -41,14 +44,14 @@ export default function WithdrawOptionsForm({
     useMutation({
       mutationFn: CreateWithdrawAccount,
       onSuccess: () => {
-        toast.success("Withdrawal account added successfully", {
+        toast.success(t("withdrawAccountAdded"), {
           id: "withdrawal-account",
         });
         handleSuccessClose();
       },
       onError: (error) => {
         toast.error(
-          error.message ?? "Unable to add withdrawal account, try again!",
+          error.message ?? t("withdrawAccountFailed"),
           {
             id: "withdrawal-account",
           }
@@ -60,14 +63,14 @@ export default function WithdrawOptionsForm({
     useMutation({
       mutationFn: UpdateWithdrawAccount,
       onSuccess: () => {
-        toast.success("Withdrawal account updated successfully", {
+        toast.success(t("withdrawAccountUpdated"), {
           id: "withdrawal-account",
         });
         handleSuccessClose();
       },
       onError: (error) => {
         toast.error(
-          error.message ?? "Unable to update withdrawal account, try again!",
+          error.message ?? t("withdrawAccountFailed"),
           {
             id: "withdrawal-account",
           }
@@ -130,16 +133,16 @@ export default function WithdrawOptionsForm({
       <DialogTrigger>{trigger}</DialogTrigger>
       <Dialog className="p-5">
         <h1 className="font-medium text-gray-600 text-lg">
-          {initialData?.accountNumber ? "Edit" : "Add"}{" "}
-          {type === EChannel.BANK_ACCOUNT ? "Bank Account" : "Mobile Money"}{" "}
-          Information
+          {initialData?.accountNumber ? common("edit") : common("add")}{" "}
+          {type === EChannel.BANK_ACCOUNT ? t("bankAccount") : t("mobileMoney")}{" "}
+          {t("information")}
         </h1>
 
         <form onSubmit={handleSubmit(onSubmit)}>
           {type === EChannel.MOBILE_MONEY ? (
             <Input
               error={errors.accountNumber?.message}
-              label="Mobile Number"
+              label={t("mobileNumber")}
               type="text"
               onChange={(e) =>
                 setValue("accountNumber", e.target.value, {
@@ -154,7 +157,7 @@ export default function WithdrawOptionsForm({
               <Select
                 error={errors.bankCode?.message}
                 isLoading={isLoadingBanks}
-                label="Bank Name"
+                label={t("bankName")}
                 onChange={(e) =>
                   setValue("bankCode", e.target.value, {
                     shouldDirty: true,
@@ -162,7 +165,7 @@ export default function WithdrawOptionsForm({
                   })
                 }
                 value={watch("bankCode")}
-                placeholder=" Select Bank"
+                placeholder={t("selectBank")}
               >
                 {banks?.data.map((bank) => (
                   <option key={bank.id} value={bank.code}>
@@ -172,7 +175,7 @@ export default function WithdrawOptionsForm({
               </Select>
               <Input
                 error={errors.accountNumber?.message}
-                label="Account Number"
+                label={t("accountNumber")}
                 value={watch("accountNumber")}
                 type="text"
                 onChange={(e) =>
@@ -184,7 +187,7 @@ export default function WithdrawOptionsForm({
               />
               <Input
                 error={errors.accountName?.message}
-                label="Account Name"
+                label={t("accountName")}
                 value={watch("accountName")}
                 type="text"
                 onChange={(e) =>
@@ -203,7 +206,7 @@ export default function WithdrawOptionsForm({
               className="w-fit"
               disabled={!isDirty}
             >
-              Save
+              {common("save")}
             </Button>
             <Button
               disabled={isUpdatingAccount || isAddingAccount}
@@ -212,7 +215,7 @@ export default function WithdrawOptionsForm({
               variant="danger"
               className="w-fit"
             >
-              Cancel
+              {t("cancel")}
             </Button>
           </div>
         </form>

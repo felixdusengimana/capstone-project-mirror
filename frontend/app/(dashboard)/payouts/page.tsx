@@ -7,12 +7,16 @@ import { ECurrency, EStatus } from "@/types";
 import { IPayoutsFilters } from "@/types/payouts";
 import dynamic from "next/dynamic";
 import { useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 const WithdrawForm = dynamic(
   () => import("@/components/molecules/WithdrawForm"),
   { ssr: false }
 );
 
 export default function PayoutsPage() {
+  const t = useTranslations("dashboard");
+  const common = useTranslations("common");
+  const locale = useLocale();
   // const { data: creator } = useGetMe();
 
   const [filters, setFilters] = useState<Partial<IPayoutsFilters>>({
@@ -31,12 +35,12 @@ export default function PayoutsPage() {
   return (
     <>
       <div className="min-h-full w-full dashboard-padding text-black pb-10">
-        <h1 className="text-4xl font-sans font-bold text-[#1A1A1A]">Payouts</h1>
+        <h1 className="text-4xl font-sans font-bold text-[#1A1A1A]">{t("payouts")}</h1>
 
         <div className="w-full flex justify-between flex-wrap gap-10 items-center bg-white mt-8 px-6 py-7 rounded-lg">
           <div>
             <p className="text-gray-400 text-sm font-medium">
-              Outstanding balance
+              {t("outstandingBalance")}
             </p>
             {walletLoading ? (
               <div className="animate-pulse h-8 w-24 bg-gray-200 rounded-lg mt-4"></div>
@@ -69,25 +73,25 @@ export default function PayoutsPage() {
 
         <div className="bg-white px-[67px] py-[55px] w-full rounded-lg mt-8">
           <p className="font-medium text-base text-gray-700 mb-4">
-            Payouts History
+            {t("payoutHistory")}
           </p>
           <div className="grid grid-cols-3 border-b border-gray-100 py-[11px]">
-            <p className="text-gray-400 text-sm font-normal pl-2">Date</p>
-            <p className="text-gray-400 text-sm font-normal pl-2">Amount</p>
-            <p className="text-gray-400 text-sm font-normal pl-2">Status</p>
+            <p className="text-gray-400 text-sm font-normal pl-2">{common("date")}</p>
+            <p className="text-gray-400 text-sm font-normal pl-2">{common("amount")}</p>
+            <p className="text-gray-400 text-sm font-normal pl-2">{common("status")}</p>
           </div>
           {isLoadingPayouts ? (
-            <div>Loading...</div>
+            <div>{common("loading")}</div>
           ) : payouts?.data.results && payouts?.data.results.length <= 0 ? (
-            <div className="mt-2">No payouts data found</div>
+            <div className="mt-2">{t("noPayouts")}</div>
           ) : (
             <>
               {payouts?.data.results?.map((item, index) => (
                 <div className="grid grid-cols-3 py-[11px]" key={index}>
                   <p className="text-gray-600 font-normal text-sm pl-2">
-                    {new Date(item.createdAt).toLocaleDateString() +
+                    {new Date(item.createdAt).toLocaleDateString(locale) +
                       " " +
-                      new Date(item.createdAt).toLocaleTimeString()}
+                      new Date(item.createdAt).toLocaleTimeString(locale)}
                   </p>
                   <p className="text-gray-600 font-normal text-sm pl-2">
                     {item.amount.toLocaleString()} {item.currency}
@@ -101,7 +105,7 @@ export default function PayoutsPage() {
                     className="py-1 capitalize"
                     bordered
                   >
-                    {item.paymentStatus}
+                    {item.paymentStatus === EStatus.SUCCESSFUL ? common("success") : common("pending")}
                   </Pill>
                 </div>
               ))}

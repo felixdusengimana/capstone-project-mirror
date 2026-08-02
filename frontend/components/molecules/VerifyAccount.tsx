@@ -9,12 +9,14 @@ import Link from "next/link";
 import { UploadVerificationImage } from "@/services/users";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { useTranslations } from "next-intl";
 
 export default function VerifyAccount({
   trigger,
 }: {
   trigger?: React.ReactNode;
 }) {
+  const t = useTranslations("components");
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathName = usePathname();
@@ -38,14 +40,14 @@ export default function VerifyAccount({
       queryClient.invalidateQueries({
         queryKey: ["me"],
       });
-      toast.success("Verification picture uploaded successfully", {
+      toast.success(t("verificationUploaded"), {
         id: "updatingProfile",
       });
 
       router.push(`${pathName}?verify=done`);
     },
     onError: () => {
-      toast.error("Error updating Profile picture", {
+      toast.error(t("pictureFailed"), {
         id: "updatingProfile",
       });
     },
@@ -57,7 +59,7 @@ export default function VerifyAccount({
         <div className="w-full">
           {trigger ?? (
             <button className="text-sm bg-gray-900 text-white rounded-full font-normal py-[11px] w-[204px]">
-              Get verified
+              {t("getVerified")}
             </button>
           )}
         </div>
@@ -142,10 +144,9 @@ export default function VerifyAccount({
                 />
               </svg>
 
-              <h3 className="mt-8">Success !</h3>
+              <h3 className="mt-8">{t("verificationUploaded")}</h3>
               <p className="max-w-[307px] text-center mt-4">
-                Thank you for verifying your account, we’ll get back to you
-                shortly
+                {t("verificationThanks")}
               </p>
             </div>
 
@@ -156,7 +157,7 @@ export default function VerifyAccount({
                   setOpen(false);
                 }}
               >
-                Back home
+                {t("backHome")}
               </Button>
             </Link>
           </div>
@@ -165,7 +166,7 @@ export default function VerifyAccount({
             <div className="w-full py-6 pb-16 bg-[#fff] rounded-lg border-gray-200">
               <div className="px-8 pb-6 mb-6">
                 <h1 className="text-4xl font-sans font-bold text-[#1A1A1A]">
-                  Tips to help you
+                  {t("verificationTips")}
                 </h1>
               </div>
 
@@ -181,7 +182,7 @@ export default function VerifyAccount({
                       fontSize: "14px",
                     }}
                   >
-                    Position your face in the center of your screen
+                    {t("centerFace")}
                   </p>
                 </div>
 
@@ -196,7 +197,7 @@ export default function VerifyAccount({
                       fontSize: "14px",
                     }}
                   >
-                    Make sure you are in a good lighting environment
+                    {t("goodLighting")}
                   </p>
                 </div>
                 <div className="flex gap-4">
@@ -210,8 +211,7 @@ export default function VerifyAccount({
                       fontSize: "14px",
                     }}
                   >
-                    Avoid wearing masks, hat or any other thing that might cover
-                    your face
+                    {t("uncoveredFace")}
                   </p>
                 </div>
               </form>
@@ -222,7 +222,7 @@ export default function VerifyAccount({
                 router.push(pathName + "?verify=1");
               }}
             >
-              Verify account
+              {t("verifyAccount")}
             </Button>
           </>
         )}
@@ -236,7 +236,7 @@ export default function VerifyAccount({
               setOpen(false);
             }}
           >
-            Cancel
+            {t("cancel")}
           </Button>
         </Link>
       </Dialog>

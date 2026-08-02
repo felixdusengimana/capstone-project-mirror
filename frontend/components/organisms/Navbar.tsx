@@ -2,12 +2,15 @@
 import Button from "../atoms/Button";
 import Link from "next/link";
 import Logo from "../molecules/Logo";
+import { useTranslations } from "next-intl";
+import LanguageSwitcher from "../molecules/LanguageSwitcher";
 // import { useAuth } from "@/hooks/useAuth";
 // import { Fragment, useEffect, useState } from "react";
 // import Icon, { IconNames } from "../atoms/Icon";
 // import { useRouter } from "next/navigation";
 
 export default function Navbar() {
+  const t = useTranslations("navigation");
   // const isLoggedIn = false;
   // const [linkOpen, setLinkOpen] = useState(false);
   // const [isAnimating, setIsAnimating] = useState(false);
@@ -42,6 +45,7 @@ export default function Navbar() {
       <div className="page-padding w-full flex justify-between items-center">
         <Logo />
         <div className="flex items-center gap-3 md:gap-6">
+          <LanguageSwitcher className="hidden md:flex" />
           {/* Hamburger toggler — commented out for mobile, links shown directly instead */}
           {/* <Icon
             fill="#fff"
@@ -52,19 +56,19 @@ export default function Navbar() {
 
           {/* Mobile: plain text links */}
           <Link href={"/login"} className="md:hidden text-white font-normal text-base">
-            Login
+            {t("login")}
           </Link>
           <Link href={"/sign-up"} className="md:hidden text-white font-normal text-base">
-            Join
+            {t("join")}
           </Link>
 
           {/* Desktop: button styles */}
           <Link href={"/login"} className="hidden md:block">
-            <Button variant="secondary">Login</Button>
+            <Button variant="secondary">{t("login")}</Button>
           </Link>
           <Link href={"/sign-up"} className="hidden md:block">
             <Button variant="white" className="font-semibold">
-              Sign up free
+              {t("signUpFree")}
             </Button>
           </Link>
         </div>

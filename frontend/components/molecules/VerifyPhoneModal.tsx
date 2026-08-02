@@ -9,12 +9,15 @@ import { ICreateUser, step0 } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import Button from "../atoms/Button";
+import { useTranslations } from "next-intl";
 
 export default function VerifyPhoneModal({
   initialOpen,
 }: {
   initialOpen?: boolean;
 }) {
+  const t = useTranslations("components");
+  const onboarding = useTranslations("onboarding");
   const [open, setOpen] = React.useState(initialOpen ?? false);
   const {
     handleSubmit,
@@ -26,11 +29,11 @@ export default function VerifyPhoneModal({
 
   const { mutate: verifyOTP, isPending } = useMutation({
     onSuccess() {
-      toast.success("OTP verified successfully!", { id: "update-profile" });
+      toast.success(onboarding("otpVerified"), { id: "update-profile" });
       setOpen(false);
     },
     onError(error) {
-      toast.error(error.message ?? "OTP verification failed!", {
+      toast.error(error.message ?? onboarding("otpFailed"), {
         id: "update-profile",
       });
     },
@@ -52,7 +55,7 @@ export default function VerifyPhoneModal({
     <DialogRoot open={open} onOpenChange={setOpen}>
       <DialogTrigger className="w-fit">
         <span className="text-blue-500 underline text-sm">
-          Verify phone number
+          {t("verifyPhone")}
         </span>
       </DialogTrigger>
       <Dialog className="pt-4 min-w-[600px]">
@@ -60,7 +63,7 @@ export default function VerifyPhoneModal({
           onSubmit={handleSubmit(onSubmit)}
           className="p-4 text-black flex flex-col items-center"
         >
-          <h1 className="text-2xl font-semibold mb-4">Verify phone number</h1>
+          <h1 className="text-2xl font-semibold mb-4">{t("verifyPhone")}</h1>
 
           <div className="max-w-[500px]">
             <OTPInput
@@ -71,14 +74,14 @@ export default function VerifyPhoneModal({
           </div>
           <div className="flex gap-4 my-4">
             <Button type="submit" disabled={!isDirty} isLoading={isPending}>
-              Verify
+              {t("verify")}
             </Button>
             <Button
               variant="danger"
               type="button"
               onClick={() => setOpen(false)}
             >
-              Cancel
+              {t("cancel")}
             </Button>
           </div>
         </form>

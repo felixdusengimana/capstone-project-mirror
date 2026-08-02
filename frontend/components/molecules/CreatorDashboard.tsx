@@ -2,8 +2,10 @@
 
 import { useGetCreatorDashboard } from "@/services/creator";
 import CardIcon from "./CardIcon";
+import { useTranslations } from "next-intl";
 
 export default function CreatorDashboard() {
+  const t = useTranslations("dashboard");
   const { data: dashboard, isLoading: fetchingDashboard } =
     useGetCreatorDashboard({ enabled: true });
 
@@ -12,7 +14,7 @@ export default function CreatorDashboard() {
       {/* Money Earned */}
       <div className="w-full bg-white p-8 rounded-lg">
         <CardIcon icon="coins" className="bg-gray-50" />
-        <h3 className="font-medium text-sm text-gray-400 mt-6">Money Earned</h3>
+        <h3 className="font-medium text-sm text-gray-400 mt-6">{t("moneyEarned")}</h3>
         <h1 className="text-gray-800 font-medium text-xl md:text-4xl mt-4 flex flex-wrap items-center gap-2">
           {fetchingDashboard ? (
             <span className="animate-pulse bg-gray-200 h-6 w-6 block"></span>
@@ -34,7 +36,7 @@ export default function CreatorDashboard() {
       {/* Supporters */}
       <div className="w-full bg-white p-8 rounded-lg">
         <CardIcon icon="coins" className="bg-gray-50" />
-        <h1 className="font-medium text-sm text-gray-400 mt-6">Total Gifts</h1>
+        <h1 className="font-medium text-sm text-gray-400 mt-6">{t("totalGifts")}</h1>
         <div className="mt-4 text-gray-800 font-medium text-xl md:text-4xl">
           {fetchingDashboard ? (
             <span className="animate-pulse bg-gray-200 h-10 w-20 block"></span>
@@ -50,7 +52,7 @@ export default function CreatorDashboard() {
       <div className="w-full bg-white p-8 rounded-lg">
         <CardIcon icon="user-star" className="bg-gray-50" />
         <h3 className="font-medium text-sm text-gray-400 mt-6">
-          Single Biggest supporter
+          {t("largestGift")}
         </h3>
         <h1 className="text-gray-800 font-medium text-xl md:text-4xl mt-4 flex flex-wrap items-center gap-2">
           {fetchingDashboard ? (

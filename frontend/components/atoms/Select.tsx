@@ -1,5 +1,8 @@
+"use client";
 import { ComponentProps, ReactNode, useId } from "react";
 import Icon from "./Icon";
+import { useTranslations } from "next-intl";
+import { getValidationMessageKey } from "@/i18n/validation";
 
 export interface IOption {
   value: string;
@@ -15,6 +18,7 @@ interface SelectProps extends ComponentProps<"select"> {
 }
 
 export default function Select(props: SelectProps) {
+  const validation = useTranslations("validation");
   const {
     label,
     labelStyle,
@@ -28,6 +32,9 @@ export default function Select(props: SelectProps) {
     ...rest
   } = props;
   const id = useId();
+  const validationKey =
+    typeof error === "string" ? getValidationMessageKey(error) : undefined;
+  const localizedError = validationKey ? validation(validationKey) : error;
   const isDisabled = disabled || isLoading;
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -48,7 +55,7 @@ export default function Select(props: SelectProps) {
       )}
       <div
         className={`w-full flex items-center px-4 ${
-          error ? "border-red-400 bg-red-50" : "border-[#E5E9F0] bg-slate-50"
+          localizedError ? "border-red-400 bg-red-50" : "border-[#E5E9F0] bg-slate-50"
         } ${isDisabled ? "bg-slate-300" : ""} border rounded-xl`}
       >
         {left && <>{left}</>}
@@ -56,7 +63,7 @@ export default function Select(props: SelectProps) {
           disabled={isDisabled}
           {...rest}
           className={`appearance-none outline-none w-full py-[13px] text-black disabled:bg-slate-300  ${
-            error ? "border-red-400 bg-red-50" : "bg-slate-50 "
+            localizedError ? "border-red-400 bg-red-50" : "bg-slate-50 "
           }`}
           id={props.id ?? id}
           value={value}
@@ -75,11 +82,11 @@ export default function Select(props: SelectProps) {
           <Icon name="dropdown" />
         )}
       </div>
-      {Boolean(error) &&
-        (typeof error === "string" ? (
-          <p className="text-red-500 text-sm mt-1">{error}</p>
+      {Boolean(localizedError) &&
+        (typeof localizedError === "string" ? (
+          <p className="text-red-500 text-sm mt-1">{localizedError}</p>
         ) : (
-          error
+          localizedError
         ))}
     </div>
   );

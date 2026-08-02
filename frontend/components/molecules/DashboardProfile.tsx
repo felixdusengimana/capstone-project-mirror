@@ -9,8 +9,10 @@ import CardIcon from "./CardIcon";
 import dynamic from "next/dynamic";
 import { useGetMe } from "@/services/users";
 import { IconNames } from "../atoms/Icon";
+import { useTranslations } from "next-intl";
 
 export default function DashboardProfile() {
+  const t = useTranslations("dashboard");
   const { data: profile, isPending: isFetchingUser } = useGetMe();
 
   return (
@@ -29,9 +31,9 @@ export default function DashboardProfile() {
       </div>
       <div className="flex justify-between items-center">
         <div className="max-w-[476px]">
-          <h3 className="text-sm text-gray-400 uppercase">BIO</h3>
+          <h3 className="text-sm text-gray-400 uppercase">{t("bio")}</h3>
           <p className="text-[#475569] mt-0.5">
-            {profile?.data.bio ?? "No bio"}
+            {profile?.data.bio ?? t("noBio")}
           </p>
         </div>
         <div className="flex gap-3 items-center">

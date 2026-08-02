@@ -2,6 +2,7 @@
 import { useCallback, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import Button from "../atoms/Button";
+import { useTranslations } from "next-intl";
 
 interface ICustomWebcamProps {
   isUpdatingPic?: boolean;
@@ -12,6 +13,7 @@ export default function CustomWebcam({
   updateProfilePic,
   isUpdatingPic,
 }: ICustomWebcamProps) {
+  const t = useTranslations("components");
   const webcamRef = useRef(null);
   const [imgSrc, setImgSrc] = useState(null);
   const [file, setFile] = useState<File | null>(null);
@@ -73,7 +75,7 @@ export default function CustomWebcam({
             : capture
         }
       >
-        {imgSrc ? "Next" : "Take photo"}
+        {imgSrc ? t("photoNext") : t("takePhoto")}
       </Button>
     </>
   );

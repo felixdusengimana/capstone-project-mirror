@@ -6,6 +6,7 @@ import Dialog, { DialogRoot, DialogTrigger } from "../molecules/Dialog";
 import Avatar from "../atoms/Avatar";
 import Icon from "../atoms/Icon";
 import { error } from "console";
+import { useTranslations } from "next-intl";
 
 interface IImageCropProps {
   defaultImage: string;
@@ -21,6 +22,7 @@ const ImageCrop = ({
   error,
   avatarSize = "2xl",
 }: IImageCropProps) => {
+  const t = useTranslations("components");
   const [openModal, setOpenModal] = useState(false);
   const [preview, setPreview] = useState<string>("");
 
@@ -65,7 +67,7 @@ const ImageCrop = ({
               } flex items-center justify-center gap-1 px-4 py-3 w-full`}
             >
               <Icon name="camera" />
-              <p>Upload Profile</p>
+              <p>{t("uploadProfile")}</p>
             </div>
             {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
           </label>

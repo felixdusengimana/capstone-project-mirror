@@ -13,23 +13,26 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { useTranslations } from "next-intl";
 
 export default function LoginPage() {
+  const t = useTranslations("auth");
+  const common = useTranslations("common");
   const router = useRouter();
 
   const { mutate, isPending } = useMutation({
     onSuccess(data) {
-      toast.success("Logged in successful!", { id: "login" });
+      toast.success(t("loginSuccess"), { id: "login" });
       const token = data?.data?.token;
       const expiresIn = data.data?.expiresIn;
       if (!token || !expiresIn) {
-        return toast.error("Login failed!", { id: "login" });
+        return toast.error(t("loginFailed"), { id: "login" });
       }
       setCookie("token", token, expiresIn);
       router.push("/resolve");
     },
     onError(error) {
-      toast.error(`${error.message ?? "Login failed!"}`, {
+      toast.error(`${error.message ?? t("loginFailed")}`, {
         id: "login",
       });
     },
@@ -45,7 +48,7 @@ export default function LoginPage() {
   });
 
   const onSubmit = (data: IRegisterInputs) => {
-    toast.loading("Login...", { id: "login" });
+    toast.loading(t("loggingIn"), { id: "login" });
     mutate(data);
   };
 
@@ -55,14 +58,14 @@ export default function LoginPage() {
       className="flex flex-col text-gray-700 justify-between h-full p-8 lg:p-0"
     >
       <p className="text-right font-light text-lg text-gray-500">
-        Don&apos;t have an account,{" "}
+        {t("noAccount")}{" "}
         <Link href={"/sign-up"} className="font-medium underline">
-          Sign up
+          {t("signUp")}
         </Link>
       </p>
       <div className="max-w-[562px]">
         <h1 className="text-gray-700 text-4xl font-mono mb-10">
-          Login into your account{" "}
+          {t("loginTitle")}
         </h1>
         {/* <ThirdPartyLogin thirdParty="google" />
         <div className="my-6 flex gap-5 justify-center items-center">
@@ -71,7 +74,7 @@ export default function LoginPage() {
           <div className="bg-gray-400 h-[1px] w-[105.5px]" />
         </div> */}
         <Input
-          label="Email"
+          label={common("email")}
           className="mb-4"
           onChange={(e) =>
             setValue("email", e.target.value, { shouldValidate: true })
@@ -79,7 +82,7 @@ export default function LoginPage() {
           error={errors.email?.message}
         />
         <Input
-          label="Password"
+          label={common("password")}
           type="password"
           onChange={(e) =>
             setValue("password", e.target.value, { shouldValidate: true })
@@ -87,10 +90,10 @@ export default function LoginPage() {
           error={errors.password?.message}
         />
         <Link href={"/forgot-password"} className="text-right block">
-          Forgot password?
+          {t("forgotPassword")}
         </Link>
         <Button className="w-full mt-10" isLoading={isPending}>
-          {isPending ? "Login..." : "Login"}
+          {isPending ? t("loggingIn") : t("loginTitle")}
         </Button>
       </div>
       <div></div>

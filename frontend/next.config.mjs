@@ -1,4 +1,7 @@
+import createNextIntlPlugin from "next-intl/plugin";
+
 const API_URL = process.env.NEXT_PUBLIC_BASE_URL;
+const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -15,4 +18,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

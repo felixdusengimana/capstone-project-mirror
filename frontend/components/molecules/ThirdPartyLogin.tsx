@@ -1,5 +1,6 @@
 import { ComponentProps } from "react";
 import Icon from "../atoms/Icon";
+import { useTranslations } from "next-intl";
 
 interface ThirdPartyLoginProps extends ComponentProps<"div"> {
   thirdParty: "google" | "facebook";
@@ -8,6 +9,7 @@ export default function ThirdPartyLogin({
   thirdParty,
   ...rest
 }: ThirdPartyLoginProps) {
+  const t = useTranslations("components");
   return (
     <div
       {...rest}
@@ -15,7 +17,7 @@ export default function ThirdPartyLogin({
     >
       <Icon name={thirdParty} />
       <p className="text-gray-600 text-base leading-6">
-        Continue with {thirdParty === "google" ? "Google" : "Facebook"}
+        {thirdParty === "google" ? t("continueGoogle") : t("continueFacebook")}
       </p>
     </div>
   );

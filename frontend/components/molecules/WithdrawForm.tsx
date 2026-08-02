@@ -20,6 +20,7 @@ import { IWallet } from "@/types/wallet";
 import useIsNativeCurrency from "@/hooks/useIsNativeCurrency";
 import { useGetWithdrawAccounts } from "@/services/withdrawal-accounts";
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 
 export default function WithdrawForm({
   trigger,
@@ -32,6 +33,8 @@ export default function WithdrawForm({
   errorMessage?: string;
   walletLoading?: boolean;
 }) {
+  const t = useTranslations("components");
+  const locale = useLocale();
   const { data: me, isPending: loadingUser } = useGetMe();
   const [active, setActive] = useState<"form" | "otp" | "success">("form");
   const [open, setOpen] = useState(false);
@@ -50,12 +53,12 @@ export default function WithdrawForm({
   const error =
     !bankAccount?.accountNumber && !mobileMoneyAccount?.accountNumber ? (
       <div>
-        <p>Please add a withdrawal account to proceed</p>
+        <p>{t("addWithdrawalFirst")}</p>
         <Link
           href="/settings#withdrawal-options"
           className="text-blue-500 hover:underline"
         >
-          Add withdrawal account
+          {t("addWithdrawal")}
         </Link>
       </div>
     ) : (
@@ -81,27 +84,23 @@ export default function WithdrawForm({
       z.object({
         amount: z
           .number({
-            required_error: "Amount is required",
+            required_error: t("amountRequired"),
           })
           .min(
             currencyMinWithdraw[wallet?.currency],
-            `Amount must be greater than ${
-              currencyMinWithdraw[wallet?.currency]
-            }${wallet?.currency}`
+            t("amountMinimum", {amount: currencyMinWithdraw[wallet?.currency], currency: wallet?.currency})
           )
           .max(
             wallet?.balance ?? 0,
-            `Amount must be less than ${wallet?.balance.toLocaleString()} ${
-              wallet?.currency
-            }`
+            t("amountMaximum", {amount: wallet?.balance.toLocaleString(locale), currency: wallet?.currency})
           ),
         paymentChannel: z.nativeEnum(EChannel, {
-          required_error: "Payment channel is required",
-          invalid_type_error: "Please select payment channel",
+          required_error: t("channelRequired"),
+          invalid_type_error: t("channelRequired"),
         }),
         currency: z.nativeEnum(ECurrency, {
-          required_error: "Currency is required",
-          invalid_type_error: "Please select Currency",
+          required_error: t("currencyRequired"),
+          invalid_type_error: t("currencyRequired"),
         }),
       })
     ),
@@ -121,9 +120,7 @@ export default function WithdrawForm({
   const { mutate, isPending } = useMutation({
     mutationFn: InitiatePayouts,
     onSuccess: () => {
-      toast.success(
-        "Your payout has been initiated. Your money would be in your account soon.",
-        {
+      toast.success(t("payoutStarted"), {
           id: "payout",
         }
       );
@@ -164,7 +161,7 @@ export default function WithdrawForm({
           {trigger ?? (
             <Button className="flex gap-0.5 items-center">
               <Icon name="cash-out" />
-              <p className="font-medium text-sm text-white">Withdraw</p>
+              <p className="font-medium text-sm text-white">{t("withdraw")}</p>
             </Button>
           )}
         </div>
@@ -176,7 +173,7 @@ export default function WithdrawForm({
               {error}
             </div>
             <Button className="w-full mt-4" onClick={() => setOpen(false)}>
-              Close
+              {t("close")}
             </Button>
           </>
         ) : active === "form" ? (
@@ -184,7 +181,7 @@ export default function WithdrawForm({
             <div className="w-full py-6 pb-16 bg-white rounded-lg border-gray-200">
               <div className="px-8 border-b border-gray-100 pb-6 mb-6">
                 <p className="text-gray-500 text-base font-light">
-                  Available to withdraw
+                  {t("availableToWithdraw")}
                 </p>
                 {walletLoading ? (
                   <div className="animate-pulse h-8 w-24 bg-gray-200 rounded-lg mt-4"></div>
@@ -193,7 +190,7 @@ export default function WithdrawForm({
                     <span className="font-normal text-base text-gray-400">
                       {wallet?.currency}
                     </span>{" "}
-                    {wallet?.balance.toLocaleString()}
+                    {wallet?.balance.toLocaleString(locale)}
                   </h3>
                 )}
               </div>
@@ -203,7 +200,7 @@ export default function WithdrawForm({
                 className="px-8 flex flex-col gap-4"
               >
                 <Input
-                  label="Enter amount"
+                  label={t("enterAmount")}
                   onChange={(e) =>
                     setValue(
                       "amount",
@@ -225,14 +222,14 @@ export default function WithdrawForm({
 
                 <Select
                   value={watch("paymentChannel")}
-                  label="Payment mode"
+                  label={t("paymentMode")}
                   error={errors.paymentChannel?.message}
                   onChange={(e) =>
                     setValue("paymentChannel", e.target.value as EChannel, {
                       shouldValidate: true,
                     })
                   }
-                  placeholder="Select Payment Channel"
+                  placeholder={t("selectChannel")}
                 >
                   {options.map((d) => (
                     <option key={d} value={d}>
@@ -246,7 +243,7 @@ export default function WithdrawForm({
                     {watch("paymentChannel") === EChannel.MOBILE_MONEY &&
                     mobileMoneyAccount ? (
                       <Input
-                        label="Mobile Money Number"
+                        label={t("mobileMoneyNumber")}
                         disabled
                         value={mobileMoneyAccount.accountNumber}
                       />
@@ -255,7 +252,7 @@ export default function WithdrawForm({
                     {watch("paymentChannel") === EChannel.BANK_ACCOUNT &&
                     bankAccount ? (
                       <Input
-                        label="Bank Account Number"
+                        label={t("bankAccountNumber")}
                         disabled
                         value={
                           bankAccount.accountNumber +
@@ -278,9 +275,9 @@ export default function WithdrawForm({
                     className="w-full mt-8"
                     isLoading={isSendingOTP}
                   >
-                    Withdraw{" "}
+                    {t("withdraw")}{" "}
                     {Boolean(watch("amount"))
-                      ? Number(watch("amount"))?.toLocaleString()
+                      ? Number(watch("amount"))?.toLocaleString(locale)
                       : " - "}
                     RWF
                   </Button>
@@ -293,7 +290,7 @@ export default function WithdrawForm({
                     onClick={() => setOpen(false)}
                     disabled={isSendingOTP}
                   >
-                    Cancel
+                    {t("cancel")}
                   </Button>
                 </div>
               </form>
@@ -302,16 +299,13 @@ export default function WithdrawForm({
         ) : active === "otp" ? (
           <div className="max-w-[591px] flex items-center flex-col gap-10">
             <p className="text-black">
-              Enter OTP code sent to{" "}
-              <span className="text-gray-700">
-                {convertEmail(me?.data?.email ?? "")}
-              </span>
+              {t("enterOtp", {email: convertEmail(me?.data?.email ?? "")})}
             </p>
             <div className="max-w-[378]">
               <OTPInput
                 onChange={(value) => {
                   if (value.length === 6) {
-                    toast.loading("Initiating payout", { id: "payout" });
+                    toast.loading(t("initiatingPayout"), { id: "payout" });
                     mutate({ ...watch(), otp: value });
                   }
                 }}
@@ -325,7 +319,7 @@ export default function WithdrawForm({
                 disabled={Object.keys(errors).length > 0 || isLoading}
                 className="w-full mt-8"
               >
-                Verify OTP
+                {t("verifyOtp")}
               </Button>
               <Button
                 disabled={isPending}
@@ -336,7 +330,7 @@ export default function WithdrawForm({
                 type="button"
                 onClick={() => setOpen(false)}
               >
-                Cancel
+                {t("cancel")}
               </Button>
             </div>
           </div>
@@ -356,7 +350,7 @@ export default function WithdrawForm({
                 height="26"
                 rx="13"
                 fill="#10B981"
-                fill-opacity="0.29"
+                fillOpacity="0.29"
               />
               <circle cx="35" cy="91" r="11" fill="#AFE2D4" />
             </svg>
@@ -376,7 +370,7 @@ export default function WithdrawForm({
                 height="26"
                 rx="13"
                 fill="#10B981"
-                fill-opacity="0.29"
+                fillOpacity="0.29"
               />
               <circle cx="11" cy="11" r="11" fill="#B3AFE2" />
             </svg>
@@ -395,16 +389,16 @@ export default function WithdrawForm({
               />
             </svg>
             <p className="text-gray-800 font-light text-2xl">
-              Withdraw success !
+              {t("withdrawSuccess")}
             </p>
             <p className="font-medium text-4xl text-gray-800 flex items-start justify-start">
               <span className="text-base font-medium text-gray-400">
                 {watch("currency")}
               </span>
-              {watch("amount").toLocaleString()}
+              {watch("amount").toLocaleString(locale)}
             </p>
 
-            <p className="text-gray-800">Send to {me?.data?.name}</p>
+            <p className="text-gray-800">{t("sentTo", {name: me?.data?.name ?? ""})}</p>
 
             <div className="w-full flex flex-col gap-4">
               <Button
@@ -412,7 +406,7 @@ export default function WithdrawForm({
                 onClick={() => setOpen(false)}
                 className="w-full mt-8"
               >
-                Back Home
+                {t("backHome")}
               </Button>
               <Button
                 disabled={isPending}
@@ -423,7 +417,7 @@ export default function WithdrawForm({
                 type="button"
                 onClick={() => setOpen(false)}
               >
-                Cancel
+                {t("cancel")}
               </Button>
             </div>
           </div>

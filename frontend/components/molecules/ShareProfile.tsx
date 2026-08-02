@@ -3,6 +3,7 @@ import Dialog, { DialogRoot, DialogTrigger } from "./Dialog";
 import Button from "../atoms/Button";
 import { IUser } from "@/types/user";
 import PesatoneTipCard from "../organisms/TipCard";
+import { useTranslations } from "next-intl";
 
 export default function ShareProfile({
   trigger,
@@ -11,6 +12,7 @@ export default function ShareProfile({
   trigger?: React.ReactNode;
   profile?: IUser;
 }) {
+  const t = useTranslations("components");
 
   return (
     <DialogRoot>
@@ -19,7 +21,7 @@ export default function ShareProfile({
           {trigger ?? (
             <Button className="flex gap-0.5 px-2 py-0 items-center">
               <p className="font-medium text-xs md:text-sm text-white">
-                Share profile
+                {t("shareProfile")}
               </p>
             </Button>
           )}

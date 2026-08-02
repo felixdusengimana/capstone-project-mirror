@@ -3,16 +3,18 @@ import { IconNames } from "@/components/atoms/Icon";
 import AdminNavbar from "@/components/organisms/AdminNavbar";
 import Sidebar from "@/components/organisms/Sidebar";
 import { ReactNode } from "react";
+import { useTranslations } from "next-intl";
 
 export default function DashBoardLayout({ children }: { children: ReactNode }) {
+  const t = useTranslations("dashboard");
   const links = [
     {
-      label: "Home",
+      label: t("home"),
       icon: "dashboard",
       href: "/dashboard",
     },
     {
-      label: "Payouts",
+      label: t("payouts"),
       icon: "payouts",
       href: "/payouts",
     },
@@ -22,7 +24,7 @@ export default function DashBoardLayout({ children }: { children: ReactNode }) {
     //   href: "/supporters",
     // },
     {
-      label: "Settings",
+      label: t("settings"),
       icon: "settings",
       href: "/settings",
     },

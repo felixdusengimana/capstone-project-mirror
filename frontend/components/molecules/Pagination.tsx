@@ -1,4 +1,5 @@
 import Icon from "../atoms/Icon";
+import { useTranslations } from "next-intl";
 
 export interface PaginationProps {
   total: number;
@@ -15,6 +16,7 @@ export default function Pagination({
   onPageChange,
   loading,
 }: PaginationProps) {
+  const t = useTranslations("components");
   return (
     <div className="text-black w-full flex justify-between items-center">
       <button
@@ -25,10 +27,10 @@ export default function Pagination({
         className="bg-gray-50 border  disabled:cursor-not-allowed border-gray-200 text-[#0000008A] disabled:bg-slate-300 font-normal rounded-md px-4 py-2 text-sm flex"
       >
         <Icon name="chevron-left" />
-        Previous
+        {t("previous")}
       </button>
       <p className="text-[#0000008A] font-normal text-sm">
-        Page {currentPage.toLocaleString()} of {total.toLocaleString()}
+        {t("pageOf", {current: currentPage, total})}
       </p>
       <button
         onClick={() => {
@@ -37,7 +39,7 @@ export default function Pagination({
         disabled={loading || currentPage + 1 > total}
         className="bg-gray-50 border disabled:cursor-not-allowed border-gray-200 text-[#0000008A] disabled:bg-slate-300 font-normal rounded-md px-4 py-2 text-sm flex"
       >
-        Next
+        {t("photoNext")}
         <div className="rotate-180">
           <Icon name="chevron-left" />
         </div>

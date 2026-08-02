@@ -1,6 +1,8 @@
 "use client";
 import { ComponentProps, ReactNode, useEffect, useId, useState } from "react";
 import Icon from "./Icon";
+import { useTranslations } from "next-intl";
+import { getValidationMessageKey } from "@/i18n/validation";
 
 interface InputProps extends ComponentProps<"input"> {
   label?: string;
@@ -11,6 +13,7 @@ interface InputProps extends ComponentProps<"input"> {
 }
 
 export default function Input({ value, ...props }: InputProps) {
+  const validation = useTranslations("validation");
   const {
     label,
     labelStyle,
@@ -24,6 +27,9 @@ export default function Input({ value, ...props }: InputProps) {
   const isPassword = props.type === "password";
   const [showPassword, setShowPassword] = useState(false);
   const id = useId();
+  const validationKey =
+    typeof error === "string" ? getValidationMessageKey(error) : undefined;
+  const localizedError = validationKey ? validation(validationKey) : error;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const unFormatted =
@@ -66,7 +72,7 @@ export default function Input({ value, ...props }: InputProps) {
       <div>
         <div
           className={`w-full flex items-center px-4 border rounded-xl  ${
-            error ? "border-orange-300 bg-red-50" : "border-[#E5E9F0]  "
+            localizedError ? "border-orange-300 bg-red-50" : "border-[#E5E9F0]  "
           } ${props.disabled ? "bg-gray-300" : "bg-slate-50"}`}
         >
           {left && <>{left}</>}
@@ -95,10 +101,10 @@ export default function Input({ value, ...props }: InputProps) {
               </div>
             ))}
         </div>
-        {Boolean(error) && (typeof error === "string" ? (
-            <p className="text-orange-400 text-sm mt-1">{error}</p>
+        {Boolean(localizedError) && (typeof localizedError === "string" ? (
+            <p className="text-orange-400 text-sm mt-1">{localizedError}</p>
           ) : (
-            error
+            localizedError
           ))}
       </div>
     </div>

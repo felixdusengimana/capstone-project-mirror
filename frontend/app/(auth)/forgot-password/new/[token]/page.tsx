@@ -11,8 +11,11 @@ import { useParams, useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { useTranslations } from "next-intl";
 
 export default function Login() {
+  const t = useTranslations("auth");
+  const common = useTranslations("common");
   const { token } = useParams() as { token: string };
   const router = useRouter();
 
@@ -30,7 +33,7 @@ export default function Login() {
 
   const { mutate, isPending } = useMutation({
     onSuccess() {
-      toast.success("Password changed successfully", {
+      toast.success(t("passwordChanged"), {
         id: "email",
       });
       router.replace("/login");
@@ -42,7 +45,7 @@ export default function Login() {
   });
 
   const onSubmit = (data: IResetPasswordInputs) => {
-    toast.loading("Changing password...", { id: "email" });
+    toast.loading(t("changingPassword"), { id: "email" });
     mutate(data);
   };
 
@@ -50,12 +53,12 @@ export default function Login() {
     <>
       {!token ? (
         <div className="flex flex-col items-center justify-center h-full">
-          <h1 className="text-2xl font-bold mb-4 text-black">Link expired!</h1>
+          <h1 className="text-2xl font-bold mb-4 text-black">{t("expiredTitle")}</h1>
           <p className="text-center text-gray-600">
-            The link you clicked has expired. Please request a new link.
+            {t("expiredDescription")}
           </p>
           <Link href="/forgot-password">
-            <Button className="mt-6">Request new link</Button>
+            <Button className="mt-6">{t("requestNewLink")}</Button>
           </Link>
         </div>
       ) : (
@@ -66,13 +69,13 @@ export default function Login() {
           <div></div>
           <div className="max-w-[562px]">
             <h1 className="text-gray-700 text-4xl font-mono mb-4">
-              Reset password
+              {t("resetPassword")}
             </h1>
             <p className="text-gray-600 font-normal text-lg">
-              This password should be different from the previous password
+              {t("newPasswordDescription")}
             </p>
             <Input
-              label="Password"
+              label={common("password")}
               className="mb-4 mt-10"
               type="password"
               placeholder="● ● ● ● ● ● ●"
@@ -86,7 +89,7 @@ export default function Login() {
               error={errors.password?.message}
             />
             <Input
-              label="Retype password"
+              label={t("retypePassword")}
               type="password"
               placeholder="● ● ● ● ● ● ●"
               value={watch("password2")}
@@ -99,7 +102,7 @@ export default function Login() {
               error={errors.password2?.message}
             />
             <Button isLoading={isPending} className="w-full mt-10">
-              Reset password
+              {t("resetPassword")}
             </Button>
           </div>
           <div></div>

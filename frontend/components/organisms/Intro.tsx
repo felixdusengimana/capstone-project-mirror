@@ -3,18 +3,19 @@
 import DownloadApp from "../molecules/DownloadApp";
 import CreatorSearchModal from "../molecules/CreatorSearchModal";
 import Trusties from "../molecules/Trusties";
+import { useTranslations } from "next-intl";
 
 export default function Intro() {
+  const t = useTranslations("home");
   return (
     <div className="intro">
       <div className="page-padding">
         <div className="pt-28 max-w-[722px]">
           <h1 className="heading font-mono text-white md:text-left text-center">
-            Search and gift your favorite creators
+            {t("heroTitle")}
           </h1>
           <p className="text-xl text-[#8A8A8B] max-w-[535px] mt-5 mb-10 md:text-left text-center">
-            A place where fans show gratitude to the African content creators
-            they love!
+            {t("heroDescription")}
           </p>
 
           <CreatorSearchModal className="max-w-full md:max-w-[502px]" />
@@ -36,7 +37,7 @@ export default function Intro() {
       <img
         src="/home-bg.png"
         className="block md:hidden w-full h-full"
-        alt="Home bg"
+        alt={t("homeImageAlt")}
       />
     </div>
   );

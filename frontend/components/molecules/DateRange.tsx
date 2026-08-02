@@ -2,6 +2,7 @@
 import React from "react";
 import { DateRangePicker } from "@nextui-org/date-picker";
 import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
+import { useTranslations } from "next-intl";
 
 export default function DateRange({
   onChange,
@@ -10,10 +11,11 @@ export default function DateRange({
   onChange?: (startDate: string, endDate: string) => void;
   initialValue?: { startDate?: string; endDate?: string };
 }) {
+  const t = useTranslations("components");
   return (
     <div className="flex w-full flex-wrap md:flex-nowrap gap-4">
       <DateRangePicker
-        label="From - To"
+        label={t("fromTo")}
         maxValue={today(getLocalTimeZone())}
         visibleMonths={2}
         pageBehavior="single"

@@ -4,6 +4,7 @@ import { ChangeEvent } from "react";
 import { RotationSlider, ZoomSlider } from "./Sliders";
 import Cropper from "./Cropper";
 import Button from "../atoms/Button";
+import { useTranslations } from "next-intl";
 
 interface ImageCropModalContentProps {
   handleDone: () => void;
@@ -14,6 +15,7 @@ const ImageCropModalContent: React.FC<ImageCropModalContentProps> = ({
   handleDone,
   handleClose,
 }) => {
+  const t = useTranslations("components");
   const { setImage } = useImageCropContext();
 
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -28,7 +30,7 @@ const ImageCropModalContent: React.FC<ImageCropModalContentProps> = ({
 
   return (
     <div className="text-center relative">
-      <h5 className="text-gray-800 mb-4">Edit profile picture</h5>
+      <h5 className="text-gray-800 mb-4">{t("editPicture")}</h5>
       <div className="border border-dashed border-gray-200 p-6 rounded-lg">
         <div className="flex justify-center">
           <div className="crop-container mb-4">
@@ -50,14 +52,14 @@ const ImageCropModalContent: React.FC<ImageCropModalContentProps> = ({
           className="block border border-gray-200 rounded-full lg:px-8 px-6 lg:py-4 py-2 shadow w-full mb-4 text-gray-800 hover:shadow-lg"
           htmlFor="avatarInput"
         >
-          Upload Another Picture
+          {t("uploadAnother")}
         </label>
         <div className="flex gap-2">
           <Button onClick={handleClose} variant="danger">
-            Cancel
+            {t("cancel")}
           </Button>
           <Button variant="secondary" className="w-full" onClick={handleDone}>
-            Done & Save
+            {t("doneSave")}
           </Button>
         </div>
       </div>

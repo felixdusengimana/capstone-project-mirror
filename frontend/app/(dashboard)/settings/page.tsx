@@ -33,8 +33,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { useTranslations } from "next-intl";
 
 export default function UserSettings() {
+  const t = useTranslations("settings");
+  const common = useTranslations("common");
   const { data: usr, isLoading } = useGetMe();
   const [openPhoneModal, setOpenPhoneModal] = useState(false);
   const queryClient = useQueryClient();
@@ -63,12 +66,12 @@ export default function UserSettings() {
       queryClient.invalidateQueries({
         queryKey: ["me"],
       });
-      toast.success("Profile updated successfully", {
+      toast.success(t("profileUpdated"), {
         id: "updatingProfile",
       });
     },
     onError: (error) => {
-      toast.error(error?.message ?? "Error updating Profile", {
+      toast.error(error?.message ?? t("profileUpdateFailed"), {
         id: "updatingProfile",
       });
     },
@@ -80,12 +83,12 @@ export default function UserSettings() {
       queryClient.invalidateQueries({
         queryKey: ["me"],
       });
-      toast.success("Profile picture updated successfully", {
+      toast.success(t("pictureUpdated"), {
         id: "updatingProfile",
       });
     },
     onError: () => {
-      toast.error("Error updating Profile picture", {
+      toast.error(t("pictureUpdateFailed"), {
         id: "updatingProfile",
       });
     },
@@ -108,7 +111,7 @@ export default function UserSettings() {
   };
 
   const onSubmit = (data: IUpdateUser) => {
-    toast.loading("updating profile information", {
+    toast.loading(t("updating"), {
       id: "updatingProfile",
     });
 
@@ -118,7 +121,7 @@ export default function UserSettings() {
 
   return (
     <div className="min-h-full w-full dashboard-padding text-black pb-10">
-      <h1 className="text-4xl font-sans font-bold text-[#1A1A1A]">Settings</h1>
+      <h1 className="text-4xl font-sans font-bold text-[#1A1A1A]">{t("title")}</h1>
       <form
         id="profile-settings"
         onSubmit={handleSubmit(onSubmit)}
@@ -129,7 +132,7 @@ export default function UserSettings() {
             defaultImage={usr?.data?.profileImageUrl ?? ""}
             callbackOnDone={async (avatar) => {
               if (avatar) {
-                toast.loading("updating profile information", {
+                toast.loading(t("updating"), {
                   id: "updatingProfile",
                 });
                 const data = new FormData();
@@ -141,22 +144,22 @@ export default function UserSettings() {
         </ImageCropProvider>
         <div className="flex flex-grow flex-col gap-4">
           <Input
-            label="Your name"
+            label={t("yourName")}
             value={watch("name")}
             disabled={isUserLoading}
             onChange={(e) => handleChange("name", e.target.value)}
             error={errors.name?.message}
           />
           <TextArea
-            label="Bio"
+            label={t("bio")}
             disabled={isUserLoading}
             onChange={(e) => handleChange("bio", e.target.value)}
             value={watch("bio")}
             error={errors.bio?.message}
           />
-          <Input label="Email" value={usr?.data.email} disabled />
+          <Input label={common("email")} value={usr?.data.email} disabled />
           <Input
-            label="Phone (optional)"
+            label={t("phoneOptional")}
             value={watch("phoneNumber")}
             disabled={isUserLoading}
             onChange={(e) => handleChange("phoneNumber", e.target.value)}
@@ -174,7 +177,7 @@ export default function UserSettings() {
             size="sm"
             className="w-fit ml-auto"
           >
-            Save
+            {common("save")}
           </Button>
         </div>
       </form>
@@ -184,7 +187,7 @@ export default function UserSettings() {
         className="max-w-[900px] bg-white px-10 lg:px-[67px] py-[55px] w-full rounded-lg mt-8 flex flex-wrap gap-y-2 gap-x-[107px] justify-between items-start"
       >
         <p className="flex-grow font-medium text-lg text-gray-600">
-          Social Links
+          {t("socialLinks")}
         </p>
         <div className="flex-grow">
           <div className="flex flex-col gap-4  max-w-full min-w-full lg:min-w-[486px]">
@@ -199,7 +202,7 @@ export default function UserSettings() {
               return (
                 <div key={index} className="flex items-center">
                   <Input
-                    label={`Social Media Link ${index + 1}`}
+                    label={t("socialLink", {number: index + 1})}
                     className="flex-grow"
                     value={link.link}
                     error={
@@ -282,7 +285,7 @@ export default function UserSettings() {
             }
             type="button"
           >
-            <Icon name="add" /> <p>Add new link</p>
+            <Icon name="add" /> <p>{t("addLink")}</p>
           </Button>
 
           <Button
@@ -291,7 +294,7 @@ export default function UserSettings() {
             size="sm"
             className="w-fit mt-5 ml-auto"
           >
-            Save
+            {common("save")}
           </Button>
         </div>
       </form>
@@ -303,10 +306,9 @@ export default function UserSettings() {
         className="max-w-[900px] mb-10 bg-white px-10 lg:px-[67px] py-[55px] w-full rounded-lg mt-8 flex flex-wrap gap-y-5 gap-x-[107px] justify-between items-start"
       >
         <div className="max-w-[413px]">
-          <h1 className="font-medium text-gray-600 text-lg">Delete account</h1>
+          <h1 className="font-medium text-gray-600 text-lg">{t("deleteAccount")}</h1>
           <p className="font-normal text-gray-400 text-base">
-            Your account, along with all associated data will be permanently
-            deleted and cannot be restored.
+            {t("deleteDescription")}
           </p>
         </div>
         <DeleteAccount pesaTag={usr?.data?.username} />

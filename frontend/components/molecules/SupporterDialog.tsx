@@ -9,6 +9,7 @@ import CardIcon from "./CardIcon";
 import { useState } from "react";
 import { useGetTransactionByReference } from "@/services/transactions";
 import { ITransaction } from "@/types/transaction";
+import { useLocale, useTranslations } from "next-intl";
 
 interface SupporterDialogProps {
   trigger?: React.ReactNode;
@@ -20,6 +21,8 @@ export default function SupporterDialog({
   referenceId,
   transaction,
 }: SupporterDialogProps) {
+  const t = useTranslations("components");
+  const locale = useLocale();
   const [open, setOpen] = useState(false);
   const handleOpen = () => {
     setOpen(!open);
@@ -54,25 +57,25 @@ export default function SupporterDialog({
 
             <div className="flex flex-col gap-4">
               <h3 className="text-gray-800 text-base font-medium">
-                Payment details
+                {t("paymentDetails")}
               </h3>
               <div className="flex text-base font-normal text-gray-600 justify-between">
-                <p className="text-gray-400">Amount</p>
+                <p className="text-gray-400">{t("amount")}</p>
                 <p>
                   {transaction?.currency}{" "}
-                  {transaction?.amount?.toLocaleString()}
+                  {transaction?.amount?.toLocaleString(locale)}
                 </p>
               </div>
 
               <div className="flex text-base font-normal text-gray-600 justify-between">
-                <p className="text-gray-400">Transaction fee</p>
+                <p className="text-gray-400">{t("transactionFee")}</p>
                 <p>
                   {transaction?.currency} {transaction?.transactionFee}
                 </p>
               </div>
 
               <div className="flex text-base font-normal text-gray-600 justify-between">
-                <p className="text-gray-400">Transaction ID</p>
+                <p className="text-gray-400">{t("transactionId")}</p>
                 <p>{transaction?.transactionReference}</p>
               </div>
             </div>

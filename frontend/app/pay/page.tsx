@@ -17,9 +17,12 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
+import { useLocale, useTranslations } from 'next-intl';
 
 
 const PaymentUI = () => {
+  const t = useTranslations("payment");
+  const locale = useLocale();
   const [checked, setChecked] = useState(EPaymentMethod.MTN_MOBILE_MONEY);
   const [isConfirming, setIsConfirming] = useState(false);
   const [transactionReference, setTransactionReference] = useState("");
@@ -44,7 +47,7 @@ const PaymentUI = () => {
       setTransactionReference(data?.data?.transactionReference);
     },
     onError: () => {
-      toast.error("An error occurred while initiating the transaction, Please try again");
+      toast.error(t("initiationFailed"));
       setIsConfirming(false);
     },
   });
@@ -69,7 +72,7 @@ const PaymentUI = () => {
     if (!Boolean(phoneNumber) || phoneNumber.length < 10 || phoneNumber.length > 10) {
       setError("phoneNumber", {
         type: "manual",
-        message: "Please enter a valid phone number",
+        message: t("invalidPhone"),
       });
       return;
     }
@@ -80,7 +83,7 @@ const PaymentUI = () => {
     ) {
       setError("phoneNumber", {
         type: "manual",
-        message: "Please enter a valid MTN Mobile Money number",
+        message: t("invalidMtn"),
       });
       return;
     }
@@ -88,7 +91,7 @@ const PaymentUI = () => {
     if (checked === EPaymentMethod.AIRTEL_MONEY && !(phoneNumber.startsWith("072") || phoneNumber.startsWith("073"))) {
       setError("phoneNumber", {
         type: "manual",
-        message: "Please enter a valid Airtel Money number",
+        message: t("invalidAirtel"),
       });
       return;
     }
@@ -111,14 +114,14 @@ const PaymentUI = () => {
           <div className="flex gap-8 justify-between items-center mb-4">
             <Logo type='dark' />
             <div className="">
-              <p className="text-sm font-semibold text-gray-800">Support {createFullName}</p>
+              <p className="text-sm font-semibold text-gray-800">{t("support", {name: createFullName ?? ""})}</p>
               <p className="text-xs text-gray-500">{email}</p>
             </div>
           </div>
           {paymentStatus === EStatus.PENDING ? <div className="flex flex-col w-full  items-baseline mb-6">
-            <p className="text-xl font-bold text-gray-900">{amount.toLocaleString()} RWF</p>
+            <p className="text-xl font-bold text-gray-900">{amount.toLocaleString(locale)} RWF</p>
             <button className="text-sm text-indigo-600 hover:text-indigo-800 focus:outline-none">
-              Transaction breakdown
+              {t("breakdown")}
               <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 inline-block ml-1">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
               </svg>
@@ -198,12 +201,9 @@ const PaymentUI = () => {
                   />
                 </svg>
 
-                <h2 className="mt-8 text-2xl font-bold">🎉 Another one! 🎉</h2>
+                <h2 className="mt-8 text-2xl font-bold">🎉 {t("successTitle")} 🎉</h2>
                 <p className="max-w-[307px] text-center mt-4">
-                  Your support means a lot—you are truly amazing! <br/>
-                  Your kindness touches us deeply, and  {" "}
-                  <span className="font-bold">{createFullName}</span> 
-                  {" "}  appreciates you 🙏🏾!
+                  {t("successMessage", {name: createFullName ?? ""})} 🙏🏾
                 </p>
               </div>
 
@@ -214,19 +214,19 @@ const PaymentUI = () => {
                   router.back();
                 }}
               >
-                Gift Again
+                {t("giftAgain")}
               </Button>
 
               <Link href={"/"}>
                 <Button className="w-full mt-3" variant="gray">
-                  Back Home
+                  {t("backHome")}
                 </Button>
               </Link>
             </div>
           ) : (paymentStatus === EStatus.FAILED) ? (
             <>
               <div className='text-red-500 flex items-center flex-col justify-center'>
-                🥹 We failed to process this transaction. 🙏🏾 Please give it another shot.
+                🥹 {t("failed")}
               </div>
 
               <Button
@@ -237,30 +237,32 @@ const PaymentUI = () => {
                   setTransactionReference("");
                 }}
               >
-                Try Again 🙏🏾
+                {t("tryAgain")} 🙏🏾
               </Button>
             </>
           ) : (paymentStatus === EStatus.CANCELLED) ? (
             <div>
-              🥹 It seems like you cancelled the transaction. 🙏🏾 Please give it another shot.
+              {t("cancelled")}
             </div>
           ) : isConfirming ? <div className='text-black flex items-center flex-col justify-center'>
             <DotsLoadingAnimation />
             <p className='text-center'>
-              Waiting for approval...
+              {t("waiting")}
 
             </p>
             <p className='text-center'>
-              If you do not see a popup prompt on your cell phone, Dial 
-              <b>
-                {checked === EPaymentMethod.MTN_MOBILE_MONEY ? "*182*7*1#" : <span>*182*5*6*1# <small>or</small> *500*5*6*1#</span>}
-              </b>To approve payment!</p>
+              {t("dialInstruction", {
+                code: checked === EPaymentMethod.MTN_MOBILE_MONEY
+                  ? "*182*7*1#"
+                  : `*182*5*6*1# ${t("or")} *500*5*6*1#`,
+              })}
+            </p>
           </div> : (
             <form onSubmit={handleSubmit(onSubmit)}>
-              <p className="text-sm text-gray-700 mb-4">Please enter your {checked.replaceAll("_", " ").toLocaleLowerCase()} details to begin payment</p>
+              <p className="text-sm text-gray-700 mb-4">{t("enterDetails", {method: checked === EPaymentMethod.MTN_MOBILE_MONEY ? t("mtn") : t("airtel")})}</p>
               <div>
                 <label htmlFor="phoneNumber" className="block text-xs font-medium text-gray-700">
-                  PHONE NUMBER
+                  {t("phoneNumber")}
                 </label>
 
                 <Input
@@ -281,13 +283,13 @@ const PaymentUI = () => {
                 disabled={isConfirming}
                 className="mt-6 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
               >
-                Pay RWF {amount?.toLocaleString()}
+                {t("pay", {amount: amount?.toLocaleString(locale)})}
               </Button>
             </form>
           )}
           <div className="mt-4 flex gap-1 text-center border w-fit p-2 mx-auto">
             <svg className='w-4 h-4 text-[#7d5f39] fill-[#7d5f39]' version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 330 330" xmlSpace="preserve"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="XMLID_509_"> <path id="XMLID_510_" d="M65,330h200c8.284,0,15-6.716,15-15V145c0-8.284-6.716-15-15-15h-15V85c0-46.869-38.131-85-85-85 S80,38.131,80,85v45H65c-8.284,0-15,6.716-15,15v170C50,323.284,56.716,330,65,330z M180,234.986V255c0,8.284-6.716,15-15,15 s-15-6.716-15-15v-20.014c-6.068-4.565-10-11.824-10-19.986c0-13.785,11.215-25,25-25s25,11.215,25,25 C190,223.162,186.068,230.421,180,234.986z M110,85c0-30.327,24.673-55,55-55s55,24.673,55,55v45H110V85z"></path> </g> </g></svg>
-            <span className="text-xs text-[#7d5f39]">SECURED BY PESATONE</span>
+            <span className="text-xs text-[#7d5f39]">{t("secured")}</span>
           </div>
         </div>
 
@@ -295,7 +297,7 @@ const PaymentUI = () => {
         {(!isConfirming && paymentStatus == EStatus.PENDING) ? (<div className="bg-gray-50 w-full md:w-1/2 p-6 flex flex-col justify-start">
           <div className="flex justify-end">
             <button onClick={() => {
-              if (confirm("Are you sure you want to cancel this payment?")) {
+              if (confirm(t("cancelConfirm"))) {
                 clear();
                 router.back();
               }
@@ -305,7 +307,7 @@ const PaymentUI = () => {
               </svg>
             </button>
           </div>
-          <h2 className="text-sm font-semibold text-gray-700 mb-4">PAYMENT OPTIONS</h2>
+          <h2 className="text-sm font-semibold text-gray-700 mb-4">{t("options")}</h2>
           <div className='flex flex-row md:flex-col gap-4'>
             {Object.values(EPaymentMethod).map((method) => (
               <button
@@ -316,7 +318,7 @@ const PaymentUI = () => {
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 mr-2">
                   <path d="M4 4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H7a1 1 0 01-1-1v-2z" />
                 </svg>
-                {method.replaceAll("_", " ")}
+                {method === EPaymentMethod.MTN_MOBILE_MONEY ? t("mtn") : t("airtel")}
               </button>
             ))
             }

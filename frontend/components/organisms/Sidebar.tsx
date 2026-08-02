@@ -9,6 +9,7 @@ import Button from "../atoms/Button";
 import dynamic from "next/dynamic";
 import { removeCookie } from "@/utils/cookie";
 import { useGetMe } from "@/services/users";
+import { useTranslations } from "next-intl";
 const VerifyAccount = dynamic(
   () => import("@/components/molecules/VerifyAccount"),
   { ssr: false }
@@ -23,6 +24,8 @@ export default function Sidebar({
   links = [],
   ...props
 }: SidebarProps) {
+  const t = useTranslations("dashboard");
+  const nav = useTranslations("navigation");
   const pathname = usePathname();
   const { data: usr, isLoading: isUserLoading } = useGetMe();
 
@@ -75,7 +78,7 @@ export default function Sidebar({
         <div className="flex flex-col mt-[96px] mb-[76px] gap-[15px] items-center justify-center bg-gray-50 border border-gray-200 px-[39px] py-[31px] rounded-lg">
           <Image alt="" src="/dance.svg" width={204} height={130} />
           <p className="text-center text-[#475569] text-sm font-normal">
-            Verify your account now to unlock exclusive benefits!
+            {t("verifyPrompt")}
           </p>
           <VerifyAccount />
         </div>
@@ -88,7 +91,7 @@ export default function Sidebar({
           className="text-gray-900 flex gap-1 items-center"
         >
           <Icon name="logout" />
-          <p>Logout</p>
+          <p>{nav("logout")}</p>
         </Button>
       </div>
     </div>

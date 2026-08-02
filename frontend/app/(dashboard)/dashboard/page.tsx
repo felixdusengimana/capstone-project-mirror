@@ -12,8 +12,12 @@ import SupporterDialog from "@/components/molecules/SupporterDialog";
 import { useGetTransactions } from "@/services/transactions";
 import { ITransactionFilter } from "@/types/transaction";
 import { useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 
 export default function CreatorDashboardPage() {
+  const t = useTranslations("dashboard");
+  const common = useTranslations("common");
+  const locale = useLocale();
   const today = new Date();
   const sevenDaysAgo = new Date(
     today.getFullYear(),
@@ -31,14 +35,14 @@ export default function CreatorDashboardPage() {
   const { data: userTransactions, isLoading } = useGetTransactions(filters);
   return (
     <div className="min-h-full w-full dashboard-padding text-black pb-32 ">
-      <h1 className="text-4xl font-sans font-bold text-[#1A1A1A]">Dashboard</h1>
+      <h1 className="text-4xl font-sans font-bold text-[#1A1A1A]">{t("title")}</h1>
       <DashboardProfile />
       <div className="mt-10">
         <CreatorDashboard />
       </div>
 
       <div className="font-medium text-base text-gray-700 flex justify-between mt-12 mb-4">
-        <p>Supporters</p>
+        <p>{t("supporters")}</p>
       </div>
 
       <div className="bg-white rounded-lg py-6 mb-10">
@@ -57,7 +61,7 @@ export default function CreatorDashboardPage() {
                 className="mr-2"
               />
             }
-            placeholder="Search"
+            placeholder={t("searchSupporters")}
           />
           <div className="">
             <DateRange
@@ -72,10 +76,10 @@ export default function CreatorDashboardPage() {
           </div>
         </div>
         {isLoading ? (
-          <div className="text-gray-700 px-6">Loading</div>
+          <div className="text-gray-700 px-6">{common("loading")}</div>
         ) : userTransactions?.data?.results &&
           userTransactions?.data?.results.length <= 0 ? (
-          <div className="text-gray-700 px-6">No information found</div>
+          <div className="text-gray-700 px-6">{t("noInformation")}</div>
         ) : (
           <>
             {userTransactions?.data?.results?.map((transaction, i) => (
@@ -98,9 +102,9 @@ export default function CreatorDashboardPage() {
                           name: transaction.donorName,
                           photo: "",
                           date:
-                            new Date(transaction.paidAt).toLocaleDateString() +
+                            new Date(transaction.paidAt).toLocaleDateString(locale) +
                             " " +
-                            new Date(transaction.paidAt).toLocaleTimeString(),
+                            new Date(transaction.paidAt).toLocaleTimeString(locale),
                         }}
                       />
 

@@ -4,8 +4,11 @@ import Icon from "../atoms/Icon";
 import WithdrawOptionsForm from "./WithdrawOptionsForm";
 import { useGetWithdrawAccounts } from "@/services/withdrawal-accounts";
 import { IWithdrawalAccount } from "@/types/withdrawal-accounts";
+import { useTranslations } from "next-intl";
 
 export default function WithdrawOptions() {
+  const t = useTranslations("components");
+  const common = useTranslations("common");
   const { data: accounts, isPending: isLoadingAccounts } =
     useGetWithdrawAccounts({});
   const phone = accounts?.data.find(
@@ -18,7 +21,7 @@ export default function WithdrawOptions() {
 
   return (
     <form className="max-w-[900px] bg-white px-10 lg:px-[67px] py-[55px] w-full rounded-lg mt-8 ">
-      <h1 className="font-medium text-gray-600 text-lg">Withdraw Options</h1>
+      <h1 className="font-medium text-gray-600 text-lg">{t("withdrawOptions")}</h1>
 
       <div className="mt-5">
         <div className="flex w-full justify-between">
@@ -26,7 +29,7 @@ export default function WithdrawOptions() {
             htmlFor=""
             className="text-[#64748A] text-sm font-normal block mb-2"
           >
-            1. Mobile Money
+            1. {t("mobileMoney")}
           </label>
 
           {phone && (
@@ -35,7 +38,7 @@ export default function WithdrawOptions() {
                 id: phone?.id,
                 accountNumber: phone?.accountNumber,
               }}
-              trigger={<button type="button">Edit</button>}
+              trigger={<button type="button">{common("edit")}</button>}
               type={EChannel.MOBILE_MONEY}
             />
           )}
@@ -46,7 +49,7 @@ export default function WithdrawOptions() {
             trigger={
               <Button type="button">
                 <Icon name="add" />
-                <span className="text-sm">Add Mobile Number</span>
+                <span className="text-sm">{t("addMobile")}</span>
               </Button>
             }
             type={EChannel.MOBILE_MONEY}
@@ -56,7 +59,7 @@ export default function WithdrawOptions() {
             htmlFor=""
             className="text-[#64748A] text-sm font-normal block mb-2"
           >
-            Mobile Number:{" "}
+            {t("mobileNumber")}:{" "}
             <span className="font-bold">{phone?.accountNumber}</span>
           </label>
         )}
@@ -68,7 +71,7 @@ export default function WithdrawOptions() {
             htmlFor=""
             className="text-[#64748A] text-sm font-normal block mb-2"
           >
-            2. Bank Account
+            2. {t("bankAccount")}
           </label>
 
           {bank && (
@@ -80,7 +83,7 @@ export default function WithdrawOptions() {
                 bankCode: bank?.bank?.code,
                 accountType: bank?.accountType,
               }}
-              trigger={<button type="button">Edit</button>}
+              trigger={<button type="button">{common("edit")}</button>}
               type={EChannel.BANK_ACCOUNT}
             />
           )}
@@ -91,7 +94,7 @@ export default function WithdrawOptions() {
             trigger={
               <Button type="button">
                 <Icon name="add" />
-                <span className="text-sm">Add Bank Account</span>
+                <span className="text-sm">{t("addBank")}</span>
               </Button>
             }
             type={EChannel.BANK_ACCOUNT}
@@ -102,14 +105,14 @@ export default function WithdrawOptions() {
               htmlFor=""
               className="text-[#64748A] text-sm font-normal block mb-2"
             >
-              Bank Name: <span className="font-bold">{bank?.bank?.name}</span>
+              {t("bankName")}: <span className="font-bold">{bank?.bank?.name}</span>
             </label>
 
             <label
               htmlFor=""
               className="text-[#64748A] text-sm font-normal block mb-2"
             >
-              Account Number:{" "}
+              {t("accountNumber")}:{" "}
               <span className="font-bold">{bank?.accountNumber}</span>
             </label>
 
@@ -117,7 +120,7 @@ export default function WithdrawOptions() {
               htmlFor=""
               className="text-[#64748A] text-sm font-normal block mb-2"
             >
-              Account Name:{" "}
+              {t("accountName")}:{" "}
               <span className="font-bold">{bank?.accountName}</span>
             </label>
           </div>

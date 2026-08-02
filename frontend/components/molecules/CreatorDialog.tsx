@@ -11,12 +11,14 @@ import ChangeCreatorStatus from "./ChangeCreatorStatus";
 import { EApprovalStatus } from "@/types";
 import { useGetCreator } from "@/services/users";
 import { IconNames } from "../atoms/Icon";
+import { useTranslations } from "next-intl";
 
 interface CreatorDialogProps {
   trigger?: React.ReactNode;
   userId: string;
 }
 export default function CreatorDialog({ trigger, userId }: CreatorDialogProps) {
+  const t = useTranslations("components");
   const [open, setOpen] = useState(false);
   const { data: creator, isPending } = useGetCreator(userId!);
   const handleOpen = () => {
@@ -44,7 +46,7 @@ export default function CreatorDialog({ trigger, userId }: CreatorDialogProps) {
             />
 
             <div className="max-w-[476px]">
-              <h3 className="text-sm text-gray-400 uppercase">Bio</h3>
+              <h3 className="text-sm text-gray-400 uppercase">{t("bio")}</h3>
               <p className="text-[#475569] mt-0.5">{creator?.data?.bio}</p>
             </div>
 
@@ -66,7 +68,7 @@ export default function CreatorDialog({ trigger, userId }: CreatorDialogProps) {
                 className="w-full"
                 trigger={
                   <button className="bg-[#34D399] w-full  flex-grow border text-center border-[#34D399] text-white font-normal rounded-md px-4 py-2 text-sm">
-                    Approve
+                    {t("approve")}
                   </button>
                 }
                 newStatus={EApprovalStatus.APPROVED}
@@ -77,7 +79,7 @@ export default function CreatorDialog({ trigger, userId }: CreatorDialogProps) {
                 className="w-full"
                 trigger={
                   <button className="bg-gray-50 w-full flex-grow border text-center border-gray-200 text-[#0000008A] font-normal rounded-md px-4 py-2 text-sm">
-                    Reject
+                    {t("reject")}
                   </button>
                 }
                 newStatus={EApprovalStatus.REJECTED}

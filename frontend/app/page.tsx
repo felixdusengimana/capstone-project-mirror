@@ -8,68 +8,66 @@ import Transaction from "@/components/molecules/Transaction";
 import Footer from "@/components/organisms/Footer";
 import Intro from "@/components/organisms/Intro";
 import Navbar from "@/components/organisms/Navbar";
+import { getTranslations } from "next-intl/server";
 
-export default function page() {
+export default async function Page() {
+  const t = await getTranslations("home");
   return (
     <div className="py-12 md:py-14 lg:py-[73px]">
       <Navbar />
       <Intro />
       <section className="pt-24 page-padding">
         <div className="max-w-[503px] mx-auto text-center">
-          <h5 className="uppercase text-[#8A8A8B] mb-4">features</h5>
+          <h5 className="uppercase text-[#8A8A8B] mb-4">{t("featuresLabel")}</h5>
           <h1 className="text-4xl font-mono text-center text-white">
-            Unleash Your Influence with Our Exclusive Features
+            {t("featuresTitle")}
           </h1>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-[18px] mt-12">
-          <Card glow title="Secure Transactions" icon="secure">
-            Pesatone employs advanced encryption for secure transactions,
-            safeguarding you and your fans
+          <Card glow title={t("secureTitle")} icon="secure">
+            {t("secureDescription")}
           </Card>
-          <Card glow title="Direct Engagement" icon="fast">
-            Connect instantly with followers through Pesatone&apos;s
-            user-friendly interface, fostering community and stronger
-            relationships
+          <Card glow title={t("engagementTitle")} icon="fast">
+            {t("engagementDescription")}
           </Card>
-          <Card glow title="Transparent Earnings" icon="dollar">
-            Gain clear insight into earnings with Pesatone, easily tracking
-            gifts and donations for effective financial management
+          <Card glow title={t("earningsTitle")} icon="dollar">
+            {t("earningsDescription")}
           </Card>
         </div>
       </section>
 
       <section className="pt-20 page-padding">
         <div className="max-w-[543px] mx-auto text-center">
-          <h5 className="uppercase text-[#8A8A8B] mb-4">BENEFITS</h5>
+          <h5 className="uppercase text-[#8A8A8B] mb-4">{t("benefitsLabel")}</h5>
           <h1 className="text-4xl font-mono text-center text-white">
-            Experience the Benefits: Pesatone for Fans and Creators
+            {t("benefitsTitle")}
           </h1>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-[18px] mt-12">
           <div className="grid grid-cols-2 w-fit mx-auto lg:mx-0">
             <Avatar
-              alt="Profile 1"
+              alt={t("profileAlt", {number: 1})}
               src="/profiles/profile4.png"
               size="2xl"
               circle={false}
               className="ml-[-20px]  bg-transparent"
             />
             <Avatar
-              alt="Profile 2"
+              alt={t("profileAlt", {number: 2})}
               src={"/profiles/profile3.png"}
               size="2xl"
               circle={false}
               className="mt-[36px]  bg-transparent"
             />
             <Avatar
-              alt="Profile 3"
+              alt={t("profileAlt", {number: 3})}
               src={"/profiles/profile2.png"}
               size="2xl"
               circle={false}
               className="ml-[-20px]  bg-transparent"
             />
             <Avatar
-              alt="Profile 4"
+              alt={t("profileAlt", {number: 4})}
               src={"/profiles/profile1.png"}
               size="2xl"
               circle={false}
@@ -77,19 +75,16 @@ export default function page() {
             />
           </div>
           <div className="flex flex-col justify-center">
-            <h5 className="uppercase text-[#8A8A8B] mb-6">For Fans</h5>
+            <h5 className="uppercase text-[#8A8A8B] mb-6">{t("forFans")}</h5>
             <div className="flex flex-col gap-4">
-              <SmallCard icon="check" title="Direct Interaction">
-                Engage directly with your favorite influencers, fostering a
-                closer connection and deeper relationship
+              <SmallCard icon="check" title={t("fanDirectTitle")}>
+                {t("fanDirectDescription")}
               </SmallCard>
-              <SmallCard icon="check" title="Support Your Favorites">
-                Show your appreciation and support for the creators you love by
-                gifting them through Pesatone
+              <SmallCard icon="check" title={t("fanSupportTitle")}>
+                {t("fanSupportDescription")}
               </SmallCard>
-              <SmallCard icon="check" title="Exclusive Access ">
-                Gain access to exclusive perks and rewards as a loyal fan of
-                your favorite influencers.
+              <SmallCard icon="check" title={t("fanAccessTitle")}>
+                {t("fanAccessDescription")}
               </SmallCard>
             </div>
           </div>
@@ -97,39 +92,36 @@ export default function page() {
 
         <div className="grid  grid-cols-1 md:grid-cols-2 gap-[18px]  mt-12">
           <div className="flex flex-col justify-center">
-            <h5 className="uppercase text-[#8A8A8B] mb-6">For creators</h5>
+            <h5 className="uppercase text-[#8A8A8B] mb-6">{t("forCreators")}</h5>
             <div className="flex flex-col gap-4">
-              <SmallCard icon="check" title="Monetize Your Passion">
-                Turn your passion into profit by receiving gifts and donations
-                from your loyal fanbase
+              <SmallCard icon="check" title={t("creatorMonetizeTitle")}>
+                {t("creatorMonetizeDescription")}
               </SmallCard>
-              <SmallCard icon="check" title="Direct Fan Engagement">
-                Connect directly with your fans in a meaningful way, building a
-                loyal and supportive community
+              <SmallCard icon="check" title={t("creatorEngageTitle")}>
+                {t("creatorEngageDescription")}
               </SmallCard>
-              <SmallCard icon="check" title="Transparent Earnings">
-                Gain full visibility into your earnings and track your financial
-                progress over time
+              <SmallCard icon="check" title={t("creatorEarningsTitle")}>
+                {t("creatorEarningsDescription")}
               </SmallCard>
             </div>
           </div>
           <div className="grid grid-cols-2 mr-auto lg:mr-0 ml-auto w-fit">
             <Avatar
-              alt="Profile 5"
+              alt={t("profileAlt", {number: 5})}
               src="/profiles/profile5.png"
               size="2xl"
               circle={false}
               className="ml-[-20px] bg-transparent"
             />
             <Avatar
-              alt="Profile 8"
+              alt={t("profileAlt", {number: 8})}
               src={"/profiles/profile8.png"}
               size="2xl"
               circle={false}
               className="mt-[36px]  bg-transparent"
             />
             <Avatar
-              alt="Profile 6"
+              alt={t("profileAlt", {number: 6})}
               src={"/profiles/profile6.png"}
               size="2xl"
               circle={false}
@@ -137,7 +129,7 @@ export default function page() {
             />
 
             <Avatar
-              alt="Profile 7"
+              alt={t("profileAlt", {number: 7})}
               src={"/profiles/profile7.png"}
               size="2xl"
               circle={false}
@@ -156,20 +148,19 @@ export default function page() {
             <Card
               title={
                 <p className="max-w-[374px]">
-                  Give your Audience an easy way to Say thanks.
+                  {t("easyThanksTitle")}
                 </p>
               }
               icon="user"
               className="max-w-full"
             >
-              Create and share your art. Connect with fans. Receive direct
-              gifts.
+              {t("easyThanksDescription")}
             </Card>
           </div>
           <Card
             title={
               <p className="text-[40px] leading-[49px]">
-                Connect, Engage and Earn
+                {t("connectEarn")}
               </p>
             }
           >
@@ -181,7 +172,7 @@ export default function page() {
               className="max-w-full"
               title={
                 <p className="w-full text-center max-w-[277px] text-[30px] mx-auto">
-                  Instantly Send and Receive funds
+                  {t("sendReceive")}
                 </p>
               }
             >
@@ -248,20 +239,19 @@ export default function page() {
             <Card
               title={
                 <p className="max-w-[374px]">
-                  Search and gift your favorite creators
+                  {t("findCreatorsTitle")}
                 </p>
               }
               icon="user"
               className="max-w-full"
             >
-              Follow, engage, and gift your beloved creators. Make a difference
-              today!
+              {t("findCreatorsDescription")}
             </Card>
           </div>
           <Card
             title={
               <p className="text-[40px] leading-[49px]">
-                Gift to your favorite creator
+                {t("giftFavorite")}
               </p>
             }
           >
@@ -273,7 +263,7 @@ export default function page() {
       <section className="lg:pt-24 page-padding">
         <div className="bg-[url('/lines-bg.png')] w-full bg-cover bg-no-repeat row-span-2 bg-transparent min-h-[450px] py-5 rounded-[32px] px-6 flex flex-col gap-[53px] items-center justify-center">
           <h1 className="max-w-[767px] font-mono text-white text-[47px] text-center">
-            Empowering African Influencers, One gift at a Time.
+            {t("closing")}
           </h1>
           <div className="flex flex-wrap gap-6">
             <DownloadApp os="android" className="bg-black border-black" />

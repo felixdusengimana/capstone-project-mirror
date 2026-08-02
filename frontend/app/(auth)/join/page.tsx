@@ -44,8 +44,11 @@ import ImageCropProvider from "@/providers/ImageCropProvider";
 import {
   extractDomainFromURL,
 } from "@/utils/URL";
+import { useTranslations } from "next-intl";
 
 export default function Join() {
+  const t = useTranslations("onboarding");
+  const common = useTranslations("common");
   const STEPS = 5;
   const OTP_LENGTH = 6;
   const router = useRouter();
@@ -86,11 +89,11 @@ export default function Join() {
       queryClient.invalidateQueries({
         queryKey: ["me"],
       });
-      toast.success("Profile updated successfully!", { id: "update-profile" });
+      toast.success(t("profileUpdated"), { id: "update-profile" });
       navigate();
     },
     onError(error) {
-      toast.error(error.message ?? "Profile update failed!", {
+      toast.error(error.message ?? t("profileFailed"), {
         id: "update-profile",
       });
     },
@@ -99,11 +102,11 @@ export default function Join() {
 
   const { mutate: verifyOTP } = useMutation({
     onSuccess() {
-      toast.success("OTP verified successfully!", { id: "update-profile" });
+      toast.success(t("otpVerified"), { id: "update-profile" });
       navigate();
     },
     onError(error) {
-      toast.error(error.message ?? "OTP verification failed!", {
+      toast.error(error.message ?? t("otpFailed"), {
         id: "update-profile",
       });
     },
@@ -113,12 +116,12 @@ export default function Join() {
   const { mutateAsync: updateProfilePicAsync, isPending: isUploadingProfilePic } = useMutation({
     mutationFn: UploadProfileImage,
     onSuccess: () => {
-      toast.success("Profile picture updated successfully", {
+      toast.success(t("pictureUpdated"), {
         id: "update-profile",
       });
     },
     onError: () => {
-      toast.error("Error updating Profile picture", {
+      toast.error(t("pictureFailed"), {
         id: "update-profile",
       });
     },
@@ -183,10 +186,10 @@ export default function Join() {
   const onSubmit = async (data: Partial<ICreateUser>) => {
     if (step === "1") {
       if (!data.otp) {
-        return toast.error("OTP is required!", { id: "update-profile" });
+        return toast.error(t("otpRequired"), { id: "update-profile" });
       }
 
-      toast.loading("Verifying OTP...", { id: "update-profile" });
+      toast.loading(t("verifyingOtp"), { id: "update-profile" });
       verifyOTP({
         otp: data.otp!,
         otpType: EOtpTypes.EMAIL_VERIFICATION,
@@ -196,7 +199,7 @@ export default function Join() {
     }
 
     if (step === "2" && !watch("image") && !user?.data?.profileImageUrl) {
-      return toast.error("Profile image is required to continue", {
+      return toast.error(t("imageRequired"), {
         id: "update-profile",
       });
     }
@@ -205,7 +208,7 @@ export default function Join() {
       return navigate();
     }
 
-    toast.loading("Updating profile...", { id: "update-profile" });
+    toast.loading(t("updating"), { id: "update-profile" });
     if (profilePhoto && step === "2") {
       const profileImageData = new FormData();
       profileImageData.append("image", profilePhoto);
@@ -286,13 +289,10 @@ export default function Join() {
         {step === "1" ? (
           <>
             <h1 className="text-[#374151] text-4xl font-mono mt-[30px]">
-              Verify email{" "}
+              {t("verifyEmail")}
             </h1>
             <p className="text-[#8A8A8B] mt-2">
-              Enter OTP code sent to{" "}
-              <span className="text-gray-700 font-normal">
-                {convertEmail(user?.data.email!)}
-              </span>
+              {t("enterOtp", {email: convertEmail(user?.data.email!)})}
             </p>
             <div className="mt-10">
               <OTPInput
@@ -305,11 +305,10 @@ export default function Join() {
         ) : step === "2" ? (
           <>
             <h1 className="text-[#374151] text-4xl font-mono mt-[30px]">
-              Tell Us About You, Craft Your Identity&quot;
+              {t("identityTitle")}
             </h1>
             <p className="text-[#8A8A8B] mt-2 max-w-[500px]">
-              Complete your to let others know who you are and what you&apos;re
-              passionate about
+              {t("identityDescription")}
             </p>
             <div className="flex flex-col lg:flex-row justify-between gap-10 items-center mt-10">
               <ImageCropProvider>
@@ -330,8 +329,8 @@ export default function Join() {
               </ImageCropProvider>
               <div className="flex flex-col gap-4 flex-grow max-w-[438px]">
                 <Input
-                  label="Your name"
-                  placeholder="Eg: John Doanne"
+                  label={t("yourName")}
+                  placeholder={t("nameExample")}
                   disabled={isPending}
                   error={errors.name?.message}
                   value={watch("name")}
@@ -343,9 +342,9 @@ export default function Join() {
                   }
                 />
                 <TextArea
-                  label="Bio"
+                  label={t("bio")}
                   disabled={isPending}
-                  placeholder="I love to make people laugh"
+                  placeholder={t("bioExample")}
                   value={watch("bio")}
                   error={errors.bio?.message}
                   onChange={(e) =>
@@ -361,11 +360,10 @@ export default function Join() {
         ) : step === "3" ? (
           <>
             <h1 className="text-[#374151] text-4xl font-mono mt-[30px]">
-              Find Your Identity in the Community&quot;
+              {t("tagTitle")}
             </h1>
             <p className="text-[#8A8A8B] mt-2 max-w-[500px]">
-              Personalize your presence by choosing a user tag that resonates
-              with you.
+              {t("tagDescription")}
             </p>
             <Input
               label="PesaTag"
@@ -394,23 +392,23 @@ export default function Join() {
             {!errors.username && debouncedUsername.length >= 3 && (
               <div className="mt-2 text-sm">
                 {checkingUsername ? (
-                  <p className="text-[#8A8A8B]">Checking availability…</p>
+                  <p className="text-[#8A8A8B]">{t("checking")}</p>
                 ) : usernameCheckError ? (
                   <p className="text-[#8A8A8B]">
-                    Couldn&apos;t check availability. Please try again.
+                    {t("checkFailed")}
                   </p>
                 ) : usernameAvailable === true ? (
                   <p className="text-green-600">
-                    @{debouncedUsername} is available
+                    {t("available", {username: debouncedUsername})}
                   </p>
                 ) : usernameAvailable === false ? (
                   <div>
                     <p className="text-red-500">
-                      @{debouncedUsername} is taken
+                      {t("taken", {username: debouncedUsername})}
                     </p>
                     {usernameSuggestions.length > 0 && (
                       <div className="flex flex-wrap gap-2 mt-2 items-center">
-                        <span className="text-[#8A8A8B]">Try:</span>
+                        <span className="text-[#8A8A8B]">{t("try")}</span>
                         {usernameSuggestions.map((s) => (
                           <button
                             key={s}
@@ -436,19 +434,18 @@ export default function Join() {
         ) : step === "4" ? (
           <>
             <h1 className="text-[#374151] text-4xl font-mono mt-[30px]">
-              Discover Your World, Tailored to You&quot;
+              {t("preferencesTitle")}
             </h1>
             <p className="text-[#8A8A8B] mt-2 max-w-[500px]">
-              Let’s personalize your experience based on your country and
-              interests.
+              {t("preferencesDescription")}
             </p>
 
             <Select
               className="mt-12 mb-3"
               disabled={isPending}
               isLoading={isLoadingIndustries}
-              label="Industry"
-              placeholder="Select your industry"
+              label={t("industry")}
+              placeholder={t("selectIndustry")}
               error={errors.industryCode?.message}
               onChange={(e) =>
                 setValue("industryCode", e.target.value, {
@@ -465,9 +462,9 @@ export default function Join() {
               ))}
             </Select>
             <Select
-              label="Country"
+              label={t("country")}
               disabled={isPending}
-              placeholder="Select your country"
+              placeholder={t("selectCountry")}
               error={errors.countryIsoCode?.message}
               isLoading={isLoadingCountries}
               onChange={(e) => {
@@ -496,11 +493,10 @@ export default function Join() {
         ) : step === "5" ? (
           <>
             <h1 className="text-[#374151] text-4xl font-mono mt-[30px]">
-              Share Your World, Connect Your Networks
+              {t("socialTitle")}
             </h1>
             <p className="text-[#8A8A8B] mt-2">
-              Link your social profiles to effortlessly share your journey and
-              connect with friends
+              {t("socialDescription")}
             </p>
             <div className="flex flex-col gap-2 mt-10">
               {watch("socialLinks")?.map((link, index) => {
@@ -518,7 +514,7 @@ export default function Join() {
                         errors?.socialLinks?.message ||
                         errors?.socialLinks?.[index]?.link?.message
                       }
-                      label="Social Media Link"
+                      label={t("socialLink")}
                       className="flex-grow"
                       value={link.link}
                       onChange={(e) => {
@@ -594,7 +590,7 @@ export default function Join() {
               }
               type="button"
             >
-              <Icon name="add" /> <p>Add new link</p>
+              <Icon name="add" /> <p>{t("addLink")}</p>
             </Button>
           </>
         ) : null}
@@ -617,7 +613,7 @@ export default function Join() {
                 }
               }}
             >
-              Back
+              {common("back")}
             </Button>
           )}
         </div>
@@ -632,7 +628,7 @@ export default function Join() {
           }
           className="px-[72px]"
         >
-          Next
+          {common("next")}
         </Button>
       </div>
     </form>

@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { Righteous, Outfit, Inter } from "next/font/google";
 import { Toaster } from "react-hot-toast";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
 import "./globals.css";
 import Provider from "./provider";
+import GlobalLanguageSwitcher from "@/components/molecules/GlobalLanguageSwitcher";
 
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 const righteous = Righteous({
@@ -13,25 +16,30 @@ const righteous = Righteous({
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", weight: "400" });
 
-export const metadata: Metadata = {
-  title: "Pesatone - Search and gift your favorite creators",
-  description:
-    "A place where fans show gratitude to the African content creators they love!",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("metadata");
+  return {title: t("title"), description: t("description")};
+}
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="en">
+    <html lang={locale}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body className={`${outfit.variable} ${inter.variable} ${righteous.variable} font-sans`}>
-        <Toaster />
-        <Provider>{children}</Provider>
+        <NextIntlClientProvider locale={locale} messages={messages} timeZone="Africa/Kigali">
+          <Toaster />
+          <GlobalLanguageSwitcher />
+          <Provider>{children}</Provider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

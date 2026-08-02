@@ -1,7 +1,9 @@
 import Link from "next/link";
 import Icon from "../atoms/Icon";
+import { useTranslations } from "next-intl";
 
 export default function Footer() {
+  const t = useTranslations("navigation");
   return (
     <div className="flex justify-between gap-10 flex-wrap page-padding">
       <div className="flex flex-wrap gap-[55px]">
@@ -9,10 +11,10 @@ export default function Footer() {
           @ {new Date().getFullYear()} Pesatone
         </p>
         <Link href={"/terms-of-use"} className="font-normal text-lg text-[#8A8A8B]">
-          Terms of Use
+          {t("terms")}
         </Link>
         <Link href={"/privacy-policy"} className="font-normal text-lg text-[#8A8A8B]">
-          Privacy Policy
+          {t("privacy")}
         </Link>
       </div>
       <div className="flex  gap-6 items-center">

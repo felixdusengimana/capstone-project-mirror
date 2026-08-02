@@ -1,6 +1,7 @@
 "use client";
 import { ComponentProps, useEffect, useState } from "react";
 import Icon from "../atoms/Icon";
+import { useTranslations } from "next-intl";
 
 interface SearchInputProps extends ComponentProps<"label"> {
   placeholder?: string;
@@ -8,11 +9,12 @@ interface SearchInputProps extends ComponentProps<"label"> {
   onClear?: () => void;
 }
 export default function SearchInput({
-  placeholder = "Search for creators",
+  placeholder,
   onSearch,
   onClear,
   ...props
 }: SearchInputProps) {
+  const t = useTranslations("search");
   const [query, setQuery] = useState("");
 
   // return value after 300ms
@@ -42,7 +44,7 @@ export default function SearchInput({
       <input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t("placeholder")}
         className="w-full text-black text-left placeholder:font-medium placeholder:text-lg placeholder:text-gray-400 bg-transparent outline-none"
       />
     </label>

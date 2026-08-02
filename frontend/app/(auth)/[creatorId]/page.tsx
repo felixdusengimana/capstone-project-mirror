@@ -15,8 +15,12 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { ECurrency, EPaymentProvider } from "@/types";
 import { usePaymentStore } from "@/store/payment";
+import { useLocale, useTranslations } from "next-intl";
 
 export default function SupportCreator() {
+  const t = useTranslations("payment");
+  const common = useTranslations("common");
+  const locale = useLocale();
   const { creatorId } = useParams() as { creatorId: string };
   const {setPaymentDetails} = usePaymentStore();
   // const [successPayment, seSuccessPayment] = useState(false);
@@ -202,7 +206,7 @@ export default function SupportCreator() {
             // add skeleton loader for below content
             <div className="flex flex-col items-center gap-24 h-full p-8 lg:p-0">
               <h1 className="text-[#374151] text-4xl font-mono text-center">
-                Pesatone makes Supporting fun and easy.
+                {t("easySupport")}
               </h1>
               <div className="animate-pulse w-full lg:w-[598px] flex flex-col items-center justify-between gap-10  rounded-2xl border border-gray-200 pt-24 pb-[61px] px-5 md:px-20 relative">
                 <div className="absolute -top-16">
@@ -228,7 +232,7 @@ export default function SupportCreator() {
           ) : !data?.data ? (
             <div className="flex flex-col items-center gap-24 h-full p-8 lg:p-0">
               <h1 className="text-[#374151] text-4xl font-mono text-center">
-                Creator not found
+                {t("creatorUnavailable")}
               </h1>
             </div>
           ) : (
@@ -269,8 +273,8 @@ export default function SupportCreator() {
 
                 <div className="flex flex-col gap-4 w-full">
                   <Input
-                    label="Gift amount"
-                    placeholder="Gift amount"
+                    label={t("giftAmount")}
+                    placeholder={t("giftAmount")}
                     onChange={(e) =>
                       setValue("amount", Number(e.target.value), {
                         shouldValidate: true,
@@ -299,8 +303,8 @@ export default function SupportCreator() {
                   />
 
                   <Input
-                    label="Your name"
-                    placeholder="Your name"
+                    label={t("yourName")}
+                    placeholder={t("yourName")}
                     maxLength={100}
                     value={watch("name")}
                     error={errors.name?.message}
@@ -313,8 +317,8 @@ export default function SupportCreator() {
                   />
 
                   <Input
-                    label="Your email (Optional)"
-                    placeholder="Your email"
+                    label={t("yourEmailOptional")}
+                    placeholder={common("email")}
                     value={watch("email")}
                     error={errors.email?.message}
                     onChange={(e) =>
@@ -326,8 +330,8 @@ export default function SupportCreator() {
                   />
 
                   <TextArea
-                    label="Say something nice"
-                    placeholder="Type something ....."
+                    label={t("saySomething")}
+                    placeholder={t("notePlaceholder")}
                     maxLength={maxChars}
                     error={errors.note?.message}
                     value={watch("note")}
@@ -348,7 +352,7 @@ export default function SupportCreator() {
                   </div>
                 )} */}
                 <Button type="submit" className="w-full">
-                  Gift {watch("amount")?.toLocaleString()} {watch("currency")}
+                  {t("gift", {amount: watch("amount")?.toLocaleString(locale), currency: watch("currency")})}
                 </Button>
               </div>
             </form>

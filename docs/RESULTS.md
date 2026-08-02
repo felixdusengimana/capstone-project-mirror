@@ -10,13 +10,14 @@ Full write-up: see the capstone report. Walkthrough: [demo video](Mission%20Caps
 
 ## 1. How the evaluation was run
 
-Concurrent mixed-methods design, conducted in Kigali and several other Rwandan towns.
-Every participant completed a hands-on prototype walkthrough.
+Exploratory task-based evaluation with structured user feedback, conducted in Kigali
+and several other Rwandan towns. Every participant completed a hands-on prototype
+walkthrough before providing ratings and open feedback.
 
 | Instrument | Participants | Analysis |
 |---|---|---|
-| Semi-structured interviews | 8 Rwandan content creators | Thematic analysis (Braun & Clarke, 2006) |
-| Structured paper questionnaire | 10 supporters (fans) | Descriptive statistics |
+| Creator workflow and structured feedback | 8 Rwandan content creators | Descriptive grouping of feedback and ratings |
+| Supporter workflow and structured feedback | 10 supporters (fans) | Descriptive statistics |
 | Acceptance testing, 4 core tasks | all 18 participants | Task completion, unassisted |
 
 Tasks: register and log in, discover a creator, send a gift, view earnings.
@@ -36,6 +37,7 @@ Tasks: register and log in, discover a creator, send a gift, view earnings.
 | FR-07 | Creators request withdrawals of earnings | Pass | Unit tests (9) + acceptance testing |
 | FR-08 | Email notification on gift received | Pass | Unit test |
 | FR-09 | Admin manages user accounts and content | Pass | Manually verified |
+| FR-10 | English, Kinyarwanda and French frontend | Pass | Catalog tests, type check, production build and browser verification; implemented after user-feedback sessions |
 
 ---
 
@@ -87,19 +89,22 @@ Section 3 above reported what was observed during evaluation. This section analy
 
 ### 4.1 Achievement against stated objectives and requirements
 
-The project defined three specific objectives and six non-functional requirements. The table below assesses each against the evidence actually gathered. The assessment distinguishes three outcomes: targets that were met, targets that were measured and missed, and targets that were never measured and therefore cannot be claimed in either direction.
+The project defined four specific objectives and eight non-functional requirements. The table below assesses each against the evidence actually gathered. The assessment distinguishes targets that were met, targets that were measured and missed, and targets that were never measured and therefore cannot be claimed in either direction.
 
 | Stated target | Outcome | Basis for the assessment |
 |---|---|---|
 | **Objective 1** establish why existing support channels fail in Rwanda | Achieved | 4/8 creators previously excluded; mobile money preferred by 80% of supporters and 62.5% of creators; privacy concerns raised unprompted |
-| **Objective 2** build a platform addressing those failures | Achieved | FR-01 to FR-09 verified; identity protection, discovery, verification and earnings records implemented |
+| **Objective 2** build a platform addressing those failures | Achieved | FR-01 to FR-10 verified; identity protection, discovery, verification, earnings records and frontend localization implemented |
 | **Objective 3** evaluate whether the failures were resolved | Partially achieved | Task completion, ease of use and reuse intent measured; the specified usability instrument was not administered |
+| **Objective 4** internationalize the public frontend | Achieved in software | English, Kinyarwanda and French catalogs, persistence, validation, metadata and locale-aware formatting implemented; fluent review and localized user evaluation remain |
 | NFR-01 TLS 1.3, bcrypt hashing | Met | Implemented and exercised in validation testing |
 | NFR-02 pages load within 3 s | **Not validated** | No load-time instrumentation was ever applied |
 | NFR-03 SUS score of 70+ | **Not met** | SUS never administered; a single general item collected instead |
 | NFR-04 10,000 concurrent users | **Not validated** | No load or stress testing performed |
 | NFR-05 99% uptime | **Not validated** | No monitoring over a defined observation period |
 | NFR-06 RESTful API documented with Swagger | Met | Swagger UI exposed and used in integration testing |
+| NFR-07 localization | Partially validated | Three complete frontend catalogs and automated parity checks implemented; fluent linguistic review remains |
+| NFR-08 accessibility | Partially validated | Responsive layouts, labels and meaningful translated interface text implemented; no dedicated accessibility evaluation |
 | Backend test coverage of 80% | **Not met** | ~24% line coverage measured by JaCoCo |
 | FR-08 notification on gift received | Partially met | Email verified; SMS gateway modelled but never connected |
 
@@ -139,6 +144,7 @@ cd backend && ./mvnw jacoco:report # coverage -> target/site/jacoco/index.html
 cd frontend && pnpm test -- --coverage
 ```
 
-The non-functional targets marked *not validated* above cannot be reproduced, because
-no instrumentation for them exists in this repository. Adding it is the first item of
-future work.
+The localization implementation can be reproduced with the frontend test, type-check,
+lint and build commands documented in the root README. The non-functional targets
+marked *not validated* above cannot be reproduced because no instrumentation exists for
+them; adding it remains future work.

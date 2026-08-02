@@ -40,3 +40,7 @@ next-env.d.ts
 
 # never commit real env
 .env
+
+# internal docs
+/delivarables
+/tmp

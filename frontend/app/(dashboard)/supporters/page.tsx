@@ -1,11 +1,13 @@
 import CreatorSearchModal from "@/components/molecules/CreatorSearchModal";
 import Profile from "@/components/molecules/Profile";
 import React from "react";
+import { getTranslations } from "next-intl/server";
 
-export default function page() {
+export default async function Page() {
+  const t = await getTranslations("dashboard");
   return (
     <div className="min-h-full w-full dashboard-padding text-black pb-10">
-      <h1 className="text-4xl font-sans font-bold text-[#1A1A1A]">Creators</h1>
+      <h1 className="text-4xl font-sans font-bold text-[#1A1A1A]">{t("creators")}</h1>
       <CreatorSearchModal
         className="min-w-[900px] rounded-lg bg-[#fff] text-black"
         placeholderClassName="text-gray-600"
@@ -14,7 +16,7 @@ export default function page() {
 
       <div className="max-w-[900px] bg-white px-[67px] py-[55px] w-full rounded-lg mt-8">
         <p className="font-medium text-4xl text-gray-700 mb-4">
-          Creators you might know
+          {t("suggestedCreators")}
         </p>
 
         <div className="grid grid-cols-2 justify-between  gap-6">
@@ -31,8 +33,7 @@ export default function page() {
                 }}
               />
               <p className="text-gray-500 text-sm mt-2">
-                Embracing life&apos;s twists with joy, powered by curiosity,
-                fueled by creativity.
+                {t("sampleBio")}
               </p>
             </div>
           ))}

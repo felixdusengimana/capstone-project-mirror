@@ -5,8 +5,11 @@ import Logo from "@/components/molecules/Logo";
 import Trusties from "@/components/molecules/Trusties";
 import { useParams } from "next/navigation";
 import { ReactNode, Suspense } from "react";
+import { useTranslations } from "next-intl";
 
 export default function Layout({ children }: { children: ReactNode }) {
+  const t = useTranslations("auth");
+  const common = useTranslations("common");
   const params = useParams() as { creatorId: string };
   const isCreator = Boolean(params.creatorId);
 
@@ -17,17 +20,19 @@ export default function Layout({ children }: { children: ReactNode }) {
           isCreator ? "pt-10 lg:pt-[78px]" : "py-0 pt-20 lg:py-[78px]"
         } px-0 md:px-16 lg:px-[120px] overflow-auto`}
       >
-        <Suspense fallback={<p>Loading...</p>}>{children}</Suspense>
+        <Suspense fallback={<p>{common("loading")}</p>}>{children}</Suspense>
       </div>
       <div className="max-w-[800px] w-[800px] flex-grow overflow-hidden relative hidden md:block">
         {/* texts */}
         <div className="h-full w-full absolute z-20 bg-transparent px-12 py-[78px] flex flex-col justify-between">
-          <div>
+          <div className="absolute left-12 top-[19px]">
             <Logo />
-            <h1 className="mt-20 font-mono text-[64px] text-white leading-[79px]">
+          </div>
+          <div>
+            <h1 className="mt-[120px] font-mono text-[64px] text-white leading-[79px]">
               {isCreator
-                ? "Search and gift your favorite creators"
-                : "Give your audience an easy way to say thanks."}
+                ? t("creatorSideTitle")
+                : t("accountSideTitle")}
             </h1>
           </div>
           <div className="mt-auto">

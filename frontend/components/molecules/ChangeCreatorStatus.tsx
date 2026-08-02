@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ApproveCreator } from "@/services/users";
 import toast from "react-hot-toast";
 import { EApprovalStatus } from "@/types";
+import { useTranslations } from "next-intl";
 
 interface ChangeCreatorStatusProps {
   newStatus: EApprovalStatus;
@@ -19,6 +20,7 @@ export default function ChangeCreatorStatus({
   trigger,
   className,
 }: ChangeCreatorStatusProps) {
+  const t = useTranslations("components");
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
 
@@ -33,9 +35,9 @@ export default function ChangeCreatorStatus({
       queryClient.invalidateQueries({
         queryKey: ["creators"],
       });
-      toast.success("Creator approved");
+      toast.success(t("approve"));
     },
-    onError: () => toast.error("Error approving creator"),
+    onError: () => toast.error(t("genericError")),
   });
 
   const handleClose = () => {
@@ -52,7 +54,7 @@ export default function ChangeCreatorStatus({
         <div className="w-full py-6">
           <div className="flex items-center justify-between px-6">
             <h1 className="text-[#000000] font-medium text-lg ">
-              Change Creator Status
+              {t("changeStatus")}
             </h1>
             <Icon
               name="close"
@@ -64,7 +66,7 @@ export default function ChangeCreatorStatus({
           <div className="bg-[#E5E9F0] h-[1px] w-full my-6"></div>
           <div className="px-6">
             <p className="text-[#4D5E80]">
-              Are you sure you want to {newStatus} this user.{" "}
+              {t("statusConfirm", {status: newStatus === EApprovalStatus.APPROVED ? t("approve") : t("reject")})}
             </p>
             <div className="w-fit ml-auto flex gap-2.5 mt-6">
               <button
@@ -79,7 +81,7 @@ export default function ChangeCreatorStatus({
                 {isPending && (
                   <div className="w-3 h-3 rounded-full border border-t-0 border-gray-200 animate-spin"></div>
                 )}
-                {newStatus === EApprovalStatus.APPROVED ? "Approve" : "Reject"}
+                {newStatus === EApprovalStatus.APPROVED ? t("approve") : t("reject")}
               </button>
 
               <button
@@ -87,7 +89,7 @@ export default function ChangeCreatorStatus({
                 onClick={handleClose}
                 className="bg-gray-50 flex-grow border text-center border-gray-200 text-[#0000008A] font-normal rounded-md px-4 py-2 text-sm"
               >
-                Cancel
+                {t("cancel")}
               </button>
             </div>
           </div>

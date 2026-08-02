@@ -1,5 +1,6 @@
 import Avatar from "../atoms/Avatar";
 import Pill from "../atoms/Pill";
+import { useTranslations } from "next-intl";
 
 interface TransactionProps {
   user: {
@@ -20,6 +21,7 @@ export default function Transaction({
   status,
   className = "bg-white",
 }: TransactionProps) {
+  const t = useTranslations("common");
   return (
     <div
       className={`flex justify-between gap-10 rounded-xl  px-[11px] py-5 ${className}`}
@@ -37,7 +39,7 @@ export default function Transaction({
           {amount.toString()}
         </p>
         <Pill variant={status === "pending" ? "warning" : "success"}>
-          {status === "pending" ? "Pending" : "Success"}
+          {status === "pending" ? t("pending") : t("success")}
         </Pill>
       </div>
     </div>

@@ -3,6 +3,7 @@ import * as OTP from "@frjoy/otp";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useTranslations } from "next-intl";
 
 export default function OTPInput({
   onChange,
@@ -13,13 +14,14 @@ export default function OTPInput({
   error?: string;
   otpType: EOtpTypes;
 }) {
+  const t = useTranslations("components");
   const [countDown, setCountDown] = useState(60);
 
   const { mutate, isPending } = useMutation({
     mutationFn: () => GenerateOTP({ otpType }),
     onSuccess() {
       setCountDown(60);
-      toast.success("OTP sent successfully");
+      toast.success(t("otpSent"));
     },
     onError(error) {
       toast.error(error.message);
@@ -84,7 +86,7 @@ export default function OTPInput({
       {countDown > 0 ? (
         <div className="flex justify-center items-center mt-6">
           <p className="text-sm text-gray-500">
-            Resend OTP in {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
+            {t("resendIn", {time: `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`})}
           </p>
         </div>
       ) : (
@@ -94,7 +96,7 @@ export default function OTPInput({
             type="button"
             className="text-sm text-gray-500 underline hover:text-blue-500"
           >
-            Resend OTP
+            {t("resend")}
           </button>
         </div>
       )}

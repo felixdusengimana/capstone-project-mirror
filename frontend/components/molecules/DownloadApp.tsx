@@ -1,5 +1,6 @@
 import { ComponentProps } from "react";
 import Icon from "../atoms/Icon";
+import { useTranslations } from "next-intl";
 
 interface DownloadAppProps extends ComponentProps<"div"> {
   os: "android" | "ios";
@@ -11,6 +12,7 @@ export default function DownloadApp({
   transparent,
   ...props
 }: DownloadAppProps) {
+  const t = useTranslations("downloads");
   return (
     <div
       {...props}
@@ -23,10 +25,10 @@ export default function DownloadApp({
       <Icon name={os == "android" ? "google-play" : "apple-store"} />
       <div>
         <p className="text-[#DBDBDB] font-medium text-[10px]">
-          {os == "android" ? "Get it On" : "Download on the"}
+          {os == "android" ? t("getItOn") : t("downloadOn")}
         </p>
         <h3 className="text-[#DBDBDB] font-bold text-sm">
-          {os == "android" ? "Google Play" : "App Store"}
+          {os == "android" ? t("googlePlay") : t("appStore")}
         </h3>
       </div>
     </div>

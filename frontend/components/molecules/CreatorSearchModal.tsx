@@ -6,6 +6,7 @@ import Profile from "./Profile";
 import SearchInput from "./SearchInput";
 import Link from "next/link";
 import { useGetCreators } from "@/services/users";
+import { useTranslations } from "next-intl";
 
 interface SearchTriggerProps extends ComponentProps<"div"> {
   placeholder?: string;
@@ -13,12 +14,13 @@ interface SearchTriggerProps extends ComponentProps<"div"> {
   placeholderClassName?: string;
 }
 export function SearchTrigger({
-  placeholder = "Search for creators",
+  placeholder,
   className,
   stroke,
   placeholderClassName = "text-white",
   ...props
 }: SearchTriggerProps) {
+  const t = useTranslations("search");
   return (
     <div
       {...props}
@@ -28,7 +30,7 @@ export function SearchTrigger({
       <p
         className={`w-full text-left bg-transparent font-medium text-lg outline-none ${placeholderClassName}`}
       >
-        {placeholder}
+        {placeholder ?? t("placeholder")}
       </p>
     </div>
   );
@@ -38,6 +40,7 @@ export default function CreatorSearchModal({
   className,
   ...props
 }: SearchTriggerProps) {
+  const t = useTranslations("search");
   const [query, setQuery] = useState("");
   const { data, isLoading } = useGetCreators({ name: query, pageSize: 5 });
   const creators = data?.data.results || [];
@@ -46,7 +49,7 @@ export default function CreatorSearchModal({
     <DialogRoot>
       <DialogTrigger className="w-full">
         <SearchTrigger
-          placeholder="Search for creators"
+          placeholder={t("placeholder")}
           {...props}
           className={`mt-8 ${className}`}
         />
@@ -55,7 +58,7 @@ export default function CreatorSearchModal({
         <SearchInput onSearch={(query) => setQuery(query)} />
         <div className="">
           {isLoading ? (
-            <p className="text-center text-gray-500 py-4">Loading...</p>
+            <p className="text-center text-gray-500 py-4">{t("loading")}</p>
           ) : creators.length > 0 ? (
             creators.map((art, i) => (
               <Link
@@ -74,7 +77,7 @@ export default function CreatorSearchModal({
               </Link>
             ))
           ) : (
-            <p className="text-center text-gray-500 py-4">No results found</p>
+            <p className="text-center text-gray-500 py-4">{t("empty")}</p>
           )}
         </div>
       </Dialog>

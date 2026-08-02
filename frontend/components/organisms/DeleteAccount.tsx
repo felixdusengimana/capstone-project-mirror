@@ -6,12 +6,14 @@ import { DeleteProfileAccount } from "@/services/users";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Input from "../atoms/Input";
+import { useTranslations } from "next-intl";
 
 interface IDeleteAccountProps {
   trigger?: ReactNode;
   pesaTag?: string;
 }
 const DeleteAccount = ({ trigger, pesaTag }: IDeleteAccountProps) => {
+  const t = useTranslations("components");
   const [openModal, setOpenModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pesaTagValue, setPesaTagValue] = useState<string>("");
@@ -20,9 +22,7 @@ const DeleteAccount = ({ trigger, pesaTag }: IDeleteAccountProps) => {
   const { isPending, mutate } = useMutation({
     mutationFn: DeleteProfileAccount,
     onSuccess: () => {
-      toast.success(
-        "Account deleted successfully, We are sorry to see you go!"
-      );
+      toast.success(t("deleteSuccess"));
 
       //   clear cookies
       document.cookie =
@@ -33,23 +33,23 @@ const DeleteAccount = ({ trigger, pesaTag }: IDeleteAccountProps) => {
       router?.replace("/login");
     },
     onError: (error) => {
-      toast.error(error.message ?? "Something went wrong");
+      toast.error(error.message ?? t("genericError"));
     },
   });
 
   return (
     <DialogRoot open={openModal} onOpenChange={setOpenModal}>
       <DialogTrigger>
-        {trigger ?? <Button variant="danger-reverse">Delete my account</Button>}
+        {trigger ?? <Button variant="danger-reverse">{t("deleteMyAccount")}</Button>}
       </DialogTrigger>
       <Dialog className="p-4">
         <form className="flex flex-col gap-5">
-          <p className="text-gray-800 font-bold text-2xl">Delete Account</p>
+          <p className="text-gray-800 font-bold text-2xl">{t("deleteTitle")}</p>
           <p className="text-gray-800">
-            Are you sure you want to delete your account?
+            {t("deleteConfirm")}
           </p>
           <Input
-            placeholder="Enter your PesaTag to confirm"
+            placeholder={t("confirmTag")}
             label="PesaTag"
             value={pesaTagValue}
             onChange={(e) => {
@@ -64,21 +64,21 @@ const DeleteAccount = ({ trigger, pesaTag }: IDeleteAccountProps) => {
               disabled={isPending}
               onClick={() => setOpenModal(false)}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               isLoading={isPending}
               variant="danger"
               onClick={() => {
                 if (pesaTagValue !== pesaTag) {
-                  setError("PesaTag does not match");
+                  setError(t("tagMismatch"));
                   return;
                 }
                 setError("");
                 mutate();
               }}
             >
-              Yes, Delete
+              {t("yesDelete")}
             </Button>
           </div>
         </form>

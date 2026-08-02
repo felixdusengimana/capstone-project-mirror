@@ -100,7 +100,7 @@ Coverage report: `backend/target/site/jacoco/index.html`.
 
 ```bash
 cd frontend
-pnpm install
+pnpm install --frozen-lockfile
 pnpm dev            # http://localhost:3000
 ```
 
@@ -116,6 +116,33 @@ pnpm test -- --coverage   # with coverage (80% gate)
 
 Coverage report: `frontend/coverage/index.html`.
 
+### Frontend localization
+
+The public frontend supports **English (`en`)**, **Kinyarwanda (`rw`)**, and
+**French (`fr`)** through `next-intl` 4.13.4. The language selector stores the
+choice in the `NEXT_LOCALE` cookie, so the selected language remains active when
+the user moves between public, authentication, gifting, dashboard, settings, and
+legal pages. Existing URLs are unchanged.
+
+- Message catalogs: `frontend/messages/en.json`, `rw.json`, and `fr.json`
+- Request configuration: `frontend/i18n/request.ts`
+- Locale and cookie configuration: `frontend/i18n/config.ts`
+- Catalog-parity test: `frontend/i18n/catalogs.test.ts`
+
+When adding or changing interface text, update all three catalogs and run:
+
+```bash
+cd frontend
+pnpm test
+pnpm exec tsc --noEmit
+pnpm lint
+pnpm build
+```
+
+The automated catalog test rejects missing message paths and mismatched
+interpolation variables. Fluent-speaker review is still recommended before
+releasing changes to financial or legal terminology.
+
 ---
 
 ## 3. Admin console (`admin/`)
@@ -125,7 +152,7 @@ collide with the public app:
 
 ```bash
 cd admin
-pnpm install
+pnpm install --frozen-lockfile
 pnpm dev --port 3001      # http://localhost:3001
 ```
 
