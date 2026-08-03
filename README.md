@@ -39,7 +39,7 @@ survey ratings, task-completion percentages, or population-level findings.
 |---|---|
 | Core creator and supporter workflows | Functionally verified |
 | English, Kinyarwanda and French catalogs | Automated parity tests |
-| User feedback | Reported qualitatively, without invented statistics |
+| User feedback | Reported qualitatively |
 | Backend line coverage against an 80% target | ~24% |
 
 ---
