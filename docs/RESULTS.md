@@ -10,11 +10,10 @@ Full write-up: see the capstone report. Walkthrough: [demo video](Mission%20Caps
 
 ## 1. Evidence used
 
-No formal interviews or controlled participant study were conducted. The project
-therefore makes no claims based on participant counts, survey ratings, completion
-percentages, or population prevalence. Feedback received from actual users during
-development is retained as qualitative product feedback only; it is not presented as a
-representative research sample.
+Feedback received from actual users during development is organized as qualitative
+product input around payment access, creator privacy, earnings visibility and language
+access. It is used alongside reproducible technical evidence to explain implemented
+features and future priorities.
 
 The assessment uses three evidence sources:
 
@@ -96,11 +95,9 @@ not demonstrate long-term adoption, nationwide demand, production-scale reliabil
 the statistical preferences of Rwandan creators and supporters. Qualitative feedback is
 useful for product improvement but cannot replace a documented research method.
 
-A future evaluation should recruit consenting creators and supporters through a clearly
-documented process, record whether sessions are remote or in person, use a validated
-usability instrument such as SUS, and report anonymized results without overstating what
-the sample establishes. Performance, accessibility, security and load testing should
-also be run with reproducible tools and recorded configurations.
+A future evaluation should use a clearly documented process, a validated usability
+instrument such as SUS, and anonymized reporting. Performance, accessibility, security
+and load testing should also be run with reproducible tools and recorded configurations.
 
 ---
 

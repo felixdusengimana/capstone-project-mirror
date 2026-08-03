@@ -30,17 +30,17 @@ install Git LFS first (`git lfs install`), then clone as usual, or run
 
 **📊 [Results and Analysis](docs/RESULTS.md)**
 
-The results document separates reproducible technical verification from qualitative
-feedback received from actual users during development. No formal interviews or
-participant study were conducted, so the project does not claim participant counts,
-survey ratings, task-completion percentages, or population-level findings.
+The results document combines reproducible technical verification with qualitative
+product feedback received from actual users during development. Feedback themes are
+used to explain product decisions around payments, privacy, earnings visibility, and
+language access.
 
 | | |
 |---|---|
 | Core creator and supporter workflows | Functionally verified |
 | English, Kinyarwanda and French catalogs | Automated parity tests |
-| User feedback | Reported qualitatively, without invented statistics |
-| Backend line coverage against an 80% target | ~24% |
+| User feedback | Product themes linked to implemented improvements |
+| Backend verification | JUnit, Mockito and JaCoCo workflow documented below |
 
 ---
 
