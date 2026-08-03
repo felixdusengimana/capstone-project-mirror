@@ -41,6 +41,7 @@ language access.
 | English, Kinyarwanda and French catalogs | Automated parity tests |
 | User feedback | Product themes linked to implemented improvements |
 | Backend verification | JUnit, Mockito and JaCoCo workflow documented below |
+| API performance | Reproducible local load-test suite and measured baseline |
 
 ---
 
@@ -281,6 +282,23 @@ docker run --name pesatone-db -e POSTGRES_USER=pesatone \
 
 `admin/` has no test suite yet. Measured coverage and the reasoning behind the
 gap are in [docs/RESULTS.md](docs/RESULTS.md).
+
+### Performance and load test
+
+With the backend and PostgreSQL running, execute the public read-path benchmark:
+
+```bash
+(cd backend && RATE_LIMIT_MAX_REQUESTS=1000000 ./mvnw spring-boot:run)
+# In another terminal:
+AB_BIN=/usr/sbin/ab ./performance/run-load-test.sh
+```
+
+Set `RUN_SUSTAINED=1` to include the 400,000-request scenario. Linux users can omit
+`AB_BIN` when `ab` is installed from `apache2-utils`. See
+[`performance/README.md`](performance/README.md) for configuration, scope and safety
+notes. Actual baseline measurements and their limitations are recorded in
+[`docs/RESULTS.md`](docs/RESULTS.md); they do not establish production capacity or
+support for 10,000 simultaneous users.
 
 ---
 

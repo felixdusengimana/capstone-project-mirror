@@ -72,23 +72,59 @@ goals.
 | Verify that the core workflows function | Achieved for the tested prototype | Automated tests, manual workflow checks and the recorded demonstration |
 | Internationalize the public frontend | Achieved in software | English, Kinyarwanda and French catalogs, persistence and automated parity validation are implemented |
 | TLS and password hashing controls | Implemented | Security configuration and validation checks |
-| Pages load within three seconds | Not validated | No formal performance measurement was conducted |
+| Pages load within three seconds | Not validated | Local API latency was benchmarked, but browser rendering and production network latency were not measured |
 | System Usability Scale score of 70 or higher | Not validated | No formal SUS study was conducted |
-| Support 10,000 concurrent users | Not validated | No load or stress test was conducted |
+| Support 10,000 concurrent users | Not validated | Load tests reached 100 concurrent local clients; that is not evidence of 10,000-user capacity |
 | Maintain 99% uptime | Not validated | No production monitoring period was conducted |
 | REST API documented with Swagger | Met | Swagger interface is available in the backend |
 | Localization | Partially validated | Catalog completeness is automated; fluent linguistic review remains |
 | Accessibility | Partially validated | Responsive layouts and labels are implemented; no dedicated accessibility audit was conducted |
 | Backend test coverage of 80% | Not met | Approximately 24% line coverage was measured with JaCoCo |
 
-The distinction between “not met” and “not validated” is important. Backend coverage
-was measured and fell below its target. Performance, usability, concurrency and uptime
-targets were not formally measured, so the project cannot honestly claim that they
-passed or failed.
+The distinction between “not met,” “partially validated” and “not validated” is
+important. Backend coverage was measured and fell below its target. Local API latency
+was measured, but that evidence does not validate the browser page-load target.
+Usability, 10,000-user concurrency and uptime also remain unverified.
 
 ---
 
-## 5. Limitations and future evaluation
+## 5. Performance and load-test benchmark
+
+On 3 August 2026, the public read paths were tested locally with ApacheBench 2.3 against
+Spring Boot 3.2.4, Java 17.0.19 and PostgreSQL 17.9. The API and database ran on the same
+arm64 macOS 26.5.2 computer over loopback. The database contained the application's
+seeded master records; creator search returned an empty page. The rate-limit ceiling was
+raised only for the benchmark so that throttling did not replace application processing
+as the measured constraint.
+
+| Endpoint and scenario | Requests | Concurrent clients | Failed | Requests/second | Mean latency | p95 | p99 | Maximum |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Health baseline | 2,000 | 25 | 0 | 5,741.24 | 4.354 ms | 9 ms | 39 ms | 91 ms |
+| Industries read path | 2,000 | 25 | 0 | 4,804.16 | 5.204 ms | 15 ms | 31 ms | 120 ms |
+| Creator search | 2,000 | 25 | 0 | 10,280.40 | 2.432 ms | 3 ms | 4 ms | 58 ms |
+| Industries burst | 5,000 | 100 | 0 | 10,501.40 | 9.523 ms | 30 ms | 46 ms | 92 ms |
+| Creator-search burst | 5,000 | 100 | 0 | 18,970.80 | 5.271 ms | 9 ms | 16 ms | 19 ms |
+| Industries sustained run | 400,000 | 100 | 0 | 14,647.16 | 6.827 ms | 15 ms | 34 ms | 177 ms |
+
+All 416,000 measured requests completed without an HTTP transport or response-length
+failure reported by ApacheBench. The sustained industries run lasted 27.309 seconds.
+For these particular local read paths, increasing concurrency from 25 to 100 did not
+push the p95 above 30 ms. This establishes a reproducible development baseline and
+shows that the tested API paths remained responsive under the defined local workload.
+
+The benchmark does not establish production scalability. Loopback removes internet and
+TLS latency; the seeded database is small; the empty creator result makes creator-search
+figures optimistic; and ApacheBench does not model user think time or mixed workflows.
+Payment providers, authentication, writes, callbacks, email and browser rendering were
+excluded. Consequently, the results neither validate 10,000 simultaneous users nor
+prove the full website's three-second page-load objective. Those claims require a
+production-like environment, representative data, mixed read/write scenarios and
+distributed load generation. The suite and reproduction steps are in
+[`performance/`](../performance/README.md).
+
+---
+
+## 6. Limitations and future evaluation
 
 The evidence demonstrates that the prototype and its tested workflows function; it does
 not demonstrate long-term adoption, nationwide demand, production-scale reliability or
@@ -96,12 +132,14 @@ the statistical preferences of Rwandan creators and supporters. Qualitative feed
 useful for product improvement but cannot replace a documented research method.
 
 A future evaluation should use a clearly documented process, a validated usability
-instrument such as SUS, and anonymized reporting. Performance, accessibility, security
-and load testing should also be run with reproducible tools and recorded configurations.
+instrument such as SUS, and anonymized reporting. The load suite should be extended to
+a production-like staging environment with realistic creator and transaction volumes,
+mixed authenticated read/write workflows, external-provider sandboxes, resource
+monitoring and longer soak tests. Accessibility and security audits also remain needed.
 
 ---
 
-## 6. Reproducing the technical checks
+## 7. Reproducing the technical checks
 
 ```bash
 cd backend && ./mvnw test
@@ -110,10 +148,13 @@ cd frontend && pnpm test
 cd frontend && pnpm exec tsc --noEmit
 cd frontend && pnpm lint
 cd frontend && pnpm build
+AB_BIN=/usr/sbin/ab ./performance/run-load-test.sh
+RUN_SUSTAINED=1 AB_BIN=/usr/sbin/ab ./performance/run-load-test.sh
 ```
 
 The JaCoCo report is generated at `backend/target/site/jacoco/index.html`. The frontend
 catalog test verifies that English, Kinyarwanda and French contain matching message keys
-and interpolation variables. Targets marked *not validated* cannot be reproduced from
-the current project because the required formal evaluation or instrumentation was not
-performed.
+and interpolation variables. Start the backend with
+`RATE_LIMIT_MAX_REQUESTS=1000000` before running the benchmark; this is a test setting,
+not a production recommendation. Targets still marked *not validated* require evidence
+beyond the current project instrumentation.
